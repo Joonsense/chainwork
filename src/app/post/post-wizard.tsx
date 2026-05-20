@@ -169,7 +169,10 @@ export function PostWizard({ companies }: { companies: Company[] }) {
       setSubmitting(true);
       setServerError(null);
       const res = await submitJob({ data });
-      if (res.ok) {
+      if (res.ok && res.checkoutUrl) {
+        // Featured slot — hand off to Stripe Checkout.
+        window.location.href = res.checkoutUrl;
+      } else if (res.ok) {
         router.push(`/post/success?slug=${encodeURIComponent(res.slug)}`);
       } else {
         setServerError(res.error);

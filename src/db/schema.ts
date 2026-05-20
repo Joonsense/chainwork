@@ -69,6 +69,9 @@ export const jobs = pgTable(
     ecosystems: jsonb("ecosystems").$type<string[]>().notNull().default([]),
     skills: jsonb("skills").$type<string[]>().notNull().default([]),
     isFeatured: boolean("is_featured").notNull().default(false),
+    /* when a paid Featured slot lapses (P9) — the expiry cron clears
+       is_featured once this passes; null for never-featured rows */
+    featuredUntil: timestamp("featured_until", { withTimezone: true }),
     isSponsored: boolean("is_sponsored").notNull().default(false),
     isVerified: boolean("is_verified").notNull().default(false),
     applyUrl: text("apply_url"), // external careers page
@@ -104,13 +107,21 @@ export const jobAlerts = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     email: text("email").notNull(),
+    /* set when a signed-in user subscribes — powers "your alerts" (P9) */
+    userId: text("user_id").references(() => users.id, {
+      onDelete: "cascade",
+    }),
     query: text("query"), // free-text search the alert watches
     filters: jsonb("filters")
       .$type<Record<string, unknown>>()
       .notNull()
       .default({}),
-    frequency: text("frequency").notNull().default("real-time"), // real-time · daily · weekly
+    frequency: text("frequency").notNull().default("daily"), // realtime · daily · weekly
     channels: jsonb("channels").$type<string[]>().notNull().default(["email"]),
+    /* double opt-in (P9) — `token` powers both confirm and unsubscribe */
+    verified: boolean("verified").notNull().default(false),
+    token: text("token").notNull().unique(),
+    lastSentAt: timestamp("last_sent_at", { withTimezone: true }),
     active: boolean("active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -127,7 +138,9 @@ export const savedJobs = pgTable(
     jobId: uuid("job_id")
       .notNull()
       .references(() => jobs.id, { onDelete: "cascade" }),
-    userId: text("user_id").notNull(), // opaque identifier until auth lands
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -249,6 +262,7 @@ export type NewCompany = typeof companies.$inferInsert;
 export type Job = typeof jobs.$inferSelect;
 export type NewJob = typeof jobs.$inferInsert;
 export type JobAlert = typeof jobAlerts.$inferSelect;
+export type NewJobAlert = typeof jobAlerts.$inferInsert;
 export type SavedJob = typeof savedJobs.$inferSelect;
 export type CandidateProfile = typeof candidateProfiles.$inferSelect;
 export type User = typeof users.$inferSelect;

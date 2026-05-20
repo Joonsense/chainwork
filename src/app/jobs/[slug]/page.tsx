@@ -5,6 +5,7 @@ import { GlassNav } from "@/components/layout/glass-nav";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { JobMarkdown } from "@/components/jobs/job-markdown";
 import { JsonLdCard } from "@/components/jobs/json-ld-card";
+import { SaveButton } from "@/components/jobs/save-button";
 import { StickyApplyBar } from "@/components/jobs/sticky-apply-bar";
 import { getJobBySlug } from "@/db/queries";
 import { formatSalary, relativeTime } from "@/lib/format";
@@ -151,6 +152,9 @@ export default async function JobDetailPage({ params }: Params) {
               <div className="text-[12px] text-text-tertiary">
                 {company.stage} · {company.size} · {job.location}
               </div>
+            </div>
+            <div className="ml-auto shrink-0">
+              <SaveButton slug={job.slug} />
             </div>
           </div>
 

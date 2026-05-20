@@ -16,3 +16,12 @@ function resolveSiteUrl(): string {
 }
 
 export const SITE_URL = resolveSiteUrl();
+
+/**
+ * The origin the app is actually served from — used for absolute links
+ * in emails, Stripe redirect URLs, and alert confirmation links.
+ * `BETTER_AUTH_URL` is the authoritative running-app URL.
+ */
+export const APP_URL = (
+  process.env.BETTER_AUTH_URL ?? "http://localhost:3000"
+).replace(/\/+$/, "");

@@ -80,14 +80,23 @@ export default async function MePage() {
             )}
           </section>
 
-          {/* saved roles — feature lands in P9 */}
+          {/* saved roles */}
           <section className="mt-8">
             <SectionLabel>
               <Bookmark size={12} /> Saved roles
             </SectionLabel>
-            <div className="rounded-2xl border border-dashed border-line px-6 py-10 text-center text-[13px] text-text-tertiary">
-              Saving roles to revisit later arrives in the next release.
-            </div>
+            <Link
+              href="/me/saved"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-subtle bg-surface px-5 py-4 transition-colors hover:border-line"
+            >
+              <span className="text-[13px] text-text-secondary">
+                Roles you bookmarked, in one place.
+              </span>
+              <span className="flex shrink-0 items-center gap-1 text-[13px] font-medium text-text-bright">
+                View saved
+                <ArrowRight size={13} strokeWidth={2.4} />
+              </span>
+            </Link>
           </section>
         </div>
       </main>

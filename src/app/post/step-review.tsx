@@ -78,6 +78,7 @@ function buildPreview(v: PostForm, companies: Company[]): JobWithCompany {
     ecosystems: v.jobEcosystems,
     skills: trimmed(v.skills),
     isFeatured: v.isFeatured,
+    featuredUntil: null,
     isSponsored: false,
     isVerified: company.verified,
     applyUrl: v.applyUrl || null,
@@ -216,7 +217,7 @@ export function StepReview({ companies }: { companies: Company[] }) {
         <ToggleField
           name="isFeatured"
           label="Feature this role — $199 / 2 weeks"
-          description="Pinned to the top of the home page and the /jobs feed. Card payment goes live in P9; as admin you can toggle it on now."
+          description="Pinned to the top of the home page and the /jobs feed for 14 days. Publishing takes you to secure checkout; the role goes live either way."
         />
       </div>
 

@@ -14,7 +14,7 @@ import {
 } from "drizzle-orm";
 import { ECOSYSTEMS } from "@/lib/ecosystems";
 import { db } from "./index";
-import { jobs, companies, type Job, type Company } from "./schema";
+import { jobs, companies, savedJobs, type Job, type Company } from "./schema";
 import {
   type JobFilters,
   LOCATION_OPTIONS,
@@ -84,6 +84,28 @@ export async function getAllJobs(): Promise<JobWithCompany[]> {
 /** All companies, A→Z — the "existing company" picker in the post form. */
 export async function getAllCompanies(): Promise<Company[]> {
   return db.select().from(companies).orderBy(companies.name);
+}
+
+/** Slugs of the roles a user has saved — drives the bookmark state. */
+export async function getSavedJobSlugs(userId: string): Promise<string[]> {
+  const rows = await db
+    .select({ slug: jobs.slug })
+    .from(savedJobs)
+    .innerJoin(jobs, eq(savedJobs.jobId, jobs.id))
+    .where(eq(savedJobs.userId, userId));
+  return rows.map((r) => r.slug);
+}
+
+/** A user's saved roles, most-recently-saved first — the /me/saved list. */
+export async function getSavedJobs(userId: string): Promise<JobWithCompany[]> {
+  const rows = await db
+    .select()
+    .from(savedJobs)
+    .innerJoin(jobs, eq(savedJobs.jobId, jobs.id))
+    .innerJoin(companies, eq(jobs.companyId, companies.id))
+    .where(eq(savedJobs.userId, userId))
+    .orderBy(desc(savedJobs.createdAt));
+  return rows.map((r) => ({ ...r.jobs, company: r.companies }));
 }
 
 /** Roles posted by a given signed-in user — the /me "your roles" list. */
@@ -197,6 +219,22 @@ export async function searchJobs(
     jobs: rows.map((r) => ({ ...r.jobs, company: r.companies })),
     total: tot?.value ?? 0,
   };
+}
+
+/** Jobs matching an alert's filters, posted after `since` — newest first. */
+export async function getMatchingJobsSince(
+  f: JobFilters,
+  since: Date | null,
+): Promise<JobWithCompany[]> {
+  const conds = buildConditions(f);
+  if (since) conds.push(gte(jobs.postedAt, since));
+  const rows = await db
+    .select()
+    .from(jobs)
+    .innerJoin(companies, eq(jobs.companyId, companies.id))
+    .where(and(...conds))
+    .orderBy(desc(jobs.postedAt));
+  return rows.map((r) => ({ ...r.jobs, company: r.companies }));
 }
 
 export type FacetCounts = {

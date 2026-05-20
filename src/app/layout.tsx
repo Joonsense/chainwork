@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 import { CommandPalette } from "@/components/command-palette";
+import { SavedJobsProvider } from "@/components/jobs/saved-jobs-provider";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -36,7 +37,9 @@ export default function RootLayout({
     /* dark-only: the `dark` class is forced, there is no theme toggle. */
     <html lang="en" className={`dark ${inter.variable} ${jetBrainsMono.variable}`}>
       <body className="bg-base text-text-primary font-sans antialiased">
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <SavedJobsProvider>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </SavedJobsProvider>
         <CommandPalette />
         <Toaster theme="dark" position="top-center" richColors />
       </body>

@@ -6,12 +6,16 @@ import {
   SkillTag,
   SponsoredBadge,
 } from "@/components/ui/job-pills";
+import { SaveButton } from "@/components/jobs/save-button";
 import { relativeTime, firstParagraph } from "@/lib/format";
 import type { JobWithCompany } from "@/db/queries";
 
 /**
  * Latest-feed row. Compensation-first hierarchy. Below sm the right-hand
  * apply column drops into a footer so the row never overflows at 390px.
+ *
+ * A stretched link makes the whole row navigable while the bookmark
+ * button stays independently clickable (`relative z-10`).
  */
 export function ListRow({
   job,
@@ -22,10 +26,12 @@ export function ListRow({
 }) {
   const { company } = job;
   return (
-    <a
-      href={`/jobs/${job.slug}`}
-      className="group block px-4 py-4 transition-colors hover:bg-glass sm:px-[18px]"
-    >
+    <div className="group relative block px-4 py-4 transition-colors hover:bg-glass sm:px-[18px]">
+      <a
+        href={`/jobs/${job.slug}`}
+        aria-label={job.title}
+        className="absolute inset-0 z-0"
+      />
       <div className="flex gap-3.5 sm:gap-4">
         {/* logo */}
         <span
@@ -37,18 +43,17 @@ export function ListRow({
 
         {/* body */}
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-          {/* top meta — comp + location + type */}
+          {/* top meta — comp + location + type + bookmark */}
           <div className="flex flex-wrap items-center gap-1.5">
             <SalaryPill min={job.salaryMin} max={job.salaryMax} size="sm" />
             <LocationPill location={job.location} size="sm" />
             <span className="text-[11.5px] text-text-tertiary">
               {job.employmentType}
             </span>
-            {job.isSponsored && (
-              <span className="ml-auto">
-                <SponsoredBadge />
-              </span>
-            )}
+            <span className="ml-auto flex items-center gap-1.5">
+              {job.isSponsored && <SponsoredBadge />}
+              <SaveButton slug={job.slug} size="sm" />
+            </span>
           </div>
 
           {/* title */}
@@ -116,6 +121,6 @@ export function ListRow({
           <ArrowRight size={11} strokeWidth={2.4} />
         </span>
       </div>
-    </a>
+    </div>
   );
 }

@@ -1,12 +1,14 @@
 import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { SalaryPill, LocationPill, SkillTag } from "@/components/ui/job-pills";
+import { SaveButton } from "@/components/jobs/save-button";
 import { relativeTime, firstParagraph } from "@/lib/format";
 import type { JobWithCompany } from "@/db/queries";
 
 /**
  * Featured job card — the large "High-signal roles" slot.
- * `accent` adds the animated conic border to the lead card.
+ * `accent` adds the animated conic border to the lead card. A stretched
+ * link keeps the whole card clickable beneath the bookmark button.
  */
 export function FeaturedCard({
   job,
@@ -17,12 +19,17 @@ export function FeaturedCard({
 }) {
   const { company } = job;
   return (
-    <a
-      href={`/jobs/${job.slug}`}
-      className={`cw-card cw-card-glow flex h-full flex-col gap-3.5 rounded-2xl p-5 ${
+    <div
+      className={`cw-card cw-card-glow relative flex h-full flex-col gap-3.5 rounded-2xl p-5 ${
         accent ? "cw-bordered" : ""
       }`}
     >
+      <a
+        href={`/jobs/${job.slug}`}
+        aria-label={job.title}
+        className="absolute inset-0 z-0 rounded-2xl"
+      />
+
       {/* company header */}
       <div className="flex items-start justify-between gap-2.5">
         <div className="flex items-center gap-2.5">
@@ -44,10 +51,13 @@ export function FeaturedCard({
             </div>
           </div>
         </div>
-        <span className="flex shrink-0 items-center gap-1 rounded-[5px] border border-accent-purple/40 bg-accent-purple/15 px-1.5 py-0.5 font-mono text-[9px] text-accent-purple">
-          <Sparkles size={9} strokeWidth={0} className="fill-current" />
-          featured
-        </span>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="flex items-center gap-1 rounded-[5px] border border-accent-purple/40 bg-accent-purple/15 px-1.5 py-0.5 font-mono text-[9px] text-accent-purple">
+            <Sparkles size={9} strokeWidth={0} className="fill-current" />
+            featured
+          </span>
+          <SaveButton slug={job.slug} size="sm" />
+        </div>
       </div>
 
       {/* title */}
@@ -71,9 +81,7 @@ export function FeaturedCard({
         {job.skills.slice(0, 3).map((s) => (
           <SkillTag key={s}>{s}</SkillTag>
         ))}
-        {job.ecosystems.length > 0 && (
-          <span className="mx-1 h-3 w-px bg-line" />
-        )}
+        {job.ecosystems.length > 0 && <span className="mx-1 h-3 w-px bg-line" />}
         {job.ecosystems.map((e) => (
           <EcoBadge key={e} ecosystem={e} />
         ))}
@@ -89,6 +97,6 @@ export function FeaturedCard({
           <ArrowRight size={11} strokeWidth={2.4} />
         </span>
       </div>
-    </a>
+    </div>
   );
 }

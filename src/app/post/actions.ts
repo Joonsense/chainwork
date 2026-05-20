@@ -1,16 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { eq } from "drizzle-orm";
-import { db, companies, jobs } from "@/db";
+import { db, companies, jobs, type Company } from "@/db";
 import { postFormSchema, resolveLocation } from "@/lib/post-schema";
 import { buildJobPostingJsonLd } from "@/lib/job-json-ld";
 import { firstParagraph } from "@/lib/format";
 import { slugify } from "@/lib/utils";
 import { getServerSession } from "@/lib/auth";
+import { APP_URL } from "@/lib/site";
+import { stripe, stripeEnabled, FEATURED_PRICE_CENTS } from "@/lib/stripe";
+import { sendRealtimeAlertsForJob } from "@/lib/alerts";
+import type { JobWithCompany } from "@/db/queries";
 
 export type SubmitResult =
-  | { ok: true; slug: string }
+  | { ok: true; slug: string; checkoutUrl?: string }
   | { ok: false; error: string };
 
 const cleanList = (rows: { value: string }[]): string[] =>
@@ -31,18 +36,48 @@ async function uniqueJobSlug(base: string): Promise<string> {
   }
 }
 
+/** Stripe Checkout for a Featured slot — $199, charged before the slot is granted. */
+async function createFeaturedCheckout(job: {
+  id: string;
+  slug: string;
+  title: string;
+}): Promise<string> {
+  const checkout = await stripe!.checkout.sessions.create({
+    mode: "payment",
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: "usd",
+          unit_amount: FEATURED_PRICE_CENTS,
+          product_data: {
+            name: "Featured role slot — 2 weeks",
+            description: job.title,
+          },
+        },
+      },
+    ],
+    metadata: { jobId: job.id, kind: "featured" },
+    success_url: `${APP_URL}/post/success?slug=${job.slug}&featured=paid`,
+    cancel_url: `${APP_URL}/post/success?slug=${job.slug}&featured=cancelled`,
+  });
+  if (!checkout.url) throw new Error("Stripe did not return a checkout URL");
+  return checkout.url;
+}
+
 /**
  * Inserts a job (and its company, if new) from the /post wizard.
  *
- * Admin-gated: the caller passes the same token the page was opened with,
- * and it is re-checked here — server actions are public POST endpoints, so
- * the page-level gate alone is not enough. Real auth lands in P8.
+ * The session is re-checked here — server actions are public POST
+ * endpoints, so the page guard alone is not enough.
+ *
+ * Featured: with Stripe wired, the job is saved un-featured and the
+ * caller is sent to Checkout; the webhook flips `is_featured` on payment.
+ * Without Stripe, the slot is granted directly (dev fallback).
  */
 export async function submitJob(args: {
   data: unknown;
 }): Promise<SubmitResult> {
-  // Re-check the session — server actions are public POST endpoints, so
-  // the page-level guard alone is not enough.
   const session = await getServerSession();
   if (!session) {
     return { ok: false, error: "You must be signed in to post a role." };
@@ -62,6 +97,7 @@ export async function submitJob(args: {
     let companyName: string;
     let companyWebsite: string | null;
     let companyVerified: boolean;
+    let company: Company;
 
     if (f.companyMode === "existing") {
       const [existing] = await db
@@ -72,6 +108,7 @@ export async function submitJob(args: {
       if (!existing) {
         return { ok: false, error: "That company no longer exists." };
       }
+      company = existing;
       companyId = existing.id;
       companySlug = existing.slug;
       companyName = existing.name;
@@ -106,6 +143,7 @@ export async function submitJob(args: {
           verified: false,
         })
         .returning();
+      company = created;
       companyId = created.id;
       companySlug = created.slug;
       companyName = created.name;
@@ -122,6 +160,10 @@ export async function submitJob(args: {
     const title = f.title.trim();
     const descriptionMd = f.descriptionMd.trim();
 
+    // Featured: pay-then-grant when Stripe is wired; granted now otherwise.
+    const wantsFeatured = f.isFeatured;
+    const grantNow = wantsFeatured && !stripeEnabled;
+
     const jsonLd = buildJobPostingJsonLd({
       title,
       descriptionMd,
@@ -135,39 +177,64 @@ export async function submitJob(args: {
       company: { name: companyName, website: companyWebsite },
     });
 
-    await db.insert(jobs).values({
-      slug,
-      companyId,
-      postedBy: session.user.id,
-      title,
-      descriptionMd,
-      responsibilities: cleanList(f.responsibilities),
-      requirements: cleanList(f.requirements),
-      niceToHave: cleanList(f.niceToHave),
-      oneLiner: firstParagraph(descriptionMd).slice(0, 160),
-      roleCategory: f.roleCategory,
-      seniority: f.seniority,
-      employmentType: f.employmentType,
-      location,
-      remoteScope,
-      salaryMin,
-      salaryMax,
-      salaryCurrency: f.salaryCurrency,
-      hasTokenEquity: f.hasTokenEquity,
-      ecosystems: f.jobEcosystems,
-      skills: cleanList(f.skills),
-      isFeatured: f.isFeatured,
-      isSponsored: false,
-      isVerified: companyVerified,
-      applyUrl: f.applyUrl.trim() || null,
-      applyEmail: f.applyEmail.trim() || null,
-      jsonLd,
-      postedAt,
+    const [inserted] = await db
+      .insert(jobs)
+      .values({
+        slug,
+        companyId,
+        postedBy: session.user.id,
+        title,
+        descriptionMd,
+        responsibilities: cleanList(f.responsibilities),
+        requirements: cleanList(f.requirements),
+        niceToHave: cleanList(f.niceToHave),
+        oneLiner: firstParagraph(descriptionMd).slice(0, 160),
+        roleCategory: f.roleCategory,
+        seniority: f.seniority,
+        employmentType: f.employmentType,
+        location,
+        remoteScope,
+        salaryMin,
+        salaryMax,
+        salaryCurrency: f.salaryCurrency,
+        hasTokenEquity: f.hasTokenEquity,
+        ecosystems: f.jobEcosystems,
+        skills: cleanList(f.skills),
+        isFeatured: grantNow,
+        featuredUntil: grantNow
+          ? new Date(Date.now() + 14 * 86_400_000)
+          : null,
+        isSponsored: false,
+        isVerified: companyVerified,
+        applyUrl: f.applyUrl.trim() || null,
+        applyEmail: f.applyEmail.trim() || null,
+        jsonLd,
+        postedAt,
+      })
+      .returning();
+
+    // Realtime job alerts — fire after the response so the user is not
+    // blocked on email delivery.
+    after(async () => {
+      await sendRealtimeAlertsForJob({
+        ...inserted,
+        company,
+      } as JobWithCompany);
     });
 
-    // Home and /jobs are force-dynamic, but revalidate is correct intent.
     revalidatePath("/");
     revalidatePath("/jobs");
+
+    // Paid Featured path → hand off to Stripe Checkout.
+    if (wantsFeatured && stripeEnabled) {
+      const checkoutUrl = await createFeaturedCheckout({
+        id: inserted.id,
+        slug,
+        title,
+      });
+      return { ok: true, slug, checkoutUrl };
+    }
+
     return { ok: true, slug };
   } catch (err) {
     console.error("submitJob failed:", err);
