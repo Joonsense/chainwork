@@ -1,0 +1,48 @@
+/* ============================================================
+ * Chainwork — Design tokens (dark-native v2)
+ * Spec §2.1 — color system.
+ * Raw values live here as CSS custom properties; tailwind.config.ts
+ * maps them to utilities (bg-base, text-text-primary, border-subtle …).
+ * The app is dark-only — these are defined once on :root.
+ * ============================================================ */
+
+:root {
+  /* ── Surfaces — near-black, layered ─────────────────────── */
+  --cw-base: #08080b; /* page background */
+  --cw-surface: #0c0c10; /* cards, panels */
+  --cw-surface-2: #111116; /* raised surface */
+  --cw-surface-3: #16161d; /* hover / active surface */
+  --cw-elevated: #1c1c25; /* popovers, menus */
+
+  /* ── Glass — translucent fills over surfaces ────────────── */
+  --cw-glass: rgba(255, 255, 255, 0.03);
+  --cw-glass-hi: rgba(255, 255, 255, 0.06);
+
+  /* ── Borders — hairlines, three weights ─────────────────── */
+  --cw-border-subtle: rgba(255, 255, 255, 0.06);
+  --cw-border-line: rgba(255, 255, 255, 0.1);
+  --cw-border-strong: rgba(255, 255, 255, 0.14);
+
+  /* ── Text — primary ink + opacity ramp ──────────────────── */
+  --cw-text-primary: #f5f5f7; /* headings, key text */
+  --cw-text-bright: #ededf0; /* emphasised body */
+  --cw-text-secondary: rgba(245, 245, 247, 0.62); /* body */
+  --cw-text-tertiary: rgba(245, 245, 247, 0.42); /* meta, labels */
+  --cw-text-muted: rgba(245, 245, 247, 0.26); /* disabled, faint */
+
+  /* ── Accents — oklch, vivid on dark ─────────────────────── */
+  --cw-accent-blue: oklch(0.72 0.16 250);
+  --cw-accent-blue-deep: oklch(0.62 0.18 250);
+  --cw-accent-purple: oklch(0.68 0.2 295);
+  --cw-accent-cyan: oklch(0.82 0.13 200);
+  --cw-accent-green: oklch(0.78 0.16 155);
+  --cw-accent-amber: oklch(0.78 0.16 75);
+  --cw-accent-pink: oklch(0.72 0.22 350);
+
+  /* ── Brand gradient ─────────────────────────────────────── */
+  --cw-gradient-brand: linear-gradient(
+    135deg,
+    oklch(0.72 0.16 250) 0%,
+    oklch(0.68 0.22 295) 100%
+  );
+}
