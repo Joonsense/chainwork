@@ -7,10 +7,12 @@ import {
   count,
   gte,
   lte,
+  ilike,
   inArray,
   sql,
   type SQL,
 } from "drizzle-orm";
+import { ECOSYSTEMS } from "@/lib/ecosystems";
 import { db } from "./index";
 import { jobs, companies, type Job, type Company } from "./schema";
 import {
@@ -256,5 +258,123 @@ export async function getFacetCounts(f: JobFilters): Promise<FacetCounts> {
         return opt ? opt.value : [];
       },
     ),
+  };
+}
+
+/* ── Command palette search (P5) ────────────────────────────── */
+
+export type PaletteJob = {
+  slug: string;
+  title: string;
+  company: string;
+  logoText: string;
+  logoBg: string;
+  logoFg: string;
+  location: string;
+  salaryMin: number;
+  salaryMax: number;
+  applyUrl: string | null;
+  applyEmail: string | null;
+};
+
+export type PaletteCompany = {
+  slug: string;
+  name: string;
+  logoText: string;
+  logoBg: string;
+  logoFg: string;
+  stage: string | null;
+  size: string | null;
+  focus: string | null;
+};
+
+export type PaletteResult = {
+  jobs: PaletteJob[];
+  jobsTotal: number;
+  companies: PaletteCompany[];
+  companiesTotal: number;
+  ecosystems: { key: string; label: string; count: number }[];
+};
+
+/** Powers /api/search — top jobs, matching companies, inferred ecosystems. */
+export async function searchPalette(q: string): Promise<PaletteResult> {
+  const term = q.trim();
+  if (!term) {
+    return {
+      jobs: [],
+      jobsTotal: 0,
+      companies: [],
+      companiesTotal: 0,
+      ecosystems: [],
+    };
+  }
+
+  const jobRows = await db
+    .select({
+      slug: jobs.slug,
+      title: jobs.title,
+      ecosystems: jobs.ecosystems,
+      location: jobs.location,
+      salaryMin: jobs.salaryMin,
+      salaryMax: jobs.salaryMax,
+      applyUrl: jobs.applyUrl,
+      applyEmail: jobs.applyEmail,
+      company: companies.name,
+      logoText: companies.logoText,
+      logoBg: companies.logoBg,
+      logoFg: companies.logoFg,
+    })
+    .from(jobs)
+    .innerJoin(companies, eq(jobs.companyId, companies.id))
+    .where(ftsCondition(term))
+    .orderBy(desc(jobs.postedAt));
+
+  // Infer ecosystems — the top ecosystems among the matched roles.
+  const ecoTally: Record<string, number> = {};
+  for (const r of jobRows) {
+    for (const e of r.ecosystems) ecoTally[e] = (ecoTally[e] ?? 0) + 1;
+  }
+  const ecosystems = Object.entries(ecoTally)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([key, count]) => ({
+      key,
+      label: ECOSYSTEMS[key]?.label ?? key.toUpperCase(),
+      count,
+    }));
+
+  const companyRows = await db
+    .select({
+      slug: companies.slug,
+      name: companies.name,
+      logoText: companies.logoText,
+      logoBg: companies.logoBg,
+      logoFg: companies.logoFg,
+      stage: companies.stage,
+      size: companies.size,
+      focus: companies.focus,
+    })
+    .from(companies)
+    .where(ilike(companies.name, `%${term}%`))
+    .orderBy(companies.name);
+
+  return {
+    jobs: jobRows.slice(0, 5).map((r) => ({
+      slug: r.slug,
+      title: r.title,
+      company: r.company,
+      logoText: r.logoText,
+      logoBg: r.logoBg,
+      logoFg: r.logoFg,
+      location: r.location,
+      salaryMin: r.salaryMin,
+      salaryMax: r.salaryMax,
+      applyUrl: r.applyUrl,
+      applyEmail: r.applyEmail,
+    })),
+    jobsTotal: jobRows.length,
+    companies: companyRows.slice(0, 3),
+    companiesTotal: companyRows.length,
+    ecosystems,
   };
 }

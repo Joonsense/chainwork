@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import { CommandTrigger } from "@/components/command-trigger";
 
 const TRY_CHIPS = [
   "Solana Rust",
@@ -68,30 +69,52 @@ export function Hero({
 
         {/* search box */}
         <div className="mx-auto mt-7 max-w-[680px]">
-          <div className="cw-glass cw-bordered flex items-center gap-3 rounded-2xl p-3.5">
+          {/* desktop — opens the command palette */}
+          <CommandTrigger
+            ariaLabel="Search roles, skills, and companies"
+            className="cw-glass cw-bordered hidden w-full items-center gap-3 rounded-2xl p-3.5 text-left md:flex"
+          >
             <Search size={18} className="shrink-0 text-text-tertiary" />
-            <input
-              type="text"
-              placeholder="senior rust"
-              aria-label="Search roles, skills, and companies"
-              className="min-w-0 flex-1 bg-transparent text-left text-[15px] text-text-primary outline-none placeholder:text-text-tertiary"
-            />
-            <kbd className="hidden h-[22px] min-w-[22px] items-center justify-center rounded-md border border-line bg-glass-hi px-1.5 font-mono text-[11px] text-text-secondary sm:inline-flex">
+            <span className="flex-1 text-[15px] text-text-tertiary">
+              Search roles · skills · companies…
+            </span>
+            <kbd className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-md border border-line bg-glass-hi px-1.5 font-mono text-[11px] text-text-secondary">
               ⌘K
             </kbd>
-          </div>
+          </CommandTrigger>
+
+          {/* mobile — falls back to a normal search */}
+          <form
+            action="/jobs"
+            className="cw-glass flex items-center gap-2 rounded-xl p-2 md:hidden"
+          >
+            <Search size={16} className="ml-1.5 shrink-0 text-text-tertiary" />
+            <input
+              name="q"
+              type="search"
+              placeholder="senior rust"
+              aria-label="Search roles, skills, and companies"
+              className="min-w-0 flex-1 bg-transparent text-[14px] text-text-primary outline-none placeholder:text-text-tertiary"
+            />
+            <button
+              type="submit"
+              className="cw-apply h-8 shrink-0 px-3.5 text-[12px]"
+            >
+              Search
+            </button>
+          </form>
 
           {/* try chips */}
           <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
             <span className="text-[11px] text-text-tertiary">Try:</span>
             {TRY_CHIPS.map((chip) => (
-              <button
+              <a
                 key={chip}
-                type="button"
+                href={`/jobs?q=${encodeURIComponent(chip)}`}
                 className="rounded-[5px] border border-line bg-glass-hi px-2 py-[3px] font-mono text-[11px] text-text-bright transition-colors hover:border-strong hover:text-text-primary"
               >
                 {chip}
-              </button>
+              </a>
             ))}
           </div>
         </div>

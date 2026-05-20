@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Search, Bookmark, Menu } from "lucide-react";
 import { BrandLogo } from "@/components/ui/brand-logo";
+import { CommandTrigger } from "@/components/command-trigger";
 
 /* Center nav links. `lgOnly` ones are hidden on the 768–1024 range so the
    bar never overflows; they rejoin at lg. */
@@ -56,22 +57,18 @@ export function GlassNav() {
           </div>
 
           <div className="flex items-center gap-2">
-            <form
-              action="/jobs"
-              className="flex h-[30px] items-center gap-2 rounded-lg border border-subtle bg-glass px-2.5 transition-colors focus-within:border-line"
+            <CommandTrigger
+              ariaLabel="Search roles, skills, and companies"
+              className="flex h-[30px] items-center gap-2 rounded-lg border border-subtle bg-glass px-2.5 text-text-tertiary transition-colors hover:border-line hover:text-text-secondary"
             >
-              <Search size={13} className="shrink-0 text-text-tertiary" />
-              <input
-                name="q"
-                type="search"
-                placeholder="Search roles, skills…"
-                aria-label="Search roles, skills, and companies"
-                className="w-[88px] bg-transparent text-[12px] text-text-primary outline-none placeholder:text-text-tertiary lg:w-[160px] xl:w-[220px]"
-              />
-              <kbd className="hidden h-[18px] min-w-[18px] items-center justify-center rounded border border-line bg-glass-hi px-1 font-mono text-[10px] text-text-secondary sm:inline-flex">
+              <Search size={13} className="shrink-0" />
+              <span className="hidden text-[12px] lg:inline">
+                Search roles, skills…
+              </span>
+              <kbd className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded border border-line bg-glass-hi px-1 font-mono text-[10px] text-text-secondary">
                 ⌘K
               </kbd>
-            </form>
+            </CommandTrigger>
             <button
               type="button"
               className="h-[30px] rounded-lg border border-subtle bg-glass px-3 text-[13px] font-medium text-text-bright transition-colors hover:border-line"
