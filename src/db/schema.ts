@@ -30,6 +30,8 @@ export const companies = pgTable("companies", {
   stage: text("stage"), // Seed, Series A/B, Bootstrapped …
   size: text("size"), // employee range, e.g. "60–120"
   focus: text("focus"), // one-line description of what they build
+  hq: text("hq"), // headquarters / base location, e.g. "Remote-first"
+  ecosystems: jsonb("ecosystems").$type<string[]>().notNull().default([]),
   website: text("website"),
   verified: boolean("verified").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })

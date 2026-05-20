@@ -81,6 +81,11 @@ export async function getAllJobs(): Promise<JobWithCompany[]> {
   return rows.map((r) => ({ ...r.jobs, company: r.companies }));
 }
 
+/** All companies, A→Z — the "existing company" picker in the post form. */
+export async function getAllCompanies(): Promise<Company[]> {
+  return db.select().from(companies).orderBy(companies.name);
+}
+
 /** Live counts + freshest index time for the hero counter. */
 export async function getHomeStats(): Promise<{
   jobs: number;
