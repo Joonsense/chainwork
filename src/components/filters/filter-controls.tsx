@@ -105,11 +105,17 @@ export function FilterReset() {
   );
 }
 
-export function SortControl() {
+export function SortControl({
+  matchAvailable = false,
+}: {
+  matchAvailable?: boolean;
+}) {
   const [sort, setSort] = useQueryState("sort", jobsSearchParams.sort);
   const options = [
     { value: "newest" as const, label: "Newest" },
     { value: "salary" as const, label: "Salary" },
+    // "Fit" only when the user is signed in with an indexed profile.
+    ...(matchAvailable ? [{ value: "fit" as const, label: "Fit" }] : []),
   ];
 
   return (

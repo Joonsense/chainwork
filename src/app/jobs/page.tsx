@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Sparkles, SearchX } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
 import { SidePanels } from "@/components/home/side-panels";
@@ -10,8 +11,16 @@ import { MobileFilterSheet } from "@/components/filters/mobile-filter-sheet";
 import { ActiveFilters } from "@/components/filters/active-filters";
 import { SortControl } from "@/components/filters/filter-controls";
 import { JobFeed } from "@/components/jobs/job-feed";
-import { searchJobs, getFacetCounts } from "@/db/queries";
+import { AiMatchPanel } from "@/components/jobs/ai-match-panel";
+import {
+  searchJobs,
+  getFacetCounts,
+  type JobWithCompany,
+} from "@/db/queries";
 import { loadJobsSearchParams, type JobFilters } from "@/lib/jobs-search-params";
+import { getServerSession } from "@/lib/auth";
+import { getStoredProfile } from "@/lib/profile-index";
+import { rankMatches } from "@/lib/matching";
 
 export const dynamic = "force-dynamic";
 
@@ -46,10 +55,27 @@ export default async function JobsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = (await loadJobsSearchParams(searchParams)) as JobFilters;
-  const [result, facets] = await Promise.all([
-    searchJobs(sp, { limit: 20, offset: 0 }),
+
+  // AI-match profile (P10) — drives the "Fit" sort + the match panel.
+  const session = await getServerSession();
+  const matchProfile = session
+    ? await getStoredProfile(session.user.id)
+    : null;
+  const fitSort = sp.sort === "fit" && matchProfile !== null;
+
+  const [searchResult, facets] = await Promise.all([
+    searchJobs(sp, { limit: fitSort ? 1000 : 20, offset: 0 }),
     getFacetCounts(sp),
   ]);
+
+  // "Fit" can't be ordered in SQL — rank the full result set in memory.
+  let result: { jobs: JobWithCompany[]; total: number } = searchResult;
+  if (fitSort && matchProfile) {
+    result = {
+      jobs: rankMatches(searchResult.jobs, matchProfile).map((r) => r.job),
+      total: searchResult.total,
+    };
+  }
   const filterKey = JSON.stringify(sp);
 
   return (
@@ -76,14 +102,16 @@ export default async function JobsPage({
                 <MobileFilterSheet>
                   <FilterGroups facets={facets} />
                 </MobileFilterSheet>
-                <button
-                  type="button"
-                  className="hidden h-9 items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 text-[12px] text-text-bright transition-colors hover:border-line sm:flex"
-                >
-                  <Sparkles size={11} className="text-accent-purple" />
-                  Match for me
-                </button>
-                <SortControl />
+                {matchProfile && (
+                  <Link
+                    href="/jobs?sort=fit"
+                    className="hidden h-9 items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 text-[12px] text-text-bright transition-colors hover:border-line sm:flex"
+                  >
+                    <Sparkles size={11} className="text-accent-purple" />
+                    Match for me
+                  </Link>
+                )}
+                <SortControl matchAvailable={matchProfile !== null} />
               </div>
             </div>
 
@@ -101,7 +129,10 @@ export default async function JobsPage({
             )}
           </div>
 
-          <SidePanels className="hidden md:flex" />
+          <div className="hidden flex-col gap-4 md:flex">
+            <AiMatchPanel />
+            <SidePanels />
+          </div>
         </div>
       </section>
     </div>

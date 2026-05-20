@@ -155,10 +155,23 @@ export const savedJobs = pgTable(
 export const candidateProfiles = pgTable("candidate_profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
+  /* the signed-in user this profile belongs to (P10) */
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
   displayName: text("display_name"),
   githubUsername: text("github_username"),
   headline: text("headline"),
   skills: jsonb("skills").$type<string[]>().notNull().default([]),
+  /* AI-extracted skills + ecosystems for job matching (P10) */
+  extractedSkills: jsonb("extracted_skills")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  preferredEcosystems: jsonb("preferred_ecosystems")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  indexSource: text("index_source"), // "github" · "cv"
+  lastIndexedAt: timestamp("last_indexed_at", { withTimezone: true }),
   resumeUrl: text("resume_url"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
