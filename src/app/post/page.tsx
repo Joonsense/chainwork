@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { GlassNav } from "@/components/layout/glass-nav";
 import { getAllCompanies } from "@/db/queries";
+import { getServerSession } from "@/lib/auth";
 import { PostWizard } from "./post-wizard";
 
-/* Token-gated, never indexed, always fresh. */
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -13,20 +13,12 @@ export const metadata: Metadata = {
 };
 
 /**
- * Admin job-posting form (P7). Gated by `?token=` matching ADMIN_POST_TOKEN
- * — a deliberate stopgap so curation can start before real auth (P8).
- * A missing or wrong token is indistinguishable from a missing page.
+ * Job-posting form. Open to any signed-in user (P8) — the P7 admin-token
+ * gate is gone. Signed-out visitors are sent to /sign-in and returned here.
  */
-export default async function PostPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ token?: string }>;
-}) {
-  const { token } = await searchParams;
-  const adminToken = process.env.ADMIN_POST_TOKEN;
-  if (!adminToken || !token || token !== adminToken) {
-    notFound();
-  }
+export default async function PostPage() {
+  const session = await getServerSession();
+  if (!session) redirect("/sign-in?next=/post");
 
   const companies = await getAllCompanies();
 
@@ -38,7 +30,7 @@ export default async function PostPage({
         <div className="relative mx-auto max-w-[820px] px-5 pb-24 pt-6 md:pt-8">
           <header className="mb-6">
             <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent-blue">
-              Admin · curation
+              Hire on Chainwork
             </span>
             <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.025em] text-text-primary md:text-[34px]">
               Post a role
@@ -49,7 +41,7 @@ export default async function PostPage({
             </p>
           </header>
 
-          <PostWizard token={token} companies={companies} />
+          <PostWizard companies={companies} />
         </div>
       </main>
     </div>

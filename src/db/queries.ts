@@ -86,6 +86,19 @@ export async function getAllCompanies(): Promise<Company[]> {
   return db.select().from(companies).orderBy(companies.name);
 }
 
+/** Roles posted by a given signed-in user — the /me "your roles" list. */
+export async function getJobsByPoster(
+  userId: string,
+): Promise<JobWithCompany[]> {
+  const rows = await db
+    .select()
+    .from(jobs)
+    .innerJoin(companies, eq(jobs.companyId, companies.id))
+    .where(eq(jobs.postedBy, userId))
+    .orderBy(desc(jobs.postedAt));
+  return rows.map((r) => ({ ...r.jobs, company: r.companies }));
+}
+
 /** Live counts + freshest index time for the hero counter. */
 export async function getHomeStats(): Promise<{
   jobs: number;

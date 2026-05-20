@@ -59,6 +59,7 @@ function buildPreview(v: PostForm, companies: Company[]): JobWithCompany {
     id: "preview",
     slug: "preview",
     companyId: company.id,
+    postedBy: null,
     title: v.title || "Untitled role",
     descriptionMd: v.descriptionMd || "",
     responsibilities: trimmed(v.responsibilities),

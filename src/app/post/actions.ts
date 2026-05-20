@@ -7,6 +7,7 @@ import { postFormSchema, resolveLocation } from "@/lib/post-schema";
 import { buildJobPostingJsonLd } from "@/lib/job-json-ld";
 import { firstParagraph } from "@/lib/format";
 import { slugify } from "@/lib/utils";
+import { getServerSession } from "@/lib/auth";
 
 export type SubmitResult =
   | { ok: true; slug: string }
@@ -38,12 +39,13 @@ async function uniqueJobSlug(base: string): Promise<string> {
  * the page-level gate alone is not enough. Real auth lands in P8.
  */
 export async function submitJob(args: {
-  token: string;
   data: unknown;
 }): Promise<SubmitResult> {
-  const adminToken = process.env.ADMIN_POST_TOKEN;
-  if (!adminToken || args.token !== adminToken) {
-    return { ok: false, error: "Unauthorized." };
+  // Re-check the session — server actions are public POST endpoints, so
+  // the page-level guard alone is not enough.
+  const session = await getServerSession();
+  if (!session) {
+    return { ok: false, error: "You must be signed in to post a role." };
   }
 
   // Never trust the client — re-validate the whole payload server-side.
@@ -136,6 +138,7 @@ export async function submitJob(args: {
     await db.insert(jobs).values({
       slug,
       companyId,
+      postedBy: session.user.id,
       title,
       descriptionMd,
       responsibilities: cleanList(f.responsibilities),

@@ -129,13 +129,7 @@ function ProgressIndicator({ step }: { step: number }) {
   );
 }
 
-export function PostWizard({
-  token,
-  companies,
-}: {
-  token: string;
-  companies: Company[];
-}) {
+export function PostWizard({ companies }: { companies: Company[] }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -174,7 +168,7 @@ export function PostWizard({
       if (step !== 2) return;
       setSubmitting(true);
       setServerError(null);
-      const res = await submitJob({ token, data });
+      const res = await submitJob({ data });
       if (res.ok) {
         router.push(`/post/success?slug=${encodeURIComponent(res.slug)}`);
       } else {

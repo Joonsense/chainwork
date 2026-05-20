@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Search, Bookmark, Menu } from "lucide-react";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { CommandTrigger } from "@/components/command-trigger";
+import { NavAuth } from "@/components/auth/nav-auth";
+import { getServerSession } from "@/lib/auth";
 
 /* Center nav links. `lgOnly` ones are hidden on the 768–1024 range so the
    bar never overflows; they rejoin at lg. */
@@ -16,7 +18,10 @@ const NAV_LINKS: { label: string; href: string; active?: boolean; lgOnly?: boole
  * Sticky glass nav (spec §2.4). Floating glass pill: brand · links · actions.
  * Below md it collapses to a compact bar with a hamburger.
  */
-export function GlassNav() {
+export async function GlassNav() {
+  const session = await getServerSession();
+  const navUser = session ? { name: session.user.name } : null;
+
   return (
     <header className="sticky top-0 z-30 bg-gradient-to-b from-base via-base/80 to-transparent">
       {/* ── desktop / tablet ── */}
@@ -69,15 +74,10 @@ export function GlassNav() {
                 ⌘K
               </kbd>
             </CommandTrigger>
-            <button
-              type="button"
-              className="h-[30px] rounded-lg border border-subtle bg-glass px-3 text-[13px] font-medium text-text-bright transition-colors hover:border-line"
-            >
-              Sign in
-            </button>
-            <button type="button" className="cw-apply h-[30px] px-3 text-[12px]">
+            <NavAuth user={navUser} variant="desktop" />
+            <Link href="/post" className="cw-apply h-[30px] px-3 text-[12px]">
               Post a job
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -96,9 +96,7 @@ export function GlassNav() {
             >
               <Bookmark size={14} />
             </button>
-            <button type="button" className="cw-apply h-8 px-3 text-[12px]">
-              Sign in
-            </button>
+            <NavAuth user={navUser} variant="mobile" />
             <button
               type="button"
               aria-label="Open menu"
