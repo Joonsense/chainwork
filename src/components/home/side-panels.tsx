@@ -1,4 +1,5 @@
 import { Zap, Sparkles, GitBranch } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /* Right-rail panels. Both are visual placeholders — job alerts ship in
    P9, AI matching in P10. */
@@ -89,11 +90,55 @@ function AiMatchesPanel() {
   );
 }
 
+function SalaryInsightPanel() {
+  const bars = [12, 18, 26, 34, 42, 38, 30, 24, 18, 14, 11, 8];
+  return (
+    <div className="cw-card rounded-xl p-4">
+      <div className="text-[12.5px] font-semibold text-text-primary">
+        Salary insight
+      </div>
+      <div className="mb-3 text-[11px] text-text-tertiary">
+        Senior · protocol · remote
+      </div>
+      <div className="flex items-baseline gap-2">
+        <span className="font-mono text-[24px] font-semibold tracking-tight text-text-primary">
+          $214k
+        </span>
+        <span className="text-[11px] text-accent-green">+8% YoY</span>
+      </div>
+      <div className="mt-0.5 text-[10px] text-text-muted">
+        median base · USD
+      </div>
+      <div className="mt-3 flex h-[42px] items-end gap-1" aria-hidden>
+        {bars.map((h, i) => (
+          <div
+            key={i}
+            className={`flex-1 rounded-[2px] ${
+              i === 4 ? "bg-gradient-brand" : "bg-surface-3"
+            }`}
+            style={{ height: h }}
+          />
+        ))}
+      </div>
+      <div className="mt-1.5 flex justify-between font-mono text-[9.5px] text-text-muted">
+        <span>$120k</span>
+        <span>$400k</span>
+      </div>
+    </div>
+  );
+}
+
 export function SidePanels({ className = "" }: { className?: string }) {
   return (
-    <aside className={`flex flex-col gap-3.5 self-start lg:sticky lg:top-20 ${className}`}>
+    <aside
+      className={cn(
+        "flex flex-col gap-3.5 self-start lg:sticky lg:top-20",
+        className,
+      )}
+    >
       <JobAlertsPanel />
       <AiMatchesPanel />
+      <SalaryInsightPanel />
     </aside>
   );
 }
