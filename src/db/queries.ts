@@ -71,6 +71,16 @@ export async function getLatestJobs(limit = 12): Promise<JobWithCompany[]> {
   return rows.map((r) => ({ ...r.jobs, company: r.companies }));
 }
 
+/** Every job + company, newest first — powers /llms.txt and the sitemap. */
+export async function getAllJobs(): Promise<JobWithCompany[]> {
+  const rows = await db
+    .select()
+    .from(jobs)
+    .innerJoin(companies, eq(jobs.companyId, companies.id))
+    .orderBy(desc(jobs.postedAt));
+  return rows.map((r) => ({ ...r.jobs, company: r.companies }));
+}
+
 /** Live counts + freshest index time for the hero counter. */
 export async function getHomeStats(): Promise<{
   jobs: number;

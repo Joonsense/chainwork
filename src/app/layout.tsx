@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 import { CommandPalette } from "@/components/command-palette";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 /* UI typeface — exposed as the --font-sans CSS variable. */
@@ -20,6 +21,8 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  /* Absolute base for OG images and other metadata URLs. */
+  metadataBase: new URL(SITE_URL),
   title: "Chainwork",
   description: "Web3 jobs, structured for humans and agents.",
 };
