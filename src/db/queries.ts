@@ -1,8 +1,26 @@
+import { cache } from "react";
 import { desc, eq, count } from "drizzle-orm";
 import { db } from "./index";
 import { jobs, companies, type Job, type Company } from "./schema";
 
 export type JobWithCompany = Job & { company: Company };
+
+/**
+ * Single job by slug, with its company. Wrapped in React `cache` so
+ * generateMetadata and the page component share one query per request.
+ */
+export const getJobBySlug = cache(
+  async (slug: string): Promise<JobWithCompany | null> => {
+    const rows = await db
+      .select()
+      .from(jobs)
+      .innerJoin(companies, eq(jobs.companyId, companies.id))
+      .where(eq(jobs.slug, slug))
+      .limit(1);
+    if (rows.length === 0) return null;
+    return { ...rows[0].jobs, company: rows[0].companies };
+  },
+);
 
 /** Featured roles, newest first — the home "High-signal roles" slots. */
 export async function getFeaturedJobs(limit = 3): Promise<JobWithCompany[]> {

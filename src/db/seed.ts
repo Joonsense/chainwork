@@ -423,6 +423,14 @@ const SALARY_BANDS: Record<string, { minLo: number; minHi: number; maxLo: number
   Principal: { minLo: 285, minHi: 330, maxLo: 360, maxHi: 400 },
 };
 const REMOTE_SCOPES = ["Worldwide", "Americas", "Europe", "APAC", "EMEA"];
+const NICE_TO_HAVE = [
+  "Open-source contributions in the crypto or AI space",
+  "Experience at an early-stage or remote-first startup",
+  "A public body of work — talks, posts, or shipped projects",
+  "Familiarity with the broader L2 and rollup landscape",
+  "Comfort collaborating fully async across timezones",
+  "Prior experience taking a product from zero to mainnet",
+];
 const FEATURED_INDICES = new Set([2, 3, 4, 7, 12, 14]); // 6 featured
 const SPONSORED_INDEX = 11; // 1 sponsored
 const TOTAL_JOBS = 50;
@@ -526,6 +534,15 @@ function generateJobs(
       `${hasTokenEquity ? ", and includes token or equity upside" : ""}.`;
 
     const requirements = arch.requirements.map((r) => r.replace("{years}", years));
+    const niceToHave = [
+      NICE_TO_HAVE[i % NICE_TO_HAVE.length],
+      NICE_TO_HAVE[(i + 2) % NICE_TO_HAVE.length],
+      NICE_TO_HAVE[(i + 4) % NICE_TO_HAVE.length],
+    ];
+    // ~1 in 7 roles apply via email only; the rest link to a careers page.
+    const applyUrl =
+      i % 7 === 0 ? null : `${company.website}/careers/${slug}`;
+    const applyEmail = `careers@${company.slug}.xyz`;
 
     const row: NewJob = {
       id: randomUUID(),
@@ -535,6 +552,8 @@ function generateJobs(
       descriptionMd,
       responsibilities: arch.responsibilities,
       requirements,
+      niceToHave,
+      oneLiner: arch.hook,
       roleCategory: arch.category,
       seniority,
       employmentType,
@@ -549,7 +568,8 @@ function generateJobs(
       isFeatured: FEATURED_INDICES.has(i),
       isSponsored: i === SPONSORED_INDEX,
       isVerified: company.verified,
-      applyUrl: `/apply/${slug}`,
+      applyUrl,
+      applyEmail,
       jsonLd: {}, // filled below
       postedAt,
       indexedAt: new Date(now - ((i * 19) % 50) * 1000),

@@ -53,6 +53,8 @@ export const jobs = pgTable(
       .notNull()
       .default([]),
     requirements: jsonb("requirements").$type<string[]>().notNull().default([]),
+    niceToHave: jsonb("nice_to_have").$type<string[]>().notNull().default([]),
+    oneLiner: text("one_liner"), // short summary for meta description
     roleCategory: text("role_category").notNull(), // 9 categories
     seniority: text("seniority").notNull(), // Junior · Mid · Senior · Staff · Principal
     employmentType: text("employment_type").notNull(), // Full-time · Contract
@@ -67,7 +69,9 @@ export const jobs = pgTable(
     isFeatured: boolean("is_featured").notNull().default(false),
     isSponsored: boolean("is_sponsored").notNull().default(false),
     isVerified: boolean("is_verified").notNull().default(false),
-    applyUrl: text("apply_url"),
+    applyUrl: text("apply_url"), // external careers page
+    applyEmail: text("apply_email"), // mailto fallback when no apply_url
+    applyCount: integer("apply_count").notNull().default(0),
     /* schema.org JobPosting — precomputed at write time, dropped straight
        into <head> on render so it never gets rebuilt per request. */
     jsonLd: jsonb("json_ld").$type<Record<string, unknown>>().notNull(),

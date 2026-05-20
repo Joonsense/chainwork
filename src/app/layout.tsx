@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 /* UI typeface — exposed as the --font-sans CSS variable. */
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="en" className={`dark ${inter.variable} ${jetBrainsMono.variable}`}>
       <body className="bg-base text-text-primary font-sans antialiased">
         {children}
+        <Toaster theme="dark" position="top-center" richColors />
       </body>
     </html>
   );
