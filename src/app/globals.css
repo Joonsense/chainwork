@@ -138,3 +138,206 @@
     color: #ffffff;
   }
 }
+
+/* ── Animated-border angle property + keyframes (spec §2.4) ───── */
+@property --cw-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes cw-spin {
+  to {
+    --cw-angle: 360deg;
+  }
+}
+@keyframes cw-pulse {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* ── Design-system component primitives ──────────────────────── */
+@layer components {
+  /* Glass surface — translucent, blurred. The glass-nav rests on this. */
+  .cw-glass {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.015)
+    );
+    border: 1px solid var(--cw-border-subtle);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  /* Card surface with hover lift. */
+  .cw-card {
+    background: linear-gradient(
+      180deg,
+      var(--cw-surface-2),
+      var(--cw-surface)
+    );
+    border: 1px solid var(--cw-border-subtle);
+    transition:
+      border-color 0.2s,
+      background 0.2s;
+  }
+  .cw-card:hover {
+    border-color: var(--cw-border-strong);
+    background: linear-gradient(
+      180deg,
+      var(--cw-surface-3),
+      var(--cw-surface-2)
+    );
+  }
+  .cw-card-glow {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 12px 48px -16px oklch(0.55 0.22 270 / 0.25);
+  }
+
+  /* Ambient background glow — two-tone radial wash. */
+  .cw-ambient {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        ellipse 80% 60% at 12% -10%,
+        oklch(0.55 0.22 270 / 0.18),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 70% 50% at 92% 8%,
+        oklch(0.62 0.2 200 / 0.12),
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 90% 60% at 50% 100%,
+        oklch(0.55 0.22 295 / 0.08),
+        transparent 60%
+      );
+  }
+
+  /* Animated conic border — for the hero search box + accent card. */
+  .cw-bordered {
+    position: relative;
+    isolation: isolate;
+  }
+  .cw-bordered::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--cw-angle),
+      oklch(0.72 0.16 250 / 0.7),
+      oklch(0.68 0.2 295 / 0.7),
+      transparent 40%,
+      transparent 80%,
+      oklch(0.72 0.16 250 / 0.7)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: cw-spin 8s linear infinite;
+  }
+
+  /* Apply button — brand-gradient fill with a conic glow on hover. */
+  .cw-apply {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    color: #ffffff;
+    background: var(--cw-gradient-brand);
+    box-shadow:
+      0 0 0 1px oklch(0.7 0.16 260 / 0.5),
+      0 6px 20px -6px oklch(0.55 0.22 270 / 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    transition:
+      transform 0.15s,
+      box-shadow 0.2s,
+      filter 0.2s;
+  }
+  .cw-apply::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 9px;
+    padding: 1px;
+    background: conic-gradient(
+      from 0deg,
+      transparent,
+      oklch(0.85 0.16 250 / 0.6),
+      transparent 30%,
+      transparent 70%,
+      oklch(0.85 0.16 295 / 0.6),
+      transparent
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .cw-apply:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+  .cw-apply:hover::before {
+    opacity: 1;
+  }
+
+  /* Live pulse dot. */
+  .cw-dot {
+    position: relative;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: var(--cw-accent-green);
+    flex-shrink: 0;
+  }
+  .cw-dot::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 9999px;
+    background: var(--cw-accent-green);
+    opacity: 0.35;
+    animation: cw-pulse 2s ease-out infinite;
+  }
+}
+
+/* Respect reduced-motion — freeze the decorative animations. */
+@media (prefers-reduced-motion: reduce) {
+  .cw-bordered::before,
+  .cw-dot::after {
+    animation: none;
+  }
+}
+
+/* Hide scrollbars on horizontal carousels. */
+.cw-no-scrollbar {
+  scrollbar-width: none;
+}
+.cw-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
