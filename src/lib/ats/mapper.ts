@@ -1,5 +1,5 @@
 /**
- * Maps ATS job data (Greenhouse / Lever) to our DB schema shape.
+ * Maps ATS job data (Greenhouse / Lever / Ashby) to our DB schema shape.
  *
  * Rules:
  *  - Role category: keyword-matched from title + department
@@ -12,6 +12,7 @@
 
 import type { GreenhouseJob } from "./greenhouse";
 import type { LeverJob } from "./lever";
+import type { AshbyJob } from "./ashby";
 import type { CompanyEntry } from "./companies";
 import type { NewJob, NewCompany } from "@/db/schema";
 
@@ -426,6 +427,103 @@ export function mapLeverJob(
     jsonLd,
     postedAt,
     source: "lever",
+    externalId: job.id,
+    viewCount: 0,
+  };
+}
+
+/* ── Ashby mapper ───────────────────────────────────────── */
+
+export function mapAshbyJob(
+  job: AshbyJob,
+  company: CompanyEntry,
+  companyId: string,
+): Omit<NewJob, "id" | "createdAt" | "indexedAt"> {
+  const department = job.department ?? job.team ?? "";
+  const descText = stripHtml(job.descriptionHtml ?? "");
+  const descMd = htmlToMd(job.descriptionHtml ?? "");
+  const fullText = `${job.title} ${department} ${descText}`;
+
+  const roleCategory = inferRoleCategory(job.title, department);
+  const seniority = inferSeniority(job.title);
+  const ecosystems = detectEcosystems(fullText, company.ecosystems);
+  const skills = extractSkills(fullText);
+
+  // Ashby sometimes includes salary in compensationTierSummary
+  const salaryText = (job.compensationTierSummary ?? "") + " " + descText;
+  const salary = parseSalary(salaryText);
+
+  const isRemote =
+    job.isRemote || /remote/i.test(job.workplaceType) || /remote/i.test(job.location);
+  const location = isRemote
+    ? "Remote"
+    : job.location || job.address?.postalAddress?.addressLocality || "Remote";
+  const remoteScope = isRemote ? "Worldwide" : undefined;
+
+  const employmentType =
+    job.employmentType === "FullTime" || job.employmentType === "FULL_TIME"
+      ? "Full-time"
+      : job.employmentType === "Contract" || job.employmentType === "CONTRACTOR"
+        ? "Contract"
+        : "Full-time";
+
+  const jobSlug = `${company.slug}-${slugify(job.title)}-${shortId()}`;
+  const postedAt = new Date(job.publishedAt ?? Date.now());
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: job.title,
+    datePosted: postedAt.toISOString().split("T")[0],
+    hiringOrganization: {
+      "@type": "Organization",
+      name: company.name,
+      sameAs: company.website,
+    },
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: location,
+      },
+    },
+    employmentType: employmentType === "Full-time" ? "FULL_TIME" : "CONTRACTOR",
+    description: descText.slice(0, 500),
+    directApply: true,
+    url: job.jobUrl,
+  };
+
+  return {
+    slug: jobSlug,
+    companyId,
+    title: job.title,
+    descriptionMd: descMd || descText || "See the full job posting for details.",
+    responsibilities: [],
+    requirements: [],
+    niceToHave: [],
+    oneLiner: descText.slice(0, 120).split(".")[0] ?? job.title,
+    roleCategory,
+    seniority,
+    employmentType,
+    location,
+    remoteScope: remoteScope ?? null,
+    salaryMin: salary?.min ?? 0,
+    salaryMax: salary?.max ?? 0,
+    salaryCurrency: "USD",
+    hasTokenEquity: false,
+    ecosystems,
+    skills,
+    isFeatured: false,
+    featuredUntil: null,
+    isSponsored: false,
+    isVerified: false,
+    applyUrl: job.applyUrl ?? job.jobUrl,
+    applyEmail: null,
+    applyCount: 0,
+    postedBy: null,
+    jsonLd,
+    postedAt,
+    source: "ashby",
     externalId: job.id,
     viewCount: 0,
   };
