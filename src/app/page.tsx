@@ -2,6 +2,7 @@ import { ArrowRight, ChevronDown, Sparkles, TrendingUp } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
 import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
 import { Hero } from "@/components/home/hero";
+import { McpCallout } from "@/components/home/mcp-callout";
 import { FilterSidebar } from "@/components/home/filter-sidebar";
 import { SidePanels } from "@/components/home/side-panels";
 import { FeaturedCard } from "@/components/jobs/featured-card";
@@ -35,6 +36,8 @@ export default async function HomePage() {
           companyCount={stats.companies}
           indexedLabel={indexedLabel}
         />
+
+        <McpCallout />
 
         {/* ── Featured ── */}
         <section className="mx-auto max-w-[1240px] px-5 pb-7 pt-1 md:px-6">
