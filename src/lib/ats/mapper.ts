@@ -166,7 +166,7 @@ const NON_ENGINEERING_PATTERNS: RegExp[] = [
 ];
 
 /** True when the title / department clearly looks like a non-engineering role. */
-function isNonEngineeringRole(title: string, department = ""): boolean {
+export function isNonEngineeringRole(title: string, department = ""): boolean {
   const text = `${title} ${department}`;
   return NON_ENGINEERING_PATTERNS.some((p) => p.test(text));
 }
