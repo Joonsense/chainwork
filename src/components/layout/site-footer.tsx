@@ -18,7 +18,6 @@ const GROUPS: Group[] = [
       { label: "Jobs", href: "/" },
       { label: "Pulse", href: "/pulse" },
       { label: "Job alerts", href: "/alerts" },
-      { label: "Salaries", href: "/salaries" },
     ],
   },
   {
