@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronDown, Sparkles, TrendingUp } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
 import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
 import { Hero } from "@/components/home/hero";
@@ -7,17 +7,19 @@ import { SidePanels } from "@/components/home/side-panels";
 import { FeaturedCard } from "@/components/jobs/featured-card";
 import { ListRow } from "@/components/jobs/list-row";
 import { BrandLogo } from "@/components/ui/brand-logo";
-import { getFeaturedJobs, getLatestJobs, getHomeStats } from "@/db/queries";
-import { relativeTime } from "@/lib/format";
+import { EcoBadge } from "@/components/ui/eco-badge";
+import { getFeaturedJobs, getLatestJobs, getHomeStats, getTrendingJobs } from "@/db/queries";
+import { formatSalary, relativeTime } from "@/lib/format";
 
 /* Data-backed page — read fresh from Neon on every request. */
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featured, latest, stats] = await Promise.all([
+  const [featured, latest, stats, trending] = await Promise.all([
     getFeaturedJobs(3),
     getLatestJobs(12),
     getHomeStats(),
+    getTrendingJobs(4),
   ]);
   const indexedLabel = stats.lastIndexedAt
     ? relativeTime(stats.lastIndexedAt)
@@ -65,6 +67,59 @@ export default async function HomePage() {
             ))}
           </div>
         </section>
+
+        {/* ── Pulse / Trending banner ── */}
+        {trending.length > 0 && (
+          <section className="mx-auto max-w-[1240px] px-5 pb-7 md:px-6">
+            <div className="mb-3 flex items-end justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <TrendingUp size={14} className="text-accent-orange" />
+                <span className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-text-tertiary">
+                  Trending · most viewed
+                </span>
+                <span className="rounded-full bg-accent-orange/15 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-accent-orange">
+                  Hot
+                </span>
+              </div>
+              <a
+                href="/pulse"
+                className="hidden shrink-0 items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12px] text-text-bright transition-colors hover:border-line sm:flex"
+              >
+                Hiring Pulse
+                <ArrowRight size={11} />
+              </a>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {trending.map((job) => (
+                <a
+                  key={job.id}
+                  href={`/jobs/${job.slug}`}
+                  className="flex items-center gap-3 rounded-xl border border-subtle bg-surface px-4 py-3 transition-colors hover:border-line hover:bg-glass"
+                >
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold"
+                    style={{ background: job.company.logoBg, color: job.company.logoFg }}
+                  >
+                    {job.company.logoText}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13px] font-semibold text-text-primary">
+                      {job.title}
+                    </div>
+                    <div className="text-[11px] text-text-tertiary">
+                      {job.company.name} · {formatSalary(job.salaryMin, job.salaryMax)}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    {job.ecosystems.slice(0, 1).map((e) => (
+                      <EcoBadge key={e} ecosystem={e} />
+                    ))}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── Body: filters · latest feed · side panels ── */}
         <section className="mx-auto max-w-[1240px] px-5 pb-16 md:px-6">

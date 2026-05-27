@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Check, ChevronRight } from "lucide-react";
+import { Check, ChevronRight, Share2 } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { JobMarkdown } from "@/components/jobs/job-markdown";
 import { JsonLdCard } from "@/components/jobs/json-ld-card";
 import { SaveButton } from "@/components/jobs/save-button";
 import { StickyApplyBar } from "@/components/jobs/sticky-apply-bar";
+import { ViewTracker } from "@/components/jobs/view-tracker";
 import { getJobBySlug } from "@/db/queries";
 import { formatSalary, relativeTime } from "@/lib/format";
 
@@ -106,6 +107,12 @@ export default async function JobDetailPage({ params }: Params) {
 
   const { company } = job;
   const jsonLdPretty = JSON.stringify(job.jsonLd, null, 2);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://chainwork-tau.vercel.app";
+  const jobUrl = `${siteUrl}/jobs/${slug}`;
+  const tweetText = encodeURIComponent(
+    `${job.title} at ${company.name} — ${formatSalary(job.salaryMin, job.salaryMax)} · ${job.location}\n\n${jobUrl}\n\n#crypto #web3 #jobs`,
+  );
+  const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
   return (
     <div className="min-h-dvh">
@@ -114,6 +121,9 @@ export default async function JobDetailPage({ params }: Params) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(job.jsonLd) }}
       />
+
+      {/* Fire-and-forget view count increment */}
+      <ViewTracker slug={slug} />
 
       <GlassNav />
 
@@ -153,7 +163,16 @@ export default async function JobDetailPage({ params }: Params) {
                 {company.stage} · {company.size} · {job.location}
               </div>
             </div>
-            <div className="ml-auto shrink-0">
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              <a
+                href={tweetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Share on X"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-subtle bg-glass text-text-tertiary transition-colors hover:border-line hover:text-text-primary"
+              >
+                <Share2 size={14} />
+              </a>
               <SaveButton slug={job.slug} />
             </div>
           </div>

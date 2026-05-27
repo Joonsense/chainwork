@@ -77,6 +77,11 @@ export const jobs = pgTable(
     applyUrl: text("apply_url"), // external careers page
     applyEmail: text("apply_email"), // mailto fallback when no apply_url
     applyCount: integer("apply_count").notNull().default(0),
+    /* ATS ingest (P11) — source + external_id power deduplication */
+    source: text("source").notNull().default("manual"), // "manual" | "greenhouse" | "lever" | "seed"
+    externalId: text("external_id"), // ATS job ID; null for manual/seed rows
+    /* viral mechanics (P11) */
+    viewCount: integer("view_count").notNull().default(0),
     /* the signed-in user who posted this job (P8) — null for seeded rows */
     postedBy: text("posted_by").references(() => users.id, {
       onDelete: "set null",
@@ -98,6 +103,7 @@ export const jobs = pgTable(
     index("jobs_is_featured_idx").on(t.isFeatured),
     index("jobs_role_category_idx").on(t.roleCategory),
     index("jobs_seniority_idx").on(t.seniority),
+    index("jobs_view_count_idx").on(t.viewCount),
   ],
 );
 

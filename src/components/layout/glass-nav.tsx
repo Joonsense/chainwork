@@ -7,9 +7,9 @@ import { getServerSession } from "@/lib/auth";
 
 /* Center nav links. `lgOnly` ones are hidden on the 768–1024 range so the
    bar never overflows; they rejoin at lg. */
-const NAV_LINKS: { label: string; href: string; active?: boolean; lgOnly?: boolean }[] = [
+const NAV_LINKS: { label: string; href: string; active?: boolean; lgOnly?: boolean; badge?: string }[] = [
   { label: "Jobs", href: "/", active: true },
-  { label: "Companies", href: "/companies" },
+  { label: "Pulse", href: "/pulse", badge: "🔥" },
   { label: "Salaries", href: "/salaries", lgOnly: true },
   { label: "Job alerts", href: "/alerts", lgOnly: true },
 ];
@@ -37,7 +37,7 @@ export async function GlassNav() {
                   key={l.label}
                   href={l.href}
                   prefetch={false}
-                  className={`rounded-md px-2.5 py-1.5 transition-colors ${
+                  className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 transition-colors ${
                     l.lgOnly ? "hidden lg:block" : ""
                   } ${
                     l.active
@@ -46,6 +46,9 @@ export async function GlassNav() {
                   }`}
                 >
                   {l.label}
+                  {l.badge && (
+                    <span className="text-[11px]">{l.badge}</span>
+                  )}
                 </Link>
               ))}
               <Link
