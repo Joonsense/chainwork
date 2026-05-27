@@ -27,7 +27,7 @@ export async function GET() {
   const body = [
     "# chainwork",
     "",
-    "> The hiring layer for crypto, AI & the open web. Salary-transparent, verified roles at the protocols defining the next decade.",
+    "> The registry for AI × crypto engineering roles. Salary-transparent, agent-native, indexed daily from 120+ companies.",
     "",
     `${stats.jobs} live roles at ${stats.companies} companies. Indexed ${indexed}.`,
     "",
