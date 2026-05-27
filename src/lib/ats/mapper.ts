@@ -131,7 +131,13 @@ const ROLE_PATTERNS: Array<{
   },
   {
     category: "Protocol",
-    patterns: [/.*/], // catch-all
+    patterns: [
+      /\bprotocol|\bconsensus|\bp2p\b|\bnode\b|\bchain\b|\bdistributed.?system|\bdecentraliz|\bvalidator|\bstaking|\bcross.?chain|\bcore.?(developer|engineer)|\b(solana|ethereum|bitcoin|near|cosmos|polkadot|aptos|sui)\b.{0,30}(engineer|developer)/i,
+    ],
+  },
+  {
+    category: "Backend",
+    patterns: [/.*/], // generic engineering catch-all
   },
 ];
 
@@ -140,7 +146,7 @@ function inferRoleCategory(title: string, department = ""): string {
   for (const { category, patterns } of ROLE_PATTERNS) {
     if (patterns.some((p) => p.test(text))) return category;
   }
-  return "Protocol";
+  return "Backend";
 }
 
 /* ── Non-engineering filter ─────────────────────────────── */
