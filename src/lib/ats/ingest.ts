@@ -24,6 +24,7 @@ export interface IngestResult {
   companiesSkipped: number; // 404 / no jobs
   jobsNew: number;
   jobsSkipped: number; // already exists
+  jobsRejected: number; // mapper returned null (non-engineering)
   errors: number;
   durationMs: number;
 }
@@ -34,6 +35,7 @@ export async function runATSIngest(): Promise<IngestResult> {
   let companiesSkipped = 0;
   let jobsNew = 0;
   let jobsSkipped = 0;
+  let jobsRejected = 0;
   let errors = 0;
 
   for (const company of COMPANY_REGISTRY) {
@@ -112,7 +114,7 @@ export async function runATSIngest(): Promise<IngestResult> {
             continue;
           }
 
-          // Map and insert
+          // Map and insert (mapper returns null for non-engineering roles)
           const jobData =
             company.atsType === "greenhouse"
               ? mapGreenhouseJob(
@@ -131,6 +133,11 @@ export async function runATSIngest(): Promise<IngestResult> {
                     company,
                     companyId,
                   );
+
+          if (!jobData) {
+            jobsRejected++;
+            continue;
+          }
 
           await db.insert(jobs).values(jobData);
           jobsNew++;
@@ -153,6 +160,7 @@ export async function runATSIngest(): Promise<IngestResult> {
     companiesSkipped,
     jobsNew,
     jobsSkipped,
+    jobsRejected,
     errors,
     durationMs: Date.now() - start,
   };
