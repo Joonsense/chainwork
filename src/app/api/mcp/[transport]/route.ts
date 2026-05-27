@@ -7,7 +7,6 @@ import {
   POSTED_VALUES,
   ROLE_OPTIONS,
   SALARY_MAX,
-  SALARY_MIN,
   SENIORITY_LEVELS,
   type JobFilters,
 } from "@/lib/jobs-search-params";
@@ -71,7 +70,7 @@ const handler = createMcpHandler(
           role: args.roles ?? [],
           seniority: args.seniority ?? [],
           loc: args.locations ?? [],
-          min: args.min_salary_k ?? SALARY_MIN,
+          min: args.min_salary_k ?? 0,
           max: SALARY_MAX,
           token: false,
           posted: args.posted_within ?? "all",
