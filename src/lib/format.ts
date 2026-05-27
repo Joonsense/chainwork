@@ -11,9 +11,15 @@ export function relativeTime(date: Date): string {
   return `${Math.floor(days / 30)}mo`;
 }
 
-/** "$210k–285k" from raw yearly USD amounts. */
+/**
+ * "$210k–285k" from raw yearly USD amounts.
+ * Returns "Competitive" when both are 0 (ATS job with no salary disclosed).
+ */
 export function formatSalary(min: number, max: number): string {
+  if (min === 0 && max === 0) return "Competitive";
   const k = (n: number) => `${Math.round(n / 1000)}k`;
+  if (min === 0) return `Up to $${k(max)}`;
+  if (max === 0) return `$${k(min)}+`;
   return `$${k(min)}–${k(max)}`;
 }
 

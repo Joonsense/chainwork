@@ -444,3 +444,97 @@ export async function searchPalette(q: string): Promise<PaletteResult> {
     ecosystems,
   };
 }
+
+/* ── Pulse dashboard (P11) ───────────────────────────────────── */
+
+export type PulseStats = {
+  totalJobs: number;
+  totalCompanies: number;
+  jobsThisWeek: number;
+  jobsToday: number;
+  ecosystemBreakdown: Array<{ eco: string; count: number }>;
+  roleBreakdown: Array<{ role: string; count: number }>;
+  topCompanies: Array<{ name: string; slug: string; logoText: string; logoBg: string; logoFg: string; count: number }>;
+};
+
+export async function getPulseStats(): Promise<PulseStats> {
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 86_400_000);
+  const dayAgo = new Date(now.getTime() - 86_400_000);
+
+  const [allJobs, totalCompaniesRes, weekCount, todayCount] = await Promise.all([
+    db
+      .select({
+        ecosystems: jobs.ecosystems,
+        roleCategory: jobs.roleCategory,
+        companyId: jobs.companyId,
+      })
+      .from(jobs),
+    db.select({ value: count() }).from(companies),
+    db.select({ value: count() }).from(jobs).where(gte(jobs.postedAt, weekAgo)),
+    db.select({ value: count() }).from(jobs).where(gte(jobs.postedAt, dayAgo)),
+  ]);
+
+  // Ecosystem breakdown
+  const ecoTally: Record<string, number> = {};
+  const roleTally: Record<string, number> = {};
+  for (const j of allJobs) {
+    for (const e of j.ecosystems) {
+      ecoTally[e] = (ecoTally[e] ?? 0) + 1;
+    }
+    roleTally[j.roleCategory] = (roleTally[j.roleCategory] ?? 0) + 1;
+  }
+
+  const ecosystemBreakdown = Object.entries(ecoTally)
+    .sort((a, b) => b[1] - a[1])
+    .map(([eco, count]) => ({ eco, count }));
+
+  const roleBreakdown = Object.entries(roleTally)
+    .sort((a, b) => b[1] - a[1])
+    .map(([role, count]) => ({ role, count }));
+
+  // Top hiring companies
+  const companyJobCounts = await db
+    .select({
+      name: companies.name,
+      slug: companies.slug,
+      logoText: companies.logoText,
+      logoBg: companies.logoBg,
+      logoFg: companies.logoFg,
+      count: count(jobs.id),
+    })
+    .from(jobs)
+    .innerJoin(companies, eq(jobs.companyId, companies.id))
+    .groupBy(companies.id, companies.name, companies.slug, companies.logoText, companies.logoBg, companies.logoFg)
+    .orderBy(desc(count(jobs.id)))
+    .limit(10);
+
+  return {
+    totalJobs: allJobs.length,
+    totalCompanies: totalCompaniesRes[0]?.value ?? 0,
+    jobsThisWeek: weekCount[0]?.value ?? 0,
+    jobsToday: todayCount[0]?.value ?? 0,
+    ecosystemBreakdown,
+    roleBreakdown,
+    topCompanies: companyJobCounts,
+  };
+}
+
+/** Top jobs by view count — powers the Trending section. */
+export async function getTrendingJobs(limit = 6): Promise<JobWithCompany[]> {
+  const rows = await db
+    .select()
+    .from(jobs)
+    .innerJoin(companies, eq(jobs.companyId, companies.id))
+    .orderBy(desc(jobs.viewCount), desc(jobs.postedAt))
+    .limit(limit);
+  return rows.map((r) => ({ ...r.jobs, company: r.companies }));
+}
+
+/** Increment view count for a job by slug. Fire-and-forget safe. */
+export async function incrementViewCount(slug: string): Promise<void> {
+  await db
+    .update(jobs)
+    .set({ viewCount: sql`${jobs.viewCount} + 1` })
+    .where(eq(jobs.slug, slug));
+}
