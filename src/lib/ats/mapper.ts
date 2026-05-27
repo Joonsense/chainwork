@@ -143,6 +143,34 @@ function inferRoleCategory(title: string, department = ""): string {
   return "Protocol";
 }
 
+/* ── Non-engineering filter ─────────────────────────────── */
+
+/**
+ * chainwork's surface is crypto / web3 / AI×crypto *engineering*. The ATS
+ * feeds happily return Sales, Marketing, Finance, HR, Design, PM, Legal,
+ * Office, and generic-internship rows alongside engineering ones. Any
+ * title or department matching these patterns is rejected at ingest time
+ * so we never carry off-target rows into the catalog.
+ */
+const NON_ENGINEERING_PATTERNS: RegExp[] = [
+  /\b(sales|account\s?(manager|executive|director)|business\s?develop|partnerships?|partner\s?success|bdr|sdr)\b/i,
+  /\b(marketing|growth|brand|content\s?(writer|creator|marketing|strategist)|social\s?media|community\s?(manager|coordinator|lead)|copywrit)\b/i,
+  /\b(designer|design\s?(lead|manager|intern|coordinator|director)?|brand\s?design|product\s?design|graphic|ui\s?design|ux\s?(design|research)|illustrator)\b/i,
+  /\b(product\s?manager|product\s?owner|principal\s?product|head\s?of\s?product|director\s?of\s?product|chief\s?product|cpo\b)\b/i,
+  /\b(accountant|controller|financial?\s?(analyst|operations|ops)|treasury|tax\b|bookkeep)\b/i,
+  /\b(hr\b|people\s?(ops|operations|partner)|talent\s?(acquisition|partner)|recruit(er|ing)|head\s?of\s?people)\b/i,
+  /\b(legal|paralegal|counsel|attorney|lawyer|compliance\s?(?!engineer)|regulatory\s?affairs)\b/i,
+  /\b(office\s?(services|manager|coordinator|administrator|admin)|executive\s?assistant|receptionist|workplace)\b/i,
+  /\b(operations\s?(manager|coordinator|associate|analyst|specialist)(?!\s?engineer)|chief\s?of\s?staff|coo\b)\b/i,
+  /\b(customer\s?(success|support|service|experience)|cx\b|client\s?(success|support|service))\b/i,
+];
+
+/** True when the title / department clearly looks like a non-engineering role. */
+function isNonEngineeringRole(title: string, department = ""): boolean {
+  const text = `${title} ${department}`;
+  return NON_ENGINEERING_PATTERNS.some((p) => p.test(text));
+}
+
 /* ── Seniority inference ────────────────────────────────── */
 
 function inferSeniority(title: string, level = ""): string {
@@ -261,8 +289,10 @@ export function mapGreenhouseJob(
   job: GreenhouseJob,
   company: CompanyEntry,
   companyId: string,
-): Omit<NewJob, "id" | "createdAt" | "indexedAt"> {
+): Omit<NewJob, "id" | "createdAt" | "indexedAt"> | null {
   const department = job.departments?.[0]?.name ?? "";
+  if (isNonEngineeringRole(job.title, department)) return null;
+
   const descText = stripHtml(job.content ?? "");
   const descMd = htmlToMd(job.content ?? "");
   const fullText = `${job.title} ${department} ${descText}`;
@@ -344,8 +374,10 @@ export function mapLeverJob(
   job: LeverJob,
   company: CompanyEntry,
   companyId: string,
-): Omit<NewJob, "id" | "createdAt" | "indexedAt"> {
+): Omit<NewJob, "id" | "createdAt" | "indexedAt"> | null {
   const department = job.categories?.department ?? "";
+  if (isNonEngineeringRole(job.text, department)) return null;
+
   const level = job.categories?.level ?? "";
   const commitment = job.categories?.commitment ?? "Full-time";
 
@@ -438,8 +470,10 @@ export function mapAshbyJob(
   job: AshbyJob,
   company: CompanyEntry,
   companyId: string,
-): Omit<NewJob, "id" | "createdAt" | "indexedAt"> {
+): Omit<NewJob, "id" | "createdAt" | "indexedAt"> | null {
   const department = job.department ?? job.team ?? "";
+  if (isNonEngineeringRole(job.title, department)) return null;
+
   const descText = stripHtml(job.descriptionHtml ?? "");
   const descMd = htmlToMd(job.descriptionHtml ?? "");
   const fullText = `${job.title} ${department} ${descText}`;
