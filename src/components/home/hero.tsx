@@ -2,11 +2,11 @@ import { Search } from "lucide-react";
 import { CommandTrigger } from "@/components/command-trigger";
 
 const TRY_CHIPS = [
-  "Solana Rust",
+  "AI agents",
   "ZK research",
   "AI x DeFi",
-  "$200k+ remote",
   "Founding engineer",
+  "Rust senior",
   "Smart contract auditor",
 ];
 
@@ -46,8 +46,8 @@ export function Hero({
         </div>
 
         {/* headline */}
-        <h1 className="mx-auto max-w-[780px] text-[33px] font-semibold leading-[1.07] tracking-[-0.03em] text-text-primary md:text-[60px] md:leading-[1.04] md:tracking-[-0.035em]">
-          The hiring layer for{" "}
+        <h1 className="mx-auto max-w-[820px] text-[33px] font-semibold leading-[1.07] tracking-[-0.03em] text-text-primary md:text-[60px] md:leading-[1.04] md:tracking-[-0.035em]">
+          The registry for{" "}
           <span
             style={{
               backgroundImage:
@@ -57,14 +57,13 @@ export function Hero({
               color: "transparent",
             }}
           >
-            crypto, AI
+            AI × crypto
           </span>{" "}
-          &amp; the open web.
+          engineering roles.
         </h1>
 
-        <p className="mx-auto mt-4 max-w-[560px] text-[14px] leading-[1.55] text-text-secondary md:text-[16px]">
-          Salary-transparent, verified roles at the protocols defining the next
-          decade.
+        <p className="mx-auto mt-4 max-w-[600px] text-[14px] leading-[1.55] text-text-secondary md:text-[16px]">
+          Salary-transparent. Agent-native. Indexed from 120+ companies, daily.
         </p>
 
         {/* search box */}

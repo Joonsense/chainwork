@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "chainwork — the hiring layer for crypto, AI & the open web";
+export const alt = "chainwork — registry for AI × crypto engineering roles";
 
 /** Root OG image — dark base + brand-gradient wash, wordmark + live count. */
 export default async function OgImage() {
@@ -63,7 +63,7 @@ export default async function OgImage() {
             letterSpacing: "-0.035em",
           }}
         >
-          The hiring layer for crypto, AI & the open web.
+          The registry for AI × crypto engineering roles.
         </div>
 
         {/* live count */}
@@ -88,7 +88,7 @@ export default async function OgImage() {
               color: "rgba(245,245,247,0.5)",
             }}
           >
-            structured for humans and agents
+            salary-transparent · agent-native · indexed daily
           </div>
         </div>
       </div>

@@ -24,8 +24,9 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   /* Absolute base for OG images and other metadata URLs. */
   metadataBase: new URL(SITE_URL),
-  title: "Chainwork",
-  description: "Web3 jobs, structured for humans and agents.",
+  title: "Chainwork — registry for AI × crypto engineering roles",
+  description:
+    "Salary-transparent, agent-native job registry. 120+ AI × crypto companies, ingested daily, searchable via MCP and llms.txt.",
 };
 
 export default function RootLayout({
