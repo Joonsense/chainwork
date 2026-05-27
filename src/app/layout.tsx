@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 import { CommandPalette } from "@/components/command-palette";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { SavedJobsProvider } from "@/components/jobs/saved-jobs-provider";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -41,6 +42,7 @@ export default function RootLayout({
         <SavedJobsProvider>
           <NuqsAdapter>{children}</NuqsAdapter>
         </SavedJobsProvider>
+        <SiteFooter />
         <CommandPalette />
         <Toaster theme="dark" position="top-center" richColors />
       </body>
