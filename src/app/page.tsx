@@ -171,17 +171,6 @@ export default async function HomePage() {
         </section>
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-subtle px-5 py-8 md:px-6">
-        <div className="mx-auto flex max-w-[1240px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <BrandLogo size={14} />
-          <p className="font-mono text-[10.5px] text-text-muted">
-            © 2026 Chainwork Labs · {stats.jobs} active roles · indexed{" "}
-            {indexedLabel} ago
-          </p>
-        </div>
-      </footer>
-
       <MobileTabBar />
     </div>
   );
