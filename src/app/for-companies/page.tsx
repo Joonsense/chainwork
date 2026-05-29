@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GlassNav } from "@/components/layout/glass-nav";
+import { getHomeStats } from "@/db/queries";
 import { SITE_URL } from "@/lib/site";
 
-export const dynamic = "force-static";
+/* Live so the stat card never claims a stale company/role count. */
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "For Companies · ChainWork",
+  title: "For Companies",
   description:
     "Reach AI × crypto engineers — the ones using AI agents to find work. JSON-LD, llms.txt, MCP-native, salary-transparent. From $99 per post in crypto.",
   alternates: { canonical: `${SITE_URL}/for-companies` },
@@ -39,14 +41,14 @@ const VALUES: Array<{ title: string; body: string }> = [
   },
 ];
 
-const STATS = [
-  { value: "120+", label: "companies indexed" },
-  { value: "Daily", label: "ATS refresh" },
-  { value: "MCP", label: "agent-native search" },
-  { value: "USD", label: "salary on every post" },
-];
-
-export default function ForCompaniesPage() {
+export default async function ForCompaniesPage() {
+  const stats = await getHomeStats();
+  const STATS = [
+    { value: stats.jobs.toLocaleString(), label: "engineering roles live" },
+    { value: stats.companies.toLocaleString(), label: "companies indexed" },
+    { value: "Daily", label: "ATS refresh" },
+    { value: "MCP", label: "agent-native search" },
+  ];
   return (
     <div className="min-h-dvh">
       <GlassNav />
@@ -69,20 +71,20 @@ export default function ForCompaniesPage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/post"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-accent-blue px-5 text-[14px] font-medium text-bg-base transition-opacity hover:opacity-90"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-accent-blue px-5 text-[14px] font-medium text-[var(--cw-base)] transition-opacity hover:opacity-90"
               >
                 Post a job — $99
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-border-subtle bg-transparent px-5 text-[14px] font-medium text-text-primary transition-colors hover:bg-surface-elevated"
+                className="inline-flex h-11 items-center justify-center rounded-lg border border-subtle bg-transparent px-5 text-[14px] font-medium text-text-primary transition-colors hover:bg-elevated"
               >
                 See pricing
               </Link>
             </div>
           </header>
 
-          <section className="mb-12 grid grid-cols-2 gap-4 rounded-xl border border-border-subtle bg-surface-elevated p-5 md:grid-cols-4">
+          <section className="mb-12 grid grid-cols-2 gap-4 rounded-xl border border-subtle bg-elevated p-5 md:grid-cols-4">
             {STATS.map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-[24px] font-semibold tracking-[-0.02em] text-text-primary md:text-[28px]">
@@ -103,7 +105,7 @@ export default function ForCompaniesPage() {
               {VALUES.map((v) => (
                 <div
                   key={v.title}
-                  className="rounded-xl border border-border-subtle bg-surface-elevated p-5"
+                  className="rounded-xl border border-subtle bg-elevated p-5"
                 >
                   <h3 className="mb-2 text-[14px] font-semibold text-text-primary">
                     {v.title}
@@ -120,7 +122,7 @@ export default function ForCompaniesPage() {
             <h2 className="mb-5 text-[13px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
               Already on Greenhouse, Lever, or Ashby?
             </h2>
-            <div className="rounded-xl border border-border-subtle bg-surface-elevated p-6">
+            <div className="rounded-xl border border-subtle bg-elevated p-6">
               <p className="mb-3 text-[14px] leading-relaxed text-text-secondary">
                 You don&apos;t need to post. We auto-ingest your roles daily —
                 engineering only, JSON-LD added, surfaced in the catalog and
@@ -157,7 +159,7 @@ export default function ForCompaniesPage() {
             </p>
             <Link
               href="/post"
-              className="mt-5 inline-flex h-11 items-center justify-center rounded-lg bg-accent-blue px-6 text-[14px] font-medium text-bg-base transition-opacity hover:opacity-90"
+              className="mt-5 inline-flex h-11 items-center justify-center rounded-lg bg-accent-blue px-6 text-[14px] font-medium text-[var(--cw-base)] transition-opacity hover:opacity-90"
             >
               Post a job
             </Link>

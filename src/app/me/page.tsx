@@ -11,7 +11,7 @@ import { getJobsByPoster } from "@/db/queries";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Your account · chainwork",
+  title: "Your account",
   robots: { index: false, follow: false },
 };
 

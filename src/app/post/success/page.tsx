@@ -4,7 +4,7 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
 
 export const metadata: Metadata = {
-  title: "Role published · chainwork",
+  title: "Role published",
   robots: { index: false, follow: false },
 };
 

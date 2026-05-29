@@ -8,7 +8,7 @@ import { PostWizard } from "./post-wizard";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Post a role · chainwork",
+  title: "Post a role",
   robots: { index: false, follow: false },
 };
 

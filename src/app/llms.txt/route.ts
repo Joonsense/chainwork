@@ -1,12 +1,9 @@
 import { getAllJobs, getHomeStats } from "@/db/queries";
-import { relativeTime } from "@/lib/format";
+import { formatSalary, relativeTime } from "@/lib/format";
 import { SITE_URL } from "@/lib/site";
 
 /* Read fresh from Neon; the CDN holds it for 10 min via Cache-Control. */
 export const dynamic = "force-dynamic";
-
-/** Salary in $thousands, e.g. 150000 → "150". */
-const k = (n: number) => Math.round(n / 1000);
 
 /**
  * `/llms.txt` — a plain-text, agent-readable index of every live role.
@@ -20,14 +17,14 @@ export async function GET() {
     : "just now";
 
   const roleLines = allJobs.map((job) => {
-    const salary = `$${k(job.salaryMin)}-${k(job.salaryMax)}k`;
+    const salary = formatSalary(job.salaryMin, job.salaryMax);
     return `- /llms/${job.slug}.md — ${job.title} at ${job.company.name} (${salary}, ${job.location})`;
   });
 
   const body = [
     "# chainwork",
     "",
-    "> The registry for AI × crypto engineering roles. Salary-transparent, agent-native, indexed daily from 120+ companies.",
+    "> The registry for AI × crypto engineering roles. Salary-transparent, agent-native, indexed daily from real ATS feeds.",
     "",
     `${stats.jobs} live roles at ${stats.companies} companies. Indexed ${indexed}.`,
     "",
@@ -51,7 +48,7 @@ export async function GET() {
     "## Conventions",
     "",
     "- Salaries are annual, in USD, and always shown as a transparent min-max range.",
-    "- Every role is remote; the location field carries the timezone scope (Worldwide, Americas, Europe, EMEA, APAC).",
+    "- Most roles are remote; the location field carries either a timezone scope (Worldwide, Americas, Europe, EMEA, APAC) for remote roles or a city for on-site roles.",
     "- The JSON API allows cross-origin requests from any origin (CORS *).",
     "- The JSON API is rate-limited to 600 requests per minute per IP.",
     "- Job slugs are stable, URL-safe, and safe to cite.",

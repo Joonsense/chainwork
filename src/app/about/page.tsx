@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/site";
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "About · ChainWork",
+  title: "About",
   description:
     "ChainWork is the registry of AI × crypto engineering roles — built by an AEO operator who needed it to exist. Machine-readable, agent-native, salary-transparent.",
   alternates: { canonical: `${SITE_URL}/about` },
@@ -60,7 +60,7 @@ export default function AboutPage() {
               What that looks like
             </h2>
             <ul className="space-y-3 text-[14px] leading-relaxed text-text-secondary">
-              <li className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
+              <li className="rounded-lg border border-subtle bg-elevated p-4">
                 <span className="font-semibold text-text-primary">
                   MCP server (built-in).
                 </span>{" "}
@@ -70,7 +70,7 @@ export default function AboutPage() {
                 </Link>{" "}
                 — your agent searches our database with two tools, no scraping.
               </li>
-              <li className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
+              <li className="rounded-lg border border-subtle bg-elevated p-4">
                 <span className="font-semibold text-text-primary">
                   llms.txt + per-role markdown.
                 </span>{" "}
@@ -80,21 +80,21 @@ export default function AboutPage() {
                 </code>
                 . No HTML parsing.
               </li>
-              <li className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
+              <li className="rounded-lg border border-subtle bg-elevated p-4">
                 <span className="font-semibold text-text-primary">
                   JSON-LD on every job.
                 </span>{" "}
                 schema.org JobPosting, pre-computed. Google JobSearch and any
                 downstream parser get the same canonical view as your eyes do.
               </li>
-              <li className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
+              <li className="rounded-lg border border-subtle bg-elevated p-4">
                 <span className="font-semibold text-text-primary">
                   AI matching by GitHub or CV.
                 </span>{" "}
                 Drop a GitHub profile or resume — we extract your skill graph
                 and rank roles by actual fit.
               </li>
-              <li className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
+              <li className="rounded-lg border border-subtle bg-elevated p-4">
                 <span className="font-semibold text-text-primary">
                   Salary-transparent, no exceptions.
                 </span>{" "}
@@ -127,8 +127,8 @@ export default function AboutPage() {
               Today&apos;s scope
             </h2>
             <p className="mb-3 text-[14px] leading-relaxed text-text-secondary">
-              We ingest from Greenhouse, Lever, and Ashby across 120+ crypto
-              and AI-adjacent companies. Engineering only — Sales / Marketing /
+              We ingest from Greenhouse, Lever, and Ashby across dozens of crypto
+              and AI-adjacent companies, growing daily. Engineering only — Sales / Marketing /
               Ops / Design / PM are filtered out at ingest. The AI × crypto
               wedge sharpens over time; broader web3 engineering is welcome
               today.

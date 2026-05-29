@@ -60,13 +60,17 @@ export async function getFeaturedJobs(limit = 3): Promise<JobWithCompany[]> {
   return rows.map((r) => ({ ...r.jobs, company: r.companies }));
 }
 
-/** Newest roles — the home "Latest roles" feed. */
+/**
+ * Home "Latest roles" feed. Salary-transparent roles surface first — the
+ * whole USP is salary transparency, so disclosed-pay roles lead, and within
+ * each group the newest win. Keeps the feed honest about what we promise.
+ */
 export async function getLatestJobs(limit = 12): Promise<JobWithCompany[]> {
   const rows = await db
     .select()
     .from(jobs)
     .innerJoin(companies, eq(jobs.companyId, companies.id))
-    .orderBy(desc(jobs.postedAt))
+    .orderBy(sql`(${jobs.salaryMax} > 0 OR ${jobs.salaryMin} > 0) DESC`, desc(jobs.postedAt))
     .limit(limit);
   return rows.map((r) => ({ ...r.jobs, company: r.companies }));
 }

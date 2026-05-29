@@ -133,7 +133,7 @@ export default async function HomePage() {
               <div className="mb-3.5 flex items-end justify-between gap-4">
                 <div>
                   <div className="mb-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-text-tertiary">
-                    Latest · {stats.jobs} roles
+                    Salary-transparent first · {stats.jobs} roles
                   </div>
                   <h2 className="text-[22px] font-semibold tracking-[-0.025em] text-text-primary md:text-[26px]">
                     Latest roles

@@ -8,7 +8,7 @@ import { GlassNav } from "@/components/layout/glass-nav";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Job alert · chainwork",
+  title: "Job alert",
   robots: { index: false, follow: false },
 };
 

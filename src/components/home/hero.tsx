@@ -63,7 +63,7 @@ export function Hero({
         </h1>
 
         <p className="mx-auto mt-4 max-w-[600px] text-[14px] leading-[1.55] text-text-secondary md:text-[16px]">
-          Salary-transparent. Agent-native. Indexed from 120+ companies, daily.
+          Salary-transparent. Agent-native. Indexed daily from real ATS feeds.
         </p>
 
         {/* search box */}

@@ -15,6 +15,7 @@ import type { LeverJob } from "./lever";
 import type { AshbyJob } from "./ashby";
 import type { CompanyEntry } from "./companies";
 import type { NewJob, NewCompany } from "@/db/schema";
+import { buildJobPostingJsonLd } from "@/lib/job-json-ld";
 
 /* ── helpers ─────────────────────────────────────────────── */
 
@@ -318,25 +319,19 @@ export function mapGreenhouseJob(
 
   const postedAt = new Date(job.updated_at ?? Date.now());
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "JobPosting",
+  const jsonLd = buildJobPostingJsonLd({
     title: job.title,
-    datePosted: postedAt.toISOString().split("T")[0],
-    hiringOrganization: {
-      "@type": "Organization",
-      name: company.name,
-      sameAs: company.website,
-    },
-    jobLocation: {
-      "@type": "Place",
-      address: { "@type": "PostalAddress", addressLocality: location },
-    },
-    employmentType: "FULL_TIME",
-    description: descText.slice(0, 500),
-    directApply: true,
-    url: job.absolute_url,
-  };
+    description: descText.slice(0, 1500),
+    slug: jobSlug,
+    postedAt,
+    employmentType: "Full-time",
+    remoteScope: remoteScope ?? null,
+    location,
+    salaryMin: salary?.min ?? 0,
+    salaryMax: salary?.max ?? 0,
+    salaryCurrency: "USD",
+    company: { name: company.name, website: company.website },
+  });
 
   return {
     slug: jobSlug,
@@ -414,25 +409,19 @@ export function mapLeverJob(
   const jobSlug = `${company.slug}-${slugify(job.text)}-${shortId()}`;
   const postedAt = new Date(job.createdAt);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "JobPosting",
+  const jsonLd = buildJobPostingJsonLd({
     title: job.text,
-    datePosted: postedAt.toISOString().split("T")[0],
-    hiringOrganization: {
-      "@type": "Organization",
-      name: company.name,
-      sameAs: company.website,
-    },
-    jobLocation: {
-      "@type": "Place",
-      address: { "@type": "PostalAddress", addressLocality: location },
-    },
-    employmentType: employmentType === "Full-time" ? "FULL_TIME" : "CONTRACTOR",
-    description: descText.slice(0, 500),
-    directApply: true,
-    url: job.hostedUrl,
-  };
+    description: descText.slice(0, 1500),
+    slug: jobSlug,
+    postedAt,
+    employmentType,
+    remoteScope: remoteScope ?? null,
+    location,
+    salaryMin: salary?.min ?? 0,
+    salaryMax: salary?.max ?? 0,
+    salaryCurrency: "USD",
+    company: { name: company.name, website: company.website },
+  });
 
   return {
     slug: jobSlug,
@@ -510,28 +499,19 @@ export function mapAshbyJob(
   const jobSlug = `${company.slug}-${slugify(job.title)}-${shortId()}`;
   const postedAt = new Date(job.publishedAt ?? Date.now());
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "JobPosting",
+  const jsonLd = buildJobPostingJsonLd({
     title: job.title,
-    datePosted: postedAt.toISOString().split("T")[0],
-    hiringOrganization: {
-      "@type": "Organization",
-      name: company.name,
-      sameAs: company.website,
-    },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: location,
-      },
-    },
-    employmentType: employmentType === "Full-time" ? "FULL_TIME" : "CONTRACTOR",
-    description: descText.slice(0, 500),
-    directApply: true,
-    url: job.jobUrl,
-  };
+    description: descText.slice(0, 1500),
+    slug: jobSlug,
+    postedAt,
+    employmentType,
+    remoteScope: remoteScope ?? null,
+    location,
+    salaryMin: salary?.min ?? 0,
+    salaryMax: salary?.max ?? 0,
+    salaryCurrency: "USD",
+    company: { name: company.name, website: company.website },
+  });
 
   return {
     slug: jobSlug,

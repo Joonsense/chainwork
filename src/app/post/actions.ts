@@ -192,11 +192,12 @@ export async function submitJob(args: {
 
     const jsonLd = buildJobPostingJsonLd({
       title,
-      descriptionMd,
+      description: descriptionMd,
       slug,
       postedAt,
       employmentType: f.employmentType,
       remoteScope,
+      location,
       salaryMin,
       salaryMax,
       salaryCurrency: f.salaryCurrency,

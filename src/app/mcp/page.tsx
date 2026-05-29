@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 const MCP_URL = `${SITE_URL}/api/mcp/mcp`;
 
 export const metadata: Metadata = {
-  title: "ChainWork MCP server · search crypto jobs from your AI agent",
+  title: "MCP server — search crypto jobs from your AI agent",
   description:
     "Connect Claude Desktop, Cursor, Windsurf, or any MCP client to ChainWork's job database. Two tools: search_jobs, get_job. Streamable HTTP transport, no auth required.",
   alternates: { canonical: `${SITE_URL}/mcp` },
@@ -54,8 +54,8 @@ export default function McpPage() {
               ChainWork MCP server
             </h1>
             <p className="mt-1.5 text-[14px] text-text-secondary">
-              Point your AI agent at our job database. Search 120+ crypto, web3,
-              and AI x crypto companies directly from Claude Desktop, Cursor,
+              Point your AI agent at our job database. Search crypto, web3,
+              and AI × crypto engineering roles directly from Claude Desktop, Cursor,
               Windsurf, or any MCP-compatible client.
             </p>
           </header>
@@ -64,7 +64,7 @@ export default function McpPage() {
             <h2 className="mb-2 text-[13px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
               Endpoint
             </h2>
-            <div className="rounded-lg border border-border-subtle bg-surface-elevated px-4 py-3 font-mono text-[13px] text-text-primary">
+            <div className="rounded-lg border border-subtle bg-elevated px-4 py-3 font-mono text-[13px] text-text-primary">
               {MCP_URL}
             </div>
             <p className="mt-2 text-[13px] text-text-secondary">
@@ -78,7 +78,7 @@ export default function McpPage() {
               Tools
             </h2>
             <ul className="space-y-3">
-              <li className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
+              <li className="rounded-lg border border-subtle bg-elevated p-4">
                 <div className="flex items-baseline gap-2">
                   <code className="font-mono text-[13px] font-semibold text-accent-blue">
                     search_jobs
@@ -93,7 +93,7 @@ export default function McpPage() {
                   to 20 jobs per call with apply URLs.
                 </p>
               </li>
-              <li className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
+              <li className="rounded-lg border border-subtle bg-elevated p-4">
                 <div className="flex items-baseline gap-2">
                   <code className="font-mono text-[13px] font-semibold text-accent-blue">
                     get_job
@@ -125,7 +125,7 @@ export default function McpPage() {
               </code>{" "}
               to bridge stdio ↔ HTTP):
             </p>
-            <pre className="overflow-x-auto rounded-lg border border-border-subtle bg-surface-elevated p-4 font-mono text-[12px] leading-relaxed text-text-primary">
+            <pre className="overflow-x-auto rounded-lg border border-subtle bg-elevated p-4 font-mono text-[12px] leading-relaxed text-text-primary">
               {claudeDesktopConfig}
             </pre>
           </section>
@@ -137,7 +137,7 @@ export default function McpPage() {
             <p className="mb-3 text-[13px] text-text-secondary">
               Clients with native Streamable HTTP support can connect directly:
             </p>
-            <pre className="overflow-x-auto rounded-lg border border-border-subtle bg-surface-elevated p-4 font-mono text-[12px] leading-relaxed text-text-primary">
+            <pre className="overflow-x-auto rounded-lg border border-subtle bg-elevated p-4 font-mono text-[12px] leading-relaxed text-text-primary">
               {streamableHttpConfig}
             </pre>
           </section>
