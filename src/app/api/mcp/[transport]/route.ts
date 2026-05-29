@@ -24,7 +24,7 @@ const handler = createMcpHandler(
       {
         title: "Search ChainWork jobs",
         description:
-          "Search ChainWork's curated database of crypto, web3, and AI x crypto engineering jobs from 120+ companies. Returns up to 20 jobs at a time with title, company, salary range, location, and an apply URL. Use empty filters to browse the newest roles.",
+          "Search ChainWork's curated database of crypto, web3, and AI x crypto engineering jobs, ingested daily from real ATS feeds. Returns up to 20 jobs at a time with title, company, salary range, location, and an apply URL. Use empty filters to browse the newest roles.",
         inputSchema: {
           q: z
             .string()

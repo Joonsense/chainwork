@@ -25,7 +25,7 @@ import { rankMatches } from "@/lib/matching";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "All roles · chainwork",
+  title: "All roles",
   description:
     "Filter salary-transparent web3 and AI roles by ecosystem, role, seniority, and compensation.",
 };

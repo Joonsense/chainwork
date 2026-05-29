@@ -18,13 +18,13 @@ type Params = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const job = await getJobBySlug(slug);
-  if (!job) return { title: "Job not found · chainwork" };
+  if (!job) return { title: "Job not found" };
 
   const description = (job.oneLiner ?? job.descriptionMd)
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 160);
-  const title = `${job.title} at ${job.company.name} · chainwork`;
+  const title = `${job.title} at ${job.company.name}`;
 
   return {
     title,

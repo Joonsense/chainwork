@@ -15,7 +15,7 @@ import { AlertsForm } from "./alerts-form";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Job alerts · chainwork",
+  title: "Job alerts",
   description: "Get new web3 roles matching your filters, by email.",
 };
 

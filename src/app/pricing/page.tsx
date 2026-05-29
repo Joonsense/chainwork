@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/site";
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "Pricing · ChainWork",
+  title: "Pricing",
   description:
     "Free for ATS-verified companies. Paid posts from $99 — settled in BTC, ETH, USDC, or any of 200+ tokens via NowPayments.",
   alternates: { canonical: `${SITE_URL}/pricing` },
@@ -88,10 +88,10 @@ export default function PricingPage() {
             {TIERS.map((tier) => (
               <div
                 key={tier.name}
-                className={`flex flex-col rounded-xl border bg-surface-elevated p-6 ${
+                className={`flex flex-col rounded-xl border bg-elevated p-6 ${
                   tier.highlight
                     ? "border-accent-blue/60 shadow-[0_0_40px_-12px_rgba(99,179,237,0.4)]"
-                    : "border-border-subtle"
+                    : "border-subtle"
                 }`}
               >
                 <div className="mb-4">
@@ -121,8 +121,8 @@ export default function PricingPage() {
                   href={tier.cta.href}
                   className={`inline-flex h-10 items-center justify-center rounded-lg px-4 text-[13px] font-medium transition-colors ${
                     tier.highlight
-                      ? "bg-accent-blue text-bg-base hover:opacity-90"
-                      : "border border-border-subtle bg-transparent text-text-primary hover:bg-surface-elevated"
+                      ? "bg-accent-blue text-[var(--cw-base)] hover:opacity-90"
+                      : "border border-subtle bg-transparent text-text-primary hover:bg-elevated"
                   }`}
                 >
                   {tier.cta.label}
@@ -131,7 +131,7 @@ export default function PricingPage() {
             ))}
           </section>
 
-          <section className="mb-12 rounded-xl border border-border-subtle bg-surface-elevated p-6">
+          <section className="mb-12 rounded-xl border border-subtle bg-elevated p-6">
             <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
               How crypto checkout works
             </h2>

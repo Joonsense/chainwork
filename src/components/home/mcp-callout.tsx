@@ -29,7 +29,7 @@ export function McpCallout() {
           Connect your agent directly — two tools, no scraping.
         </div>
 
-        <span className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg border border-accent-blue/40 bg-bg-base px-3 py-1.5 font-mono text-[11.5px] text-accent-blue transition-colors group-hover:border-accent-blue group-hover:bg-accent-blue group-hover:text-bg-base sm:self-auto">
+        <span className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg border border-accent-blue/40 bg-base px-3 py-1.5 font-mono text-[11.5px] text-accent-blue transition-colors group-hover:border-accent-blue group-hover:bg-accent-blue group-hover:text-[var(--cw-base)] sm:self-auto">
           Setup
           <ArrowRight size={11} />
         </span>

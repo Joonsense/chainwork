@@ -1,11 +1,9 @@
 import { type NextRequest } from "next/server";
 import { getJobBySlug } from "@/db/queries";
+import { formatSalary } from "@/lib/format";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-
-/** Salary in $thousands, e.g. 150000 → "150". */
-const k = (n: number) => Math.round(n / 1000);
 
 const bullets = (items: string[]) => items.map((i) => `- ${i}`).join("\n");
 
@@ -35,7 +33,11 @@ export async function GET(
   const { company } = job;
   const verified = company.verified ? " (✓ verified)" : "";
   const token = job.hasTokenEquity ? " (+ token)" : "";
-  const salary = `$${k(job.salaryMin)}-${k(job.salaryMax)}k ${job.salaryCurrency}`;
+  const salaryRange = formatSalary(job.salaryMin, job.salaryMax);
+  const salary =
+    salaryRange === "Competitive"
+      ? "Competitive (not disclosed)"
+      : `${salaryRange} ${job.salaryCurrency}`;
   const apply =
     job.applyUrl ?? (job.applyEmail ? `mailto:${job.applyEmail}` : "—");
 

@@ -7,7 +7,7 @@ import { getServerSession } from "@/lib/auth";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Sign in · chainwork",
+  title: "Sign in",
   robots: { index: false, follow: false },
 };
 

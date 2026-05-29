@@ -7,7 +7,7 @@ import { CvUpload } from "./cv-upload";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Upload your CV · chainwork",
+  title: "Upload your CV",
   robots: { index: false, follow: false },
 };
 

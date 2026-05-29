@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { db, companies, jobs } from "./index";
 import type { NewCompany, NewJob } from "./schema";
+import { buildJobPostingJsonLd } from "../lib/job-json-ld";
 
 /**
  * Seed — 20 companies, 50 jobs.
@@ -448,43 +449,19 @@ function buildJsonLd(
   job: NewJob,
   company: CompanySpec & { id: string },
 ): Record<string, unknown> {
-  return {
-    "@context": "https://schema.org/",
-    "@type": "JobPosting",
+  return buildJobPostingJsonLd({
     title: job.title,
     description: job.descriptionMd,
-    datePosted: (job.postedAt as Date).toISOString(),
-    validThrough: new Date(
-      (job.postedAt as Date).getTime() + 30 * 86_400_000,
-    ).toISOString(),
-    employmentType: job.employmentType === "Contract" ? "CONTRACTOR" : "FULL_TIME",
-    hiringOrganization: {
-      "@type": "Organization",
-      name: company.name,
-      sameAs: company.website,
-    },
-    jobLocationType: "TELECOMMUTE",
-    applicantLocationRequirements: {
-      "@type": "Country",
-      name: job.remoteScope ?? "Worldwide",
-    },
-    baseSalary: {
-      "@type": "MonetaryAmount",
-      currency: job.salaryCurrency,
-      value: {
-        "@type": "QuantitativeValue",
-        minValue: job.salaryMin,
-        maxValue: job.salaryMax,
-        unitText: "YEAR",
-      },
-    },
-    directApply: true,
-    identifier: {
-      "@type": "PropertyValue",
-      name: "Chainwork",
-      value: job.slug,
-    },
-  };
+    slug: job.slug,
+    postedAt: job.postedAt as Date,
+    employmentType: job.employmentType,
+    remoteScope: job.remoteScope ?? null,
+    location: job.location,
+    salaryMin: job.salaryMin,
+    salaryMax: job.salaryMax,
+    salaryCurrency: job.salaryCurrency ?? "USD",
+    company: { name: company.name, website: company.website ?? null },
+  });
 }
 
 /* ── job generation ─────────────────────────────────────────── */

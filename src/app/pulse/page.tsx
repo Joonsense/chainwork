@@ -11,13 +11,13 @@ import { formatSalary, relativeTime } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Crypto Hiring Pulse · chainwork",
+  title: "Crypto Hiring Pulse",
   description:
     "Real-time snapshot of who's hiring in crypto and Web3. Ecosystem breakdown, top companies, trending roles — updated daily.",
   openGraph: {
-    title: "Crypto Hiring Pulse · chainwork",
+    title: "Crypto Hiring Pulse",
     description:
-      "Who's hiring in crypto right now? Live data across 100+ Web3 companies — ecosystem breakdown, top roles, salary signals.",
+      "Who's hiring in crypto right now? Live data across crypto and Web3 companies — ecosystem breakdown, top roles, salary signals.",
     type: "website",
   },
   twitter: { card: "summary_large_image" },
@@ -137,7 +137,7 @@ export default async function PulsePage() {
               Crypto Hiring Pulse
             </h1>
             <p className="mt-1.5 text-[14px] text-text-secondary">
-              Real-time snapshot of who&apos;s hiring across 100+ Web3 companies.
+              Real-time snapshot of who&apos;s hiring across {stats.totalCompanies.toLocaleString()} crypto &amp; Web3 companies.
             </p>
           </div>
 
