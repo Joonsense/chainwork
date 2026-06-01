@@ -22,6 +22,7 @@ import {
   SENIORITY_LEVELS,
   ECOSYSTEM_OPTIONS,
 } from "@/lib/jobs-search-params";
+import { collectionFilters } from "@/lib/collections";
 
 const categoryForRoleSlug = (slug: string): string | undefined =>
   ROLE_OPTIONS.find((o) => o.value === slug)?.category;
@@ -30,6 +31,25 @@ const roleSlugForCategory = (category: string): string | undefined =>
   ROLE_OPTIONS.find((o) => o.category === category)?.value;
 
 export type JobWithCompany = Job & { company: Company };
+
+/**
+ * Jobs for a programmatic collection page (P16) — by role slug, ecosystem
+ * key, or both. Wrapped in React `cache` and keyed on primitive args so
+ * generateMetadata and the page component share one query per request.
+ * Pass `null` (not undefined) for an unused axis to keep the cache key stable.
+ */
+export const getCollectionResult = cache(
+  async (
+    role: string | null,
+    eco: string | null,
+  ): Promise<{ jobs: JobWithCompany[]; total: number }> => {
+    const filters = collectionFilters({
+      role: role ?? undefined,
+      eco: eco ?? undefined,
+    });
+    return searchJobs(filters, { limit: 400, offset: 0 });
+  },
+);
 
 /**
  * Single job by slug, with its company. Wrapped in React `cache` so

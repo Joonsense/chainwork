@@ -1,6 +1,12 @@
 import { getAllJobs, getHomeStats } from "@/db/queries";
 import { formatSalary, relativeTime } from "@/lib/format";
 import { SITE_URL } from "@/lib/site";
+import {
+  ROLE_COLLECTIONS,
+  ECO_COLLECTIONS,
+  ecoCounts,
+  roleCounts,
+} from "@/lib/collections";
 
 /* Read fresh from Neon; the CDN holds it for 10 min via Cache-Control. */
 export const dynamic = "force-dynamic";
@@ -21,6 +27,19 @@ export async function GET() {
     return `- /llms/${job.slug}.md — ${job.title} at ${job.company.name} (${salary}, ${job.location})`;
   });
 
+  // Browse-by collections — the same surface humans get, for agents that
+  // want a slice ("all Solana smart-contract roles") instead of the firehose.
+  const eco = ecoCounts(allJobs);
+  const role = roleCounts(allJobs);
+  const disciplineLines = ROLE_COLLECTIONS.filter((r) => role[r.category] > 0)
+    .map(
+      (r) =>
+        `- ${SITE_URL}/roles/${r.slug} — ${r.label} jobs (${role[r.category]})`,
+    );
+  const ecosystemLines = ECO_COLLECTIONS.filter((e) => eco[e.key] > 0).map(
+    (e) => `- ${SITE_URL}/ecosystems/${e.slug} — ${e.name} jobs (${eco[e.key]})`,
+  );
+
   const body = [
     "# chainwork",
     "",
@@ -33,6 +52,18 @@ export async function GET() {
     "Every role has a machine-readable markdown file at the path below — fetch it directly, no HTML parsing needed.",
     "",
     ...roleLines,
+    "",
+    "## Collections",
+    "",
+    `Pre-filtered role lists, one URL per slice. Each carries schema.org/ItemList JSON-LD. Full matrix (discipline × ecosystem) at ${SITE_URL}/directory.`,
+    "",
+    "### By discipline",
+    "",
+    ...disciplineLines,
+    "",
+    "### By ecosystem",
+    "",
+    ...ecosystemLines,
     "",
     "## API",
     "",
