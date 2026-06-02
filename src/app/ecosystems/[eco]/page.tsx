@@ -75,6 +75,11 @@ export default async function EcosystemPage({ params }: Params) {
     description: ecoIntro(eco, total),
     path,
     jobs,
+    breadcrumbs: [
+      { name: "chainwork", path: "/" },
+      { name: "Ecosystems", path: "/directory" },
+      { name: eco.name, path },
+    ],
   });
 
   return (

@@ -76,6 +76,11 @@ export default async function RolePage({ params }: Params) {
     description: roleIntro(role, total),
     path,
     jobs,
+    breadcrumbs: [
+      { name: "chainwork", path: "/" },
+      { name: "Roles", path: "/directory" },
+      { name: role.label, path },
+    ],
   });
 
   return (

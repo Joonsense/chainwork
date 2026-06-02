@@ -9,6 +9,7 @@ import { SaveButton } from "@/components/jobs/save-button";
 import { StickyApplyBar } from "@/components/jobs/sticky-apply-bar";
 import { ViewTracker } from "@/components/jobs/view-tracker";
 import { getJobBySlug, getAllJobs } from "@/db/queries";
+import { buildBreadcrumbJsonLd } from "@/lib/breadcrumb-json-ld";
 import { formatSalary, relativeTime } from "@/lib/format";
 
 export const dynamic = "force-static";
@@ -112,6 +113,11 @@ export default async function JobDetailPage({ params }: Params) {
   if (!job) notFound();
 
   const { company } = job;
+  const breadcrumbLd = buildBreadcrumbJsonLd([
+    { name: "chainwork", path: "/" },
+    { name: "Jobs", path: "/jobs" },
+    { name: job.title, path: `/jobs/${slug}` },
+  ]);
   const jsonLdPretty = JSON.stringify(job.jsonLd, null, 2);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://chainwork-tau.vercel.app";
   const jobUrl = `${siteUrl}/jobs/${slug}`;
@@ -126,6 +132,10 @@ export default async function JobDetailPage({ params }: Params) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(job.jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
 
       {/* Fire-and-forget view count increment */}

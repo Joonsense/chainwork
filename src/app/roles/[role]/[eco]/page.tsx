@@ -101,6 +101,11 @@ export default async function ComboPage({ params }: Params) {
     description: comboIntro(role, eco, combo.total),
     path,
     jobs: combo.jobs,
+    breadcrumbs: [
+      { name: "chainwork", path: "/" },
+      { name: role.label, path: `/roles/${role.slug}` },
+      { name: eco.name, path },
+    ],
   });
 
   return (
