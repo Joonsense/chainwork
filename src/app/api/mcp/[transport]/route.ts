@@ -1,6 +1,7 @@
 import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
-import { getJobBySlug, searchJobs } from "@/db/queries";
+import { db, jobSubmissions } from "@/db";
+import { getJobBySlug, getMarketStats, searchJobs } from "@/db/queries";
 import {
   ECOSYSTEM_OPTIONS,
   LOCATION_OPTIONS,
@@ -10,6 +11,9 @@ import {
   SENIORITY_LEVELS,
   type JobFilters,
 } from "@/lib/jobs-search-params";
+import { ECOSYSTEMS } from "@/lib/ecosystems";
+import { EMPLOYMENT_TYPES } from "@/lib/post-schema";
+import { submissionSchema } from "@/lib/submission-schema";
 import { SITE_URL } from "@/lib/site";
 
 const ALLOWED_ROLES = ROLE_OPTIONS.map((r) => r.value).join(", ");
@@ -186,14 +190,230 @@ const handler = createMcpHandler(
         };
       },
     );
+
+    server.registerTool(
+      "list_filters",
+      {
+        title: "List ChainWork filter options",
+        description:
+          "Return the exact, allowed filter values for search_jobs and submit_job — ecosystems, role categories, seniority levels, and remote-location slugs. Call this first so you pass valid filters instead of guessing.",
+        inputSchema: {},
+      },
+      async () => ({
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                ecosystems: ECOSYSTEM_OPTIONS.map((e) => ({
+                  value: e,
+                  label: ECOSYSTEMS[e]?.label ?? e.toUpperCase(),
+                })),
+                roles: ROLE_OPTIONS.map((r) => ({
+                  value: r.value,
+                  label: r.label,
+                })),
+                seniority: SENIORITY_LEVELS,
+                locations: LOCATION_OPTIONS.map((l) => ({
+                  value: l.value,
+                  label: l.label,
+                })),
+                posted_within: POSTED_VALUES,
+                employment_types: EMPLOYMENT_TYPES,
+              },
+              null,
+              2,
+            ),
+          },
+        ],
+      }),
+    );
+
+    server.registerTool(
+      "get_market_stats",
+      {
+        title: "ChainWork crypto-engineering market stats",
+        description:
+          "Get an aggregate, citable snapshot of the live AI x crypto engineering job market: salary percentiles (USD-annual midpoints), share of roles offering token/equity, remote-worldwide share, and the busiest ecosystems and role categories. Use this to answer 'what does a Solana engineer earn' or 'how many AI x crypto roles are open' style questions.",
+        inputSchema: {},
+      },
+      async () => {
+        const s = await getMarketStats();
+        const k = (n: number) => `$${Math.round(n / 1000)}k`;
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  total_live_jobs: s.totalJobs,
+                  total_companies: s.totalCompanies,
+                  disclosed_salary_jobs: s.disclosedSalaryCount,
+                  salary_usd_annual: s.salaryUsd
+                    ? {
+                        p10: k(s.salaryUsd.p10),
+                        p25: k(s.salaryUsd.p25),
+                        median: k(s.salaryUsd.median),
+                        p75: k(s.salaryUsd.p75),
+                        p90: k(s.salaryUsd.p90),
+                      }
+                    : null,
+                  token_or_equity_share: `${Math.round(s.tokenEquityShare * 100)}%`,
+                  remote_worldwide_share: `${Math.round(s.remoteWorldwideShare * 100)}%`,
+                  top_ecosystems: s.topEcosystems.slice(0, 8),
+                  top_roles: s.topRoles.slice(0, 8),
+                  source: SITE_URL,
+                  generated_at: s.generatedAt,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      },
+    );
+
+    server.registerTool(
+      "submit_job",
+      {
+        title: "Submit a job to ChainWork",
+        description:
+          "Submit a crypto / web3 / AI x crypto engineering role to ChainWork on behalf of a hiring company. Agents are welcome here. The submission enters a moderation queue (it is NOT published instantly) and goes live only after a human review. Call list_filters first to use valid ecosystem, role, seniority, and location values.",
+        inputSchema: {
+          submitter_email: z
+            .string()
+            .describe("Contact email of the submitter — used for follow-up"),
+          company_name: z.string().describe("Hiring company name"),
+          company_website: z
+            .string()
+            .optional()
+            .describe("Company website, e.g. https://example.com"),
+          title: z.string().describe("Job title, e.g. 'Senior Rust Engineer'"),
+          role_category: z
+            .string()
+            .describe(`Role slug. One of: ${ALLOWED_ROLES}`),
+          seniority: z
+            .string()
+            .describe(`Seniority. One of: ${ALLOWED_SENIORITY}`),
+          employment_type: z
+            .enum(EMPLOYMENT_TYPES)
+            .describe("Employment type"),
+          ecosystems: z
+            .array(z.string())
+            .describe(`At least one ecosystem. Allowed: ${ALLOWED_ECOS}`),
+          location: z
+            .string()
+            .describe(`Remote-scope slug. One of: ${ALLOWED_LOCATIONS}`),
+          salary_min_usd: z
+            .number()
+            .int()
+            .optional()
+            .describe("Annual minimum salary in USD (whole dollars)"),
+          salary_max_usd: z
+            .number()
+            .int()
+            .optional()
+            .describe("Annual maximum salary in USD (whole dollars)"),
+          has_token_or_equity: z.boolean().optional(),
+          description_md: z
+            .string()
+            .describe(
+              "Full role description in Markdown — at least 120 characters",
+            ),
+          apply_url: z
+            .string()
+            .optional()
+            .describe("Application URL (provide this or apply_email)"),
+          apply_email: z
+            .string()
+            .optional()
+            .describe("Application email (provide this or apply_url)"),
+        },
+      },
+      async (a) => {
+        const candidate = {
+          submitterEmail: a.submitter_email ?? "",
+          companyName: a.company_name ?? "",
+          companyWebsite: a.company_website ?? "",
+          title: a.title ?? "",
+          roleCategory:
+            ROLE_OPTIONS.find((r) => r.value === a.role_category)?.category ??
+            a.role_category ??
+            "",
+          seniority: a.seniority ?? "",
+          employmentType: a.employment_type,
+          ecosystems: a.ecosystems ?? [],
+          location: a.location ?? "",
+          salaryMin: a.salary_min_usd != null ? String(a.salary_min_usd) : "",
+          salaryMax: a.salary_max_usd != null ? String(a.salary_max_usd) : "",
+          salaryCurrency: "USD" as const,
+          hasTokenEquity: a.has_token_or_equity ?? false,
+          descriptionMd: a.description_md ?? "",
+          applyUrl: a.apply_url ?? "",
+          applyEmail: a.apply_email ?? "",
+          note: "Submitted via MCP submit_job",
+        };
+
+        const parsed = submissionSchema.safeParse(candidate);
+        if (!parsed.success) {
+          const issues = parsed.error.issues
+            .map((i) => `${i.path.join(".") || "form"}: ${i.message}`)
+            .join("; ");
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Submission rejected. Fix and retry: ${issues}. Call list_filters for valid values.`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        try {
+          await db.insert(jobSubmissions).values({
+            status: "pending",
+            submitterEmail: parsed.data.submitterEmail.trim().toLowerCase(),
+            data: parsed.data,
+            note: parsed.data.note,
+          });
+        } catch (err) {
+          console.error("MCP submit_job failed:", err);
+          return {
+            content: [
+              { type: "text", text: "Internal error saving the submission." },
+            ],
+            isError: true,
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                {
+                  status: "pending_review",
+                  message:
+                    "Submission received and queued for human moderation. It will appear publicly once approved.",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      },
+    );
   },
   {
     serverInfo: {
       name: "chainwork",
-      version: "1.0.0",
+      version: "1.1.0",
     },
     instructions:
-      "ChainWork is a curated job board for crypto, web3, and AI x crypto engineering roles. Use search_jobs to browse or filter, then get_job for the full posting. Salaries are USD-annual and shown as min–max ranges. Every job has a public apply URL.",
+      "ChainWork is the agent-native registry for crypto, web3, and AI x crypto engineering roles. Tools: list_filters (valid filter values — call first), search_jobs (browse/filter), get_job (full posting by slug), get_market_stats (salary percentiles + market snapshot), submit_job (post a role into the moderation queue). Salaries are USD-annual min–max ranges. Every job has a public apply URL. Agents are first-class clients here.",
   },
   {
     basePath: "/api/mcp",

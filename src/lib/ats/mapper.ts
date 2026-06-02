@@ -142,7 +142,7 @@ const ROLE_PATTERNS: Array<{
   },
 ];
 
-function inferRoleCategory(title: string, department = ""): string {
+export function inferRoleCategory(title: string, department = ""): string {
   const text = `${title} ${department}`;
   for (const { category, patterns } of ROLE_PATTERNS) {
     if (patterns.some((p) => p.test(text))) return category;
@@ -160,21 +160,45 @@ function inferRoleCategory(title: string, department = ""): string {
  * so we never carry off-target rows into the catalog.
  */
 const NON_ENGINEERING_PATTERNS: RegExp[] = [
-  /\b(sales|account\s?(manager|executive|director)|business\s?develop|partnerships?|partner\s?success|bdr|sdr)\b/i,
-  /\b(marketing|growth|brand|content\s?(writer|creator|marketing|strategist)|social\s?media|community\s?(manager|coordinator|lead)|copywrit)\b/i,
-  /\b(designer|design\s?(lead|manager|intern|coordinator|director)?|brand\s?design|product\s?design|graphic|ui\s?design|ux\s?(design|research)|illustrator)\b/i,
-  /\b(product\s?manager|product\s?owner|principal\s?product|head\s?of\s?product|director\s?of\s?product|chief\s?product|cpo\b)\b/i,
-  /\b(accountant|controller|financial?\s?(analyst|operations|ops)|treasury|tax\b|bookkeep)\b/i,
-  /\b(hr\b|people\s?(ops|operations|partner)|talent\s?(acquisition|partner)|recruit(er|ing)|head\s?of\s?people)\b/i,
-  /\b(legal|paralegal|counsel|attorney|lawyer|compliance\s?(?!engineer)|regulatory\s?affairs)\b/i,
-  /\b(office\s?(services|manager|coordinator|administrator|admin)|executive\s?assistant|receptionist|workplace)\b/i,
-  /\b(operations\s?(manager|coordinator|associate|analyst|specialist)(?!\s?engineer)|chief\s?of\s?staff|coo\b)\b/i,
-  /\b(customer\s?(success|support|service|experience)|cx\b|client\s?(success|support|service))\b/i,
+  // Trailing \b dropped on purpose: "business develop" must match
+  // "Business Development" (the \b after "develop" never fell on a boundary).
+  /\b(sales|account\s?(manager|executive|director)|business\s?develop|partnerships?|partner\s?success|bdr|sdr)/i,
+  /\b(marketing|marketer|growth|brand|content\s?(writer|creator|marketing|strategist)|social\s?media|community\s?(manager|coordinator|lead)|copywrit)/i,
+  /\b(designer|design\s?(lead|manager|intern|coordinator|director)?|brand\s?design|product\s?design|graphic|ui\s?design|ux\s?(design|research)|illustrator)/i,
+  /\b(product\s?manager|product\s?owner|principal\s?product|head\s?of\s?product|director\s?of\s?product|chief\s?product|cpo\b)/i,
+  /\b(accountant|controller|financial?\s?(analyst|operations|ops)|treasury|tax\b|bookkeep)/i,
+  /\b(hr\b|people\s?(ops|operations|partner)|talent\s?(acquisition|partner)|recruit(er|ing)|head\s?of\s?people)/i,
+  /\b(legal|paralegal|counsel|attorney|lawyer|compliance|regulatory\s?affairs)/i,
+  /\b(office\s?(services|manager|coordinator|administrator|admin)|executive\s?assistant|receptionist|workplace)/i,
+  /\b(operations\s?(manager|coordinator|associate|analyst|specialist|director|lead)|chief\s?of\s?staff|coo\b)/i,
+  /\b(customer\s?(success|support|service|experience)|cx\b|client\s?(success|support|service))/i,
+  // Gaps surfaced by the P16 data-quality pass — risk / fraud / GM / finance /
+  // corp-dev / marketing-ops / recruiting / media rows that title-blacklisting
+  // missed on the no-filter P11 ingest. (Engineering guard above protects any
+  // title that actually names an engineering role.)
+  /\b(fraud|aml\b|kyc\b|sanctions)/i,
+  /\b(enterprise\s?risk|risk\s?(analyst|manager|strategist|analytics|operations|specialist|lead))/i,
+  /\bgeneral\s?manager\b/i,
+  /\b(professional\s?services|corporate\s?development|corp\s?dev|biz\s?ops|strategy\s?&?\s?operations)/i,
+  /\b(demand\s?generation|competitive\s?intelligence|growth\s?marketer)/i,
+  /\b(accounting|fp\s?&\s?a|fp&a|financial\s?planning|strategic\s?finance|wealth\s?advisor|financial\s?advisor|trust\s?officer)/i,
+  /\b(sourcer|talent\s?(sourcer|partner|acquisition))/i,
+  /\b(videographer|video\s?editor|photographer)/i,
+  /\b(strategic\s?alliances|alliances\s?manager|relationship\s?manager|vip\s?relationship)/i,
 ];
+
+/**
+ * Engineering-title guard. If the title plainly names an engineering role we
+ * never reject it, even if some other word trips a blacklist pattern (e.g.
+ * "Software Engineer, Risk Engineering"). Prevents the cleanup from deleting
+ * real engineers; the rare "Sales Engineer" edge case is an acceptable miss.
+ */
+const ENGINEERING_GUARD = /\b(engineer|engineering|developer|programmer)\b/i;
 
 /** True when the title / department clearly looks like a non-engineering role. */
 export function isNonEngineeringRole(title: string, department = ""): boolean {
   const text = `${title} ${department}`;
+  if (ENGINEERING_GUARD.test(text)) return false;
   return NON_ENGINEERING_PATTERNS.some((p) => p.test(text));
 }
 

@@ -62,8 +62,9 @@ export function Hero({
           engineering roles.
         </h1>
 
-        <p className="mx-auto mt-4 max-w-[600px] text-[14px] leading-[1.55] text-text-secondary md:text-[16px]">
-          Salary-transparent. Agent-native. Indexed daily from real ATS feeds.
+        <p className="mx-auto mt-4 max-w-[620px] text-[14px] leading-[1.55] text-text-secondary md:text-[16px]">
+          Salary-transparent and open-source. Built for humans and AI agents
+          alike — searchable over MCP. Indexed daily from real ATS feeds.
         </p>
 
         {/* search box */}

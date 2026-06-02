@@ -544,6 +544,103 @@ export async function getPulseStats(): Promise<PulseStats> {
   };
 }
 
+/* ── Market stats (AEO data asset + MCP get_market_stats) ─────── */
+
+export type MarketStats = {
+  totalJobs: number;
+  totalCompanies: number;
+  disclosedSalaryCount: number;
+  salaryUsd: {
+    p10: number;
+    p25: number;
+    median: number;
+    p75: number;
+    p90: number;
+  } | null;
+  tokenEquityShare: number; // 0–1
+  remoteWorldwideShare: number; // 0–1
+  topEcosystems: Array<{ eco: string; label: string; count: number }>;
+  topRoles: Array<{ role: string; count: number }>;
+  generatedAt: string;
+};
+
+const pct = (sorted: number[], p: number): number => {
+  if (sorted.length === 0) return 0;
+  const idx = Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length));
+  return sorted[idx];
+};
+
+/**
+ * Aggregate market stats over the live job pool. Salary figures use the
+ * midpoint of each disclosed range. This is the citable, agent-readable
+ * snapshot the crypto boards don't expose — powers /data and the MCP
+ * get_market_stats tool. Cached per request.
+ */
+export const getMarketStats = cache(async (): Promise<MarketStats> => {
+  const [rows, [companyAgg]] = await Promise.all([
+    db
+      .select({
+        ecosystems: jobs.ecosystems,
+        roleCategory: jobs.roleCategory,
+        salaryMin: jobs.salaryMin,
+        salaryMax: jobs.salaryMax,
+        hasTokenEquity: jobs.hasTokenEquity,
+        remoteScope: jobs.remoteScope,
+      })
+      .from(jobs),
+    db.select({ value: count() }).from(companies),
+  ]);
+
+  const midpoints: number[] = [];
+  const ecoTally: Record<string, number> = {};
+  const roleTally: Record<string, number> = {};
+  let tokenCount = 0;
+  let remoteWw = 0;
+
+  for (const r of rows) {
+    if (r.salaryMax > 0 || r.salaryMin > 0) {
+      const lo = r.salaryMin > 0 ? r.salaryMin : r.salaryMax;
+      const hi = r.salaryMax > 0 ? r.salaryMax : r.salaryMin;
+      midpoints.push(Math.round((lo + hi) / 2));
+    }
+    if (r.hasTokenEquity) tokenCount += 1;
+    if (r.remoteScope === "Worldwide") remoteWw += 1;
+    for (const e of r.ecosystems) ecoTally[e] = (ecoTally[e] ?? 0) + 1;
+    roleTally[r.roleCategory] = (roleTally[r.roleCategory] ?? 0) + 1;
+  }
+
+  midpoints.sort((a, b) => a - b);
+
+  return {
+    totalJobs: rows.length,
+    totalCompanies: companyAgg?.value ?? 0,
+    disclosedSalaryCount: midpoints.length,
+    salaryUsd:
+      midpoints.length > 0
+        ? {
+            p10: pct(midpoints, 10),
+            p25: pct(midpoints, 25),
+            median: pct(midpoints, 50),
+            p75: pct(midpoints, 75),
+            p90: pct(midpoints, 90),
+          }
+        : null,
+    tokenEquityShare: rows.length ? tokenCount / rows.length : 0,
+    remoteWorldwideShare: rows.length ? remoteWw / rows.length : 0,
+    topEcosystems: Object.entries(ecoTally)
+      .sort((a, b) => b[1] - a[1])
+      .map(([eco, c]) => ({
+        eco,
+        label: ECOSYSTEMS[eco]?.label ?? eco.toUpperCase(),
+        count: c,
+      })),
+    topRoles: Object.entries(roleTally)
+      .sort((a, b) => b[1] - a[1])
+      .map(([role, c]) => ({ role, count: c })),
+    generatedAt: new Date().toISOString(),
+  };
+});
+
 /** Top jobs by view count — powers the Trending section. */
 export async function getTrendingJobs(limit = 6): Promise<JobWithCompany[]> {
   const rows = await db
