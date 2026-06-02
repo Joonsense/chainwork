@@ -12,8 +12,11 @@ import { EcoBadge } from "@/components/ui/eco-badge";
 import { getFeaturedJobs, getLatestJobs, getHomeStats, getTrendingJobs } from "@/db/queries";
 import { formatSalary, relativeTime } from "@/lib/format";
 
-/* Data-backed page — read fresh from Neon on every request. */
-export const dynamic = "force-dynamic";
+/* Data-backed page — prerendered + ISR, revalidated hourly (catalogue updates
+   daily). force-static caches the Neon reads; force-dynamic previously made
+   every crawler hit a full uncached DB render. */
+export const dynamic = "force-static";
+export const revalidate = 3600;
 
 export default async function HomePage() {
   const [featured, latest, stats, trending] = await Promise.all([

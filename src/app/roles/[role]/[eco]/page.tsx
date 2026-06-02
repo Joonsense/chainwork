@@ -13,7 +13,14 @@ import {
   comboIntro,
 } from "@/lib/collections";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return ROLE_COLLECTIONS.flatMap((r) =>
+    ECO_COLLECTIONS.map((e) => ({ role: r.slug, eco: e.slug })),
+  );
+}
 
 type Params = { params: Promise<{ role: string; eco: string }> };
 

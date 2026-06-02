@@ -8,10 +8,16 @@ import { JsonLdCard } from "@/components/jobs/json-ld-card";
 import { SaveButton } from "@/components/jobs/save-button";
 import { StickyApplyBar } from "@/components/jobs/sticky-apply-bar";
 import { ViewTracker } from "@/components/jobs/view-tracker";
-import { getJobBySlug } from "@/db/queries";
+import { getJobBySlug, getAllJobs } from "@/db/queries";
 import { formatSalary, relativeTime } from "@/lib/format";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const jobs = await getAllJobs();
+  return jobs.map((j) => ({ slug: j.slug }));
+}
 
 type Params = { params: Promise<{ slug: string }> };
 

@@ -11,7 +11,12 @@ import {
   roleIntro,
 } from "@/lib/collections";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return ROLE_COLLECTIONS.map((r) => ({ role: r.slug }));
+}
 
 type Params = { params: Promise<{ role: string }> };
 

@@ -8,7 +8,8 @@ import { getPulseStats, getTrendingJobs } from "@/db/queries";
 import { ECOSYSTEMS } from "@/lib/ecosystems";
 import { formatSalary, relativeTime } from "@/lib/format";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 900;
 
 export const metadata: Metadata = {
   title: "Crypto Hiring Pulse",

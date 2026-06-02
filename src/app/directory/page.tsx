@@ -10,7 +10,8 @@ import {
   roleCounts,
 } from "@/lib/collections";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Directory — every crypto engineering role by discipline & ecosystem",

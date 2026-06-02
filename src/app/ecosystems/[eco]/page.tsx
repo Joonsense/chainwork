@@ -11,7 +11,12 @@ import {
   ecoIntro,
 } from "@/lib/collections";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return ECO_COLLECTIONS.map((e) => ({ eco: e.slug }));
+}
 
 type Params = { params: Promise<{ eco: string }> };
 
