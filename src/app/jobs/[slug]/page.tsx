@@ -38,10 +38,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title,
     description,
+    alternates: { canonical: `/jobs/${slug}` },
     openGraph: {
       title: `${job.title} at ${job.company.name}`,
       description,
       type: "website",
+      url: `/jobs/${slug}`,
     },
     twitter: { card: "summary_large_image", title, description },
   };
