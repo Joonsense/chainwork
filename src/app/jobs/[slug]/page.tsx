@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, ChevronRight, Share2 } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
@@ -9,6 +10,7 @@ import { SaveButton } from "@/components/jobs/save-button";
 import { StickyApplyBar } from "@/components/jobs/sticky-apply-bar";
 import { ViewTracker } from "@/components/jobs/view-tracker";
 import { getJobBySlug, getAllJobs } from "@/db/queries";
+import { ROLE_COLLECTIONS, getEcoByKey } from "@/lib/collections";
 import { buildBreadcrumbJsonLd } from "@/lib/breadcrumb-json-ld";
 import { formatSalary, relativeTime } from "@/lib/format";
 
@@ -113,6 +115,24 @@ export default async function JobDetailPage({ params }: Params) {
   if (!job) notFound();
 
   const { company } = job;
+
+  // Internal links into the AEO collection surface — feed crawl signal from the
+  // 327 job pages to the role / ecosystem / combo landing pages we want cited.
+  const roleCol = ROLE_COLLECTIONS.find((r) => r.category === job.roleCategory);
+  const ecoCols = job.ecosystems
+    .map((k) => getEcoByKey(k))
+    .filter((e): e is NonNullable<typeof e> => Boolean(e));
+  const exploreLinks: { label: string; href: string }[] = [];
+  if (roleCol)
+    exploreLinks.push({ label: `${roleCol.label} jobs`, href: `/roles/${roleCol.slug}` });
+  for (const e of ecoCols.slice(0, 3))
+    exploreLinks.push({ label: `${e.name} jobs`, href: `/ecosystems/${e.slug}` });
+  if (roleCol && ecoCols[0])
+    exploreLinks.push({
+      label: `${ecoCols[0].name} ${roleCol.label}`,
+      href: `/roles/${roleCol.slug}/${ecoCols[0].slug}`,
+    });
+
   const breadcrumbLd = buildBreadcrumbJsonLd([
     { name: "chainwork", path: "/" },
     { name: "Jobs", path: "/jobs" },
@@ -238,6 +258,24 @@ export default async function JobDetailPage({ params }: Params) {
           {job.niceToHave.length > 0 && (
             <Section label="Nice to have">
               <BulletList items={job.niceToHave} />
+            </Section>
+          )}
+
+          {exploreLinks.length > 0 && (
+            <Section label="Explore similar roles">
+              <ul className="flex flex-wrap gap-2">
+                {exploreLinks.map((l) => (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      prefetch={false}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12.5px] text-text-secondary transition-colors hover:border-line hover:text-text-primary"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </Section>
           )}
 
