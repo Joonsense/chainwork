@@ -187,6 +187,38 @@ export const candidateProfiles = pgTable("candidate_profiles", {
     .defaultNow(),
 });
 
+/* ── job_submissions (public submission queue) ──────────────────
+ * Community-submitted roles land HERE in `pending` state — never in the
+ * live `jobs` table — so the public surface (home, /jobs, collections,
+ * sitemap, llms.txt, alerts) can never show an unmoderated row. An admin
+ * reviews the queue and publishes (which builds the real company + job
+ * rows) or rejects. `data` holds the validated submissionSchema payload. */
+export const jobSubmissions = pgTable(
+  "job_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /* "pending" | "published" | "rejected" */
+    status: text("status").notNull().default("pending"),
+    /* captured for follow-up + lead capture; the form requires it */
+    submitterEmail: text("submitter_email").notNull(),
+    /* the full validated submission payload (see lib/submission-schema) */
+    data: jsonb("data").$type<Record<string, unknown>>().notNull(),
+    note: text("note"), // optional message from the submitter
+    /* the job row created on publish — null until then */
+    publishedJobId: uuid("published_job_id").references(() => jobs.id, {
+      onDelete: "set null",
+    }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("job_submissions_status_idx").on(t.status),
+    index("job_submissions_created_at_idx").on(t.createdAt.desc()),
+  ],
+);
+
 /* ── Better-Auth tables (P8) ─────────────────────────────────────
  * Shapes match Better-Auth 1.6's expected schema. The drizzle adapter
  * runs with `usePlural`, so model `user` → table `users`, etc.
@@ -284,5 +316,7 @@ export type JobAlert = typeof jobAlerts.$inferSelect;
 export type NewJobAlert = typeof jobAlerts.$inferInsert;
 export type SavedJob = typeof savedJobs.$inferSelect;
 export type CandidateProfile = typeof candidateProfiles.$inferSelect;
+export type JobSubmission = typeof jobSubmissions.$inferSelect;
+export type NewJobSubmission = typeof jobSubmissions.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;

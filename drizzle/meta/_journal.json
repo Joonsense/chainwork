@@ -43,6 +43,13 @@
       "when": 1779298401081,
       "tag": "0005_legal_impossible_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780363419688,
+      "tag": "0006_young_jigsaw",
+      "breakpoints": true
     }
   ]
 }

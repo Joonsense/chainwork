@@ -29,6 +29,7 @@ const GROUPS: Group[] = [
     links: [
       { label: "Why chainwork", href: "/for-companies" },
       { label: "Pricing", href: "/pricing" },
+      { label: "Submit a role — free", href: "/submit" },
       { label: "Post a job", href: "/post" },
     ],
   },
