@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CollectionView, type RelatedGroup } from "@/components/collections/collection-view";
 import { getCollectionResult } from "@/db/queries";
 import { buildItemListJsonLd } from "@/lib/collection-json-ld";
+import { buildCollectionFaq } from "@/lib/collection-faq";
 import {
   ROLE_COLLECTIONS,
   ECO_COLLECTIONS,
@@ -70,6 +71,18 @@ export default async function EcosystemPage({ params }: Params) {
     })),
   });
 
+  const faq = buildCollectionFaq({
+    noun: `${eco.name} engineering`,
+    jobs,
+    total,
+    breakdown: roleLinks.length
+      ? {
+          question: `Which engineering disciplines are hiring on ${eco.name}?`,
+          items: roleLinks.map((r) => ({ label: r.label, count: r.count })),
+        }
+      : undefined,
+  });
+
   const jsonLd = buildItemListJsonLd({
     name: `${eco.name} engineering jobs`,
     description: ecoIntro(eco, total),
@@ -80,6 +93,7 @@ export default async function EcosystemPage({ params }: Params) {
       { name: "Ecosystems", path: "/directory" },
       { name: eco.name, path },
     ],
+    faq,
   });
 
   return (
@@ -99,6 +113,7 @@ export default async function EcosystemPage({ params }: Params) {
         intro={ecoIntro(eco, total)}
         jobs={jobs}
         related={related}
+        faq={faq}
       />
     </>
   );

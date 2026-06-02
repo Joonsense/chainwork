@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CollectionView, type RelatedGroup } from "@/components/collections/collection-view";
 import { getCollectionResult } from "@/db/queries";
 import { buildItemListJsonLd } from "@/lib/collection-json-ld";
+import { buildCollectionFaq } from "@/lib/collection-faq";
 import {
   ROLE_COLLECTIONS,
   ECO_COLLECTIONS,
@@ -71,6 +72,18 @@ export default async function RolePage({ params }: Params) {
     })),
   });
 
+  const faq = buildCollectionFaq({
+    noun: role.label,
+    jobs,
+    total,
+    breakdown: ecoLinks.length
+      ? {
+          question: `Which ecosystems hire the most ${role.label} engineers?`,
+          items: ecoLinks.map((e) => ({ label: e.label, count: e.count })),
+        }
+      : undefined,
+  });
+
   const jsonLd = buildItemListJsonLd({
     name: `${role.label} jobs in crypto`,
     description: roleIntro(role, total),
@@ -81,6 +94,7 @@ export default async function RolePage({ params }: Params) {
       { name: "Roles", path: "/directory" },
       { name: role.label, path },
     ],
+    faq,
   });
 
   return (
@@ -100,6 +114,7 @@ export default async function RolePage({ params }: Params) {
         intro={roleIntro(role, total)}
         jobs={jobs}
         related={related}
+        faq={faq}
       />
     </>
   );

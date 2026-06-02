@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CollectionView, type RelatedGroup } from "@/components/collections/collection-view";
 import { getCollectionResult } from "@/db/queries";
 import { buildItemListJsonLd } from "@/lib/collection-json-ld";
+import { buildCollectionFaq } from "@/lib/collection-faq";
 import {
   ROLE_COLLECTIONS,
   ECO_COLLECTIONS,
@@ -96,6 +97,12 @@ export default async function ComboPage({ params }: Params) {
     });
   }
 
+  const faq = buildCollectionFaq({
+    noun: `${eco.name} ${role.label}`,
+    jobs: combo.jobs,
+    total: combo.total,
+  });
+
   const jsonLd = buildItemListJsonLd({
     name: `${eco.name} ${role.label} jobs`,
     description: comboIntro(role, eco, combo.total),
@@ -106,6 +113,7 @@ export default async function ComboPage({ params }: Params) {
       { name: role.label, path: `/roles/${role.slug}` },
       { name: eco.name, path },
     ],
+    faq,
   });
 
   return (
@@ -125,6 +133,7 @@ export default async function ComboPage({ params }: Params) {
         intro={comboIntro(role, eco, combo.total)}
         jobs={combo.jobs}
         related={related}
+        faq={faq}
       />
     </>
   );

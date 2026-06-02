@@ -3,6 +3,7 @@ import { ChevronRight, SearchX, ArrowRight, Bell } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
 import { ListRow } from "@/components/jobs/list-row";
 import type { JobWithCompany } from "@/db/queries";
+import type { FaqItem } from "@/lib/collection-faq";
 
 export type CrumbLink = { label: string; href?: string };
 
@@ -23,6 +24,7 @@ export function CollectionView({
   intro,
   jobs,
   related,
+  faq,
 }: {
   breadcrumb: CrumbLink[];
   kicker: string;
@@ -30,6 +32,7 @@ export function CollectionView({
   intro: string;
   jobs: JobWithCompany[];
   related: RelatedGroup[];
+  faq?: FaqItem[];
 }) {
   return (
     <div className="min-h-dvh">
@@ -99,6 +102,27 @@ export function CollectionView({
                 <ListRow key={job.id} job={job} />
               ))}
             </div>
+          )}
+
+          {/* data-driven FAQ — visible Q&A backed by FAQPage JSON-LD (AEO) */}
+          {faq && faq.length > 0 && (
+            <section className="mt-12">
+              <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-text-tertiary">
+                Questions &amp; answers
+              </h2>
+              <dl className="cw-card divide-y divide-subtle overflow-hidden rounded-2xl">
+                {faq.map((item, i) => (
+                  <div key={i} className="px-5 py-4">
+                    <dt className="text-[14px] font-semibold text-text-primary">
+                      {item.q}
+                    </dt>
+                    <dd className="mt-1.5 text-[13.5px] leading-[1.6] text-text-secondary">
+                      {item.a}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
           )}
 
           {/* internal cross-links — the surface's link graph */}

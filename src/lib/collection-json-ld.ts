@@ -10,6 +10,7 @@
 import type { JobWithCompany } from "@/db/queries";
 import { SITE_URL } from "@/lib/site";
 import { buildBreadcrumbList, type Crumb } from "@/lib/breadcrumb-json-ld";
+import { buildFaqPageJsonLd, type FaqItem } from "@/lib/collection-faq";
 
 export function buildItemListJsonLd(opts: {
   name: string;
@@ -17,8 +18,10 @@ export function buildItemListJsonLd(opts: {
   /** Absolute or site-relative path of the collection page, e.g. "/roles/protocol". */
   path: string;
   jobs: JobWithCompany[];
-  /** Breadcrumb trail; when present the result is a @graph of ItemList + BreadcrumbList. */
+  /** Breadcrumb trail; folded into the @graph as a BreadcrumbList. */
   breadcrumbs?: Crumb[];
+  /** Data-driven FAQ; folded into the @graph as a FAQPage. */
+  faq?: FaqItem[];
 }): Record<string, unknown> {
   const url = `${SITE_URL}${opts.path}`;
   const itemList = {
@@ -35,11 +38,12 @@ export function buildItemListJsonLd(opts: {
     })),
   };
 
-  if (opts.breadcrumbs?.length) {
-    return {
-      "@context": "https://schema.org",
-      "@graph": [itemList, buildBreadcrumbList(opts.breadcrumbs)],
-    };
+  const graph: Record<string, unknown>[] = [itemList];
+  if (opts.breadcrumbs?.length) graph.push(buildBreadcrumbList(opts.breadcrumbs));
+  if (opts.faq?.length) graph.push(buildFaqPageJsonLd(opts.faq));
+
+  if (graph.length > 1) {
+    return { "@context": "https://schema.org", "@graph": graph };
   }
   return { "@context": "https://schema.org", ...itemList };
 }
