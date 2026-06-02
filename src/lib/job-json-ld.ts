@@ -36,6 +36,46 @@ export type JobPostingInput = {
 /** 30 days — the validity window stamped onto every posting. */
 const VALIDITY_MS = 30 * 86_400_000;
 
+/**
+ * schema.org/Google rule: `applicantLocationRequirements` must be a real
+ * `Country` (or `State`) — a region label like "Worldwide", "APAC", or "EMEA"
+ * is rejected as an invalid value, and Google then drops the posting from the
+ * job-search experience. So our internal remote *scopes* are expanded to the
+ * concrete countries each scope actually covers. Truthful (the role IS open to
+ * these markets) and valid, and it keeps the posting visible in those markets.
+ */
+const REMOTE_SCOPE_COUNTRIES: Record<string, string[]> = {
+  Worldwide: [
+    "United States", "Canada", "United Kingdom", "Germany", "France",
+    "Netherlands", "Spain", "Portugal", "Poland", "India", "Singapore",
+    "Australia", "Brazil", "Argentina", "United Arab Emirates", "Nigeria",
+    "Japan", "South Korea",
+  ],
+  Americas: [
+    "United States", "Canada", "Brazil", "Argentina", "Mexico", "Chile",
+    "Colombia",
+  ],
+  Europe: [
+    "United Kingdom", "Germany", "France", "Netherlands", "Spain", "Portugal",
+    "Poland", "Ireland", "Switzerland", "Sweden", "Italy", "Czechia",
+  ],
+  EMEA: [
+    "United Kingdom", "Germany", "France", "Netherlands", "Spain", "Poland",
+    "Ireland", "Portugal", "United Arab Emirates", "Nigeria", "Kenya",
+    "South Africa", "Israel", "Turkey",
+  ],
+  APAC: [
+    "Singapore", "India", "Australia", "Japan", "South Korea", "Indonesia",
+    "Vietnam", "Philippines", "Hong Kong", "New Zealand",
+  ],
+};
+
+/** Concrete eligible countries for a remote scope (defaults to Worldwide). */
+function applicantCountries(remoteScope: string | null): string[] {
+  return REMOTE_SCOPE_COUNTRIES[remoteScope ?? "Worldwide"]
+    ?? REMOTE_SCOPE_COUNTRIES.Worldwide;
+}
+
 /** A role is remote when it has a remote scope or its location reads "remote". */
 function isRemote(input: Pick<JobPostingInput, "remoteScope" | "location">): boolean {
   return Boolean(input.remoteScope) || /remote/i.test(input.location);
@@ -78,7 +118,14 @@ export function buildJobPostingJsonLd(
     title: job.title,
     description: job.description,
     datePosted: job.postedAt.toISOString(),
-    validThrough: new Date(job.postedAt.getTime() + VALIDITY_MS).toISOString(),
+    // Active listings must carry a FUTURE validThrough — a past date signals an
+    // expired job and Google removes it from search. ATS feeds hand us old
+    // posted dates (Lever uses the original createdAt), so floor the window to
+    // 30 days out from whenever the row is (re)computed: posted + 30d, but never
+    // already in the past for a job we still list.
+    validThrough: new Date(
+      Math.max(job.postedAt.getTime() + VALIDITY_MS, Date.now() + VALIDITY_MS),
+    ).toISOString(),
     employmentType:
       job.employmentType === "Contract" ? "CONTRACTOR" : "FULL_TIME",
     hiringOrganization: {
@@ -96,10 +143,11 @@ export function buildJobPostingJsonLd(
 
   if (remote) {
     ld.jobLocationType = "TELECOMMUTE";
-    ld.applicantLocationRequirements = {
-      "@type": "Country",
-      name: job.remoteScope ?? "Worldwide",
-    };
+    // One entry per concrete eligible country — Google rejects region labels
+    // ("Worldwide"/"APAC"/...) and needs at least one real Country.
+    ld.applicantLocationRequirements = applicantCountries(job.remoteScope).map(
+      (name) => ({ "@type": "Country", name }),
+    );
   } else {
     ld.jobLocation = {
       "@type": "Place",
