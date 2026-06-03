@@ -51,6 +51,32 @@ function dedupeBlocks(html: string): string {
   );
 }
 
+/**
+ * Labelled-notice paragraphs (e.g. "Pay Transparency Notice: …") that some ATS
+ * posts paste twice with *different* numbers — so exact-text dedupe misses them.
+ * A single posting can only carry one such notice, so we keep the FIRST and drop
+ * later ones bearing the same label. Wording is untouched; we only remove the
+ * contradictory duplicate block.
+ */
+const SINGLETON_NOTICE_LABELS = ["pay transparency notice"];
+
+function dedupeLabelledNotices(html: string): string {
+  const seen = new Set<string>();
+  return html.replace(/<p>([\s\S]*?)<\/p>/gi, (match, inner: string) => {
+    const text = inner
+      .replace(/<[^>]+>/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+    const label = SINGLETON_NOTICE_LABELS.find((l) => text.startsWith(l));
+    if (label) {
+      if (seen.has(label)) return "";
+      seen.add(label);
+    }
+    return match;
+  });
+}
+
 export function sanitizeJobHtml(input: string): string {
   if (!input) return "";
 
@@ -86,5 +112,5 @@ export function sanitizeJobHtml(input: string): string {
       !frame.mediaChildren.length,
   });
 
-  return dedupeBlocks(cleaned).trim();
+  return dedupeLabelledNotices(dedupeBlocks(cleaned)).trim();
 }
