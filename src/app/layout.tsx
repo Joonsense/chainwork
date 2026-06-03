@@ -107,23 +107,30 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  /* Public GA4 measurement id; inlined at build time. Scripts render only when set. */
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+
   return (
     /* dark-only: the `dark` class is forced, there is no theme toggle. */
     <html lang="en" className={`dark ${inter.variable} ${jetBrainsMono.variable}`}>
       <body className="bg-base text-text-primary font-sans antialiased">
-        {/* Google Analytics 4 (gtag.js) — G-X4SSJR37LF */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-X4SSJR37LF"
-          strategy="afterInteractive"
-        />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-X4SSJR37LF');
-          `}
-        </Script>
+        {/* Google Analytics 4 (gtag.js) — id from NEXT_PUBLIC_GA_ID; omitted if unset */}
+        {gaId ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="gtag-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}');
+              `}
+            </Script>
+          </>
+        ) : null}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
