@@ -7,10 +7,12 @@ import { CompanyLogo } from "@/components/ui/company-logo";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { JobDescription } from "@/components/jobs/job-description";
 import { JsonLdCard } from "@/components/jobs/json-ld-card";
+import { ListRow } from "@/components/jobs/list-row";
 import { SaveButton } from "@/components/jobs/save-button";
 import { StickyApplyBar } from "@/components/jobs/sticky-apply-bar";
 import { ViewTracker } from "@/components/jobs/view-tracker";
-import { getJobBySlug, getAllJobs } from "@/db/queries";
+import { getJobBySlug, getAllJobs, getRelatedJobs } from "@/db/queries";
+import { mergeNearDuplicates, cardKey } from "@/lib/job-display";
 import { ROLE_COLLECTIONS, getEcoByKey } from "@/lib/collections";
 import { buildBreadcrumbJsonLd } from "@/lib/breadcrumb-json-ld";
 import { formatSalary, relativeTime, plainTextExcerpt } from "@/lib/format";
@@ -115,6 +117,15 @@ export default async function JobDetailPage({ params }: Params) {
   if (!job) notFound();
 
   const { company } = job;
+
+  // "More roles" footer — same role category, near-duplicates merged, the
+  // current role's own variants excluded. Keeps a reader moving to the next
+  // posting instead of bouncing off the bottom of the page.
+  const relatedRaw = await getRelatedJobs(job.roleCategory, job.id, 8);
+  const currentKey = cardKey(job);
+  const relatedCards = mergeNearDuplicates(relatedRaw)
+    .filter((c) => c.key !== currentKey)
+    .slice(0, 5);
 
   // Internal links into the AEO collection surface — feed crawl signal from the
   // 327 job pages to the role / ecosystem / combo landing pages we want cited.
@@ -278,6 +289,43 @@ export default async function JobDetailPage({ params }: Params) {
                   </li>
                 ))}
               </ul>
+            </Section>
+          )}
+
+          {relatedCards.length > 0 && (
+            <Section
+              label={`More ${roleCol?.label ?? job.roleCategory} roles`}
+            >
+              <div className="cw-card overflow-hidden rounded-2xl">
+                {relatedCards.map((card, i) => (
+                  <div
+                    key={card.primary.id}
+                    className={i > 0 ? "border-t border-subtle" : ""}
+                  >
+                    <ListRow
+                      job={card.primary}
+                      locations={card.locations}
+                      variants={
+                        card.variants.length > 1
+                          ? card.variants.map((v) => ({
+                              slug: v.slug,
+                              location: v.location,
+                            }))
+                          : undefined
+                      }
+                      salaryRange={{ min: card.salaryMin, max: card.salaryMax }}
+                    />
+                  </div>
+                ))}
+              </div>
+              <Link
+                href={roleCol ? `/roles/${roleCol.slug}` : "/jobs"}
+                prefetch={false}
+                className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-accent-blue transition-colors hover:text-text-primary"
+              >
+                View all {roleCol?.label ?? job.roleCategory} roles
+                <ChevronRight size={13} strokeWidth={2.4} />
+              </Link>
             </Section>
           )}
 
