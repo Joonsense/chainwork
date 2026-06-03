@@ -69,6 +69,7 @@ export async function GET(req: NextRequest) {
 
   const filters: JobFilters = {
     q: "",
+    company: sp.get("company")?.trim() ?? "",
     eco: csv(sp.get("eco")),
     role: csv(sp.get("role")),
     seniority: [],

@@ -115,6 +115,7 @@ export function collectionFilters(opts: {
 }): JobFilters {
   return {
     q: "",
+    company: "",
     eco: opts.eco ? [opts.eco] : [],
     role: opts.role ? [opts.role] : [],
     seniority: [],
