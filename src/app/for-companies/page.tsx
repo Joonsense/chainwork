@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "For Companies",
   description:
-    "Reach AI × crypto engineers, the ones using AI agents to find work. JSON-LD, llms.txt, MCP-native, salary-transparent. From $99 per post in crypto.",
+    "Reach AI × crypto engineers, the ones using AI agents to find work. JSON-LD, llms.txt, MCP-native, salary-transparent. $150 per post, card or crypto.",
   alternates: { canonical: `${SITE_URL}/for-companies` },
 };
 
@@ -73,7 +73,7 @@ export default async function ForCompaniesPage() {
                 href="/post"
                 className="inline-flex h-11 items-center justify-center rounded-lg bg-accent-blue px-5 text-[14px] font-medium text-[var(--cw-base)] transition-opacity hover:opacity-90"
               >
-                Post a job, $99
+                Post a job, $150 / week
               </Link>
               <Link
                 href="/pricing"
@@ -154,8 +154,9 @@ export default async function ForCompaniesPage() {
               Start with one post.
             </h2>
             <p className="mx-auto mt-2 max-w-[480px] text-[14px] leading-relaxed text-text-secondary">
-              $99 in crypto. 30 days live. Indexed in MCP, llms.txt, REST API,
-              and the catalog within minutes.
+              $150 for a week, by card or crypto. No account. Featured and
+              indexed in MCP, llms.txt, REST API, and the catalog within
+              minutes.
             </p>
             <Link
               href="/post"

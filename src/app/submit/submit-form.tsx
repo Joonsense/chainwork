@@ -20,7 +20,7 @@ import {
 } from "@/lib/jobs-search-params";
 import { SENIORITIES, EMPLOYMENT_TYPES, CURRENCIES } from "@/lib/post-schema";
 import { ECOSYSTEMS } from "@/lib/ecosystems";
-import { createSubmission, importFromUrl } from "./actions";
+import { createSubmission, createPaidPost, importFromUrl } from "./actions";
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -38,7 +38,8 @@ function Err({ msg }: { msg?: string }) {
 const selectCls =
   "h-11 w-full rounded-lg border border-input bg-transparent px-2.5 text-[14px] text-text-primary outline-none transition-colors focus-visible:border-ring dark:bg-input/30";
 
-export function SubmitForm() {
+export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
+  const paid = tier === "paid";
   const [done, setDone] = useState(false);
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
@@ -78,6 +79,20 @@ export function SubmitForm() {
   });
 
   async function onSubmit(values: SubmissionForm) {
+    if (paid) {
+      const res = await createPaidPost({ data: values });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      // Hand off to hosted checkout; dev fallback (no rail) returns no URL.
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+        return;
+      }
+      setDone(true);
+      return;
+    }
     const res = await createSubmission({ data: values });
     if (!res.ok) {
       toast.error(res.error);
@@ -111,7 +126,7 @@ export function SubmitForm() {
           <Check size={22} className="text-accent-green" />
         </span>
         <div className="text-[16px] font-semibold text-text-primary">
-          Submitted for review
+          {paid ? "Payment received" : "Submitted for review"}
         </div>
         <p className="max-w-[360px] text-[13px] leading-[1.55] text-text-secondary">
           Thanks, your role is in the queue. We review submissions for spam
@@ -372,10 +387,12 @@ export function SubmitForm() {
         ) : (
           <Send size={15} />
         )}
-        Submit role for review
+        {paid ? "Continue to payment · $150 / week" : "Submit role for review"}
       </button>
       <p className="text-center text-[12px] text-text-tertiary">
-        Free. Reviewed for spam &amp; accuracy before going live.
+        {paid
+          ? "Secure checkout, card or crypto. Featured for 1 week. Reviewed before going live."
+          : "Free. Reviewed for spam & accuracy before going live."}
       </p>
       </form>
     </>

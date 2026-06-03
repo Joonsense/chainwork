@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Free for ATS-verified companies. Paid posts from $99, settled in BTC, ETH, USDC, or any of 200+ tokens via NowPayments.",
+    "Free for ATS-verified companies and community submissions. Post a job for $150 a week, no account needed, pay by card or crypto.",
   alternates: { canonical: `${SITE_URL}/pricing` },
 };
 
@@ -26,7 +26,7 @@ const TIERS: Tier[] = [
     name: "ATS ingest",
     price: "Free",
     unit: "forever",
-    cta: { label: "Add my company", href: "mailto:hello@chainwork.xx" },
+    cta: { label: "Add my company", href: "/submit" },
     features: [
       "Auto-import from Greenhouse, Lever, or Ashby",
       "Daily refresh (06:00 UTC)",
@@ -36,30 +36,30 @@ const TIERS: Tier[] = [
     ],
   },
   {
-    name: "Standard post",
-    price: "$99",
-    unit: "per role · 30 days",
-    cta: { label: "Post a job", href: "/post" },
-    highlight: true,
+    name: "Community submit",
+    price: "Free",
+    unit: "reviewed, then live",
+    cta: { label: "Submit a role", href: "/submit" },
     features: [
-      "Hand-written 3-step post flow",
-      "Indexed within minutes, full JSON-LD",
-      "Surfaced in MCP, REST API, llms.txt",
-      "Email alert push to matching subscribers",
-      "Apply via your URL, no candidate gating",
+      "Anyone can submit, no account",
+      "Paste an ATS link to autofill the form",
+      "Reviewed for spam and accuracy",
+      "Full JSON-LD + agent layer once live",
+      "No featured placement",
     ],
   },
   {
-    name: "Featured",
-    price: "$299",
-    unit: "per role · 30 days",
-    cta: { label: "Post & boost", href: "/post?featured=1" },
+    name: "Post a job",
+    price: "$150",
+    unit: "per role · 1 week",
+    cta: { label: "Post a job", href: "/post" },
+    highlight: true,
     features: [
-      "Everything in Standard, plus:",
-      "Homepage featured slot rotation",
-      "Top-of-list placement in /jobs",
-      "Bold rendering across the catalog",
-      "Pulse dashboard inclusion",
+      "No account, pay by card or crypto",
+      "Featured: home + top of /jobs for a week",
+      "Indexed within minutes, full JSON-LD",
+      "Surfaced in MCP, REST API, llms.txt",
+      "Reviewed before going live",
     ],
   },
 ];
@@ -79,8 +79,9 @@ export default function PricingPage() {
               Pay in crypto. Or not at all.
             </h1>
             <p className="mx-auto mt-3 max-w-[560px] text-[15px] leading-relaxed text-text-secondary">
-              Verified ATS feeds are always free. Paid posts settle on-chain
-              via NowPayments. BTC, ETH, USDC, SOL, and 200+ other tokens.
+              ATS feeds and community submissions are always free. A paid post
+              is $150 a week, no account needed. Pay by card, or in BTC, ETH,
+              USDC, SOL, and 200+ tokens.
             </p>
           </header>
 
@@ -179,13 +180,11 @@ export default function PricingPage() {
             <dl className="space-y-5 text-[14px] leading-relaxed">
               <div>
                 <dt className="font-semibold text-text-primary">
-                  Why no fiat / Stripe option?
+                  Card or crypto?
                 </dt>
                 <dd className="mt-1 text-text-secondary">
-                  Our buyers are crypto companies paying engineers in crypto.
-                  Settling in tokens matches the rest of their stack. We may
-                  add fiat later if there&apos;s demand, for now, on-chain is
-                  cleaner.
+                  Both. Checkout takes a card via Stripe, or BTC / ETH / USDC /
+                  SOL and 200+ tokens via NowPayments. No account either way.
                 </dd>
               </div>
               <div>
@@ -193,8 +192,8 @@ export default function PricingPage() {
                   Is the post auto-renewed?
                 </dt>
                 <dd className="mt-1 text-text-secondary">
-                  No. 30 days then expires. You can re-post or extend with a
-                  new invoice.
+                  No. The featured listing runs 1 week then expires. You can
+                  re-post with a new checkout.
                 </dd>
               </div>
               <div>

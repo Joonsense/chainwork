@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, jobs } from "@/db";
 import { stripe, FEATURED_DAYS } from "@/lib/stripe";
+import { markPaidPostPaid } from "@/app/submit/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -34,16 +35,19 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const checkout = event.data.object;
-    const jobId = checkout.metadata?.jobId;
-    if (jobId && checkout.metadata?.kind === "featured") {
+    const md = checkout.metadata ?? {};
+    if (md.kind === "featured" && md.jobId) {
       await db
         .update(jobs)
         .set({
           isFeatured: true,
           featuredUntil: new Date(Date.now() + FEATURED_DAYS * 86_400_000),
         })
-        .where(eq(jobs.id, jobId));
-      console.log(`Featured slot activated for job ${jobId}`);
+        .where(eq(jobs.id, md.jobId));
+      console.log(`Featured slot activated for job ${md.jobId}`);
+    } else if (md.kind === "paidpost" && md.submissionId) {
+      await markPaidPostPaid(md.submissionId);
+      console.log(`Paid post ${md.submissionId} marked paid (stripe)`);
     }
   }
 
