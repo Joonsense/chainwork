@@ -27,3 +27,26 @@ export function formatSalary(min: number, max: number): string {
 export function firstParagraph(markdown: string): string {
   return markdown.split("\n\n")[0].trim();
 }
+
+/**
+ * Plain-text excerpt for card blurbs and meta descriptions. Works on BOTH the
+ * raw-HTML descriptions (Greenhouse) and the Markdown ones (Ashby/Lever): it
+ * strips tags, decodes the common entities, drops Markdown markers, and
+ * collapses whitespace — so a blurb never shows `<div class=…>` or `**`.
+ */
+export function plainTextExcerpt(content: string, max = 180): string {
+  const text = content
+    .replace(/<[^>]+>/g, " ") // tags
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&rsquo;|&apos;/g, "'")
+    .replace(/[#>*_`~]+/g, " ") // markdown markers
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // md links → text
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length <= max) return text;
+  return text.slice(0, max).replace(/\s+\S*$/, "") + "…";
+}

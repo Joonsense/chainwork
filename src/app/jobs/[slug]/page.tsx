@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, ChevronRight, Share2 } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
+import { CompanyLogo } from "@/components/ui/company-logo";
 import { EcoBadge } from "@/components/ui/eco-badge";
-import { JobMarkdown } from "@/components/jobs/job-markdown";
+import { JobDescription } from "@/components/jobs/job-description";
 import { JsonLdCard } from "@/components/jobs/json-ld-card";
 import { SaveButton } from "@/components/jobs/save-button";
 import { StickyApplyBar } from "@/components/jobs/sticky-apply-bar";
@@ -12,7 +13,7 @@ import { ViewTracker } from "@/components/jobs/view-tracker";
 import { getJobBySlug, getAllJobs } from "@/db/queries";
 import { ROLE_COLLECTIONS, getEcoByKey } from "@/lib/collections";
 import { buildBreadcrumbJsonLd } from "@/lib/breadcrumb-json-ld";
-import { formatSalary, relativeTime } from "@/lib/format";
+import { formatSalary, relativeTime, plainTextExcerpt } from "@/lib/format";
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -29,10 +30,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const job = await getJobBySlug(slug);
   if (!job) return { title: "Job not found" };
 
-  const description = (job.oneLiner ?? job.descriptionMd)
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 160);
+  const description = plainTextExcerpt(job.oneLiner ?? job.descriptionMd, 160);
   const title = `${job.title} at ${job.company.name}`;
 
   return {
@@ -180,12 +178,14 @@ export default async function JobDetailPage({ params }: Params) {
 
           {/* company header */}
           <div className="mt-5 flex items-center gap-3">
-            <span
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-line text-[15px] font-semibold"
-              style={{ background: company.logoBg, color: company.logoFg }}
-            >
-              {company.logoText}
-            </span>
+            <CompanyLogo
+              name={company.name}
+              website={company.website}
+              logoText={company.logoText}
+              logoBg={company.logoBg}
+              logoFg={company.logoFg}
+              className="h-12 w-12 rounded-xl border border-line text-[15px]"
+            />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 text-[14px] font-medium text-text-bright">
                 <span className="truncate">{company.name}</span>
@@ -246,7 +246,7 @@ export default async function JobDetailPage({ params }: Params) {
 
           {/* sections */}
           <Section label="About the role">
-            <JobMarkdown>{job.descriptionMd}</JobMarkdown>
+            <JobDescription content={job.descriptionMd} />
           </Section>
 
           <Section label="What you'll do">

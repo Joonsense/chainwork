@@ -1,4 +1,5 @@
 import { ArrowRight, Check } from "lucide-react";
+import { CompanyLogo } from "@/components/ui/company-logo";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import {
   SalaryPill,
@@ -7,7 +8,7 @@ import {
   SponsoredBadge,
 } from "@/components/ui/job-pills";
 import { SaveButton } from "@/components/jobs/save-button";
-import { relativeTime, firstParagraph } from "@/lib/format";
+import { relativeTime, plainTextExcerpt } from "@/lib/format";
 import type { JobWithCompany } from "@/db/queries";
 
 /**
@@ -34,12 +35,14 @@ export function ListRow({
       />
       <div className="flex gap-3.5 sm:gap-4">
         {/* logo */}
-        <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] border border-line text-[14px] font-semibold"
-          style={{ background: company.logoBg, color: company.logoFg }}
-        >
-          {company.logoText}
-        </span>
+        <CompanyLogo
+          name={company.name}
+          website={company.website}
+          logoText={company.logoText}
+          logoBg={company.logoBg}
+          logoFg={company.logoFg}
+          className="h-11 w-11 rounded-[10px] border border-line text-[14px]"
+        />
 
         {/* body */}
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -81,7 +84,7 @@ export function ListRow({
           {/* blurb */}
           {showBlurb && (
             <p className="line-clamp-2 max-w-[620px] text-[13px] leading-[1.55] text-text-secondary">
-              {firstParagraph(job.descriptionMd)}
+              {job.oneLiner?.trim() || plainTextExcerpt(job.descriptionMd, 180)}
             </p>
           )}
 

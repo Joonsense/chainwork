@@ -1,8 +1,9 @@
 import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { CompanyLogo } from "@/components/ui/company-logo";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { SalaryPill, LocationPill, SkillTag } from "@/components/ui/job-pills";
 import { SaveButton } from "@/components/jobs/save-button";
-import { relativeTime, firstParagraph } from "@/lib/format";
+import { relativeTime, plainTextExcerpt } from "@/lib/format";
 import type { JobWithCompany } from "@/db/queries";
 
 /**
@@ -33,12 +34,14 @@ export function FeaturedCard({
       {/* company header */}
       <div className="flex items-start justify-between gap-2.5">
         <div className="flex items-center gap-2.5">
-          <span
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-line text-[13px] font-semibold"
-            style={{ background: company.logoBg, color: company.logoFg }}
-          >
-            {company.logoText}
-          </span>
+          <CompanyLogo
+            name={company.name}
+            website={company.website}
+            logoText={company.logoText}
+            logoBg={company.logoBg}
+            logoFg={company.logoFg}
+            className="h-10 w-10 rounded-[10px] border border-line text-[13px]"
+          />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 text-[12px] font-medium text-text-bright">
               <span className="truncate">{company.name}</span>
@@ -73,7 +76,7 @@ export function FeaturedCard({
 
       {/* blurb */}
       <p className="line-clamp-2 flex-1 text-[13px] leading-[1.55] text-text-secondary">
-        {firstParagraph(job.descriptionMd)}
+        {job.oneLiner?.trim() || plainTextExcerpt(job.descriptionMd, 160)}
       </p>
 
       {/* skills + ecosystems */}

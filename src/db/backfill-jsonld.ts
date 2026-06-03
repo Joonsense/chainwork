@@ -2,6 +2,7 @@ import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { db, companies, jobs } from "./index";
 import { buildJobPostingJsonLd } from "../lib/job-json-ld";
+import { plainTextExcerpt } from "../lib/format";
 
 /**
  * One-off, idempotent backfill: recompute jobs.json_ld for every existing
@@ -22,7 +23,9 @@ async function main() {
   for (const { jobs: job, companies: company } of rows) {
     const jsonLd = buildJobPostingJsonLd({
       title: job.title,
-      description: job.descriptionMd.slice(0, 1500),
+      // Clean plain text — strips raw ATS HTML / Markdown so schema.org
+      // description never carries <div class="content-intro"> etc.
+      description: plainTextExcerpt(job.descriptionMd, 1500),
       slug: job.slug,
       postedAt: job.postedAt,
       employmentType: job.employmentType,
@@ -34,7 +37,11 @@ async function main() {
       company: { name: company.name, website: company.website },
     });
 
-    await db.update(jobs).set({ jsonLd }).where(eq(jobs.id, job.id));
+    // Also normalise one_liner — Greenhouse rows stored raw HTML here, which
+    // leaked into card blurbs, meta descriptions, and the MCP feed.
+    const oneLiner = plainTextExcerpt(job.descriptionMd, 160);
+
+    await db.update(jobs).set({ jsonLd, oneLiner }).where(eq(jobs.id, job.id));
     updated += 1;
     if (updated % 50 === 0) console.log(`  …${updated}/${rows.length}`);
   }

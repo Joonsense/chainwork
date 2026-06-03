@@ -1,9 +1,9 @@
-import { Bookmark, ArrowRight, Users } from "lucide-react";
+import { Bookmark, ArrowRight } from "lucide-react";
 
 /**
  * Sticky bottom apply bar — last element in flow, pinned to the viewport
- * bottom. Save · Apply with referral · Apply now. "Apply now" hits the
- * apply route handler, which records intent before redirecting out.
+ * bottom. Save · Apply now. "Apply now" hits the apply route handler, which
+ * records intent before 308-redirecting to the company's real ATS page.
  */
 export function StickyApplyBar({ slug }: { slug: string }) {
   return (
@@ -19,16 +19,11 @@ export function StickyApplyBar({ slug }: { slug: string }) {
         >
           <Bookmark size={16} />
         </button>
-        <button
-          type="button"
-          className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-line bg-glass text-[13px] font-medium text-text-bright transition-colors hover:border-strong"
-        >
-          <Users size={14} className="shrink-0 text-text-tertiary" />
-          Apply with referral
-        </button>
         <a
           href={`/jobs/${slug}/apply`}
-          className="cw-apply h-11 flex-1 text-[14px] sm:flex-[1.4]"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cw-apply h-11 flex-1 text-[14px]"
         >
           Apply now
           <ArrowRight size={14} strokeWidth={2.4} />
