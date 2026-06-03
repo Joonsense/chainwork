@@ -2,8 +2,21 @@
 
 import { db, jobSubmissions } from "@/db";
 import { submissionSchema } from "@/lib/submission-schema";
+import { importJobFromUrl, type ImportResult } from "@/lib/ats/import-url";
 
 export type SubmitResult = { ok: true } | { ok: false; error: string };
+
+/**
+ * Pre-fill the submission form from a pasted Greenhouse / Lever / Ashby job
+ * link. Runs server-side (the ATS APIs need a server fetch, not the browser).
+ * Returns the lean form fields; the client merges them into the form.
+ */
+export async function importFromUrl(url: string): Promise<ImportResult> {
+  if (typeof url !== "string" || url.trim().length === 0) {
+    return { ok: false, error: "Paste a job link first." };
+  }
+  return importJobFromUrl(url);
+}
 
 /**
  * Public job submission — no auth. The payload lands in `job_submissions`

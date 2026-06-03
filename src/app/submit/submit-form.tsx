@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm, Controller, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Check, Loader2, Send } from "lucide-react";
+import { Check, Loader2, Send, Sparkles, Wand2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,7 @@ import {
 } from "@/lib/jobs-search-params";
 import { SENIORITIES, EMPLOYMENT_TYPES, CURRENCIES } from "@/lib/post-schema";
 import { ECOSYSTEMS } from "@/lib/ecosystems";
-import { createSubmission } from "./actions";
+import { createSubmission, importFromUrl } from "./actions";
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -40,11 +40,15 @@ const selectCls =
 
 export function SubmitForm() {
   const [done, setDone] = useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [importing, setImporting] = useState(false);
 
   const {
     register,
     handleSubmit,
     control,
+    reset,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<SubmissionForm>({
     // Cast bridges a types-only drift between the installed zod (4.4) and
@@ -82,6 +86,24 @@ export function SubmitForm() {
     setDone(true);
   }
 
+  async function handleImport() {
+    const url = importUrl.trim();
+    if (!url) {
+      toast.error("Paste a job link first.");
+      return;
+    }
+    setImporting(true);
+    const res = await importFromUrl(url);
+    setImporting(false);
+    if (!res.ok) {
+      toast.error(res.error);
+      return;
+    }
+    // Merge imported fields over whatever the poster has already typed.
+    reset({ ...getValues(), ...res.fields });
+    toast.success(`Imported from ${res.source}. Review the fields, then submit.`);
+  }
+
   if (done) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-2xl border border-subtle bg-surface p-10 text-center">
@@ -101,11 +123,56 @@ export function SubmitForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 rounded-2xl border border-subtle bg-surface p-5 md:p-7"
-    >
-      {/* ── you ── */}
+    <>
+      {/* ── paste-to-autofill ── */}
+      <div className="mb-4 rounded-2xl border border-accent-blue/25 bg-accent-blue/[0.06] p-4 md:p-5">
+        <div className="flex items-center gap-2">
+          <Sparkles size={15} className="text-accent-blue" />
+          <span className="text-[13.5px] font-semibold text-text-primary">
+            Already on Greenhouse, Lever, or Ashby?
+          </span>
+        </div>
+        <p className="mt-1 text-[12.5px] leading-[1.55] text-text-secondary">
+          Paste the job link and we&apos;ll fill the form from the public ATS
+          feed — no scraping, no retyping. Review and submit.
+        </p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <Input
+            type="url"
+            inputMode="url"
+            placeholder="https://boards.greenhouse.io/acme/jobs/123456"
+            className="h-11 flex-1"
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void handleImport();
+              }
+            }}
+            disabled={importing}
+          />
+          <button
+            type="button"
+            onClick={() => void handleImport()}
+            disabled={importing}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-accent-blue/40 bg-accent-blue/15 px-4 text-[13.5px] font-medium text-text-primary transition-colors hover:bg-accent-blue/25 disabled:opacity-60"
+          >
+            {importing ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <Wand2 size={15} />
+            )}
+            Autofill
+          </button>
+        </div>
+      </div>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6 rounded-2xl border border-subtle bg-surface p-5 md:p-7"
+      >
+        {/* ── you ── */}
       <div>
         <FieldLabel>Your email</FieldLabel>
         <Input
@@ -310,6 +377,7 @@ export function SubmitForm() {
       <p className="text-center text-[12px] text-text-tertiary">
         Free. Reviewed for spam &amp; accuracy before going live.
       </p>
-    </form>
+      </form>
+    </>
   );
 }
