@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "ChainWork is the registry of AI × crypto engineering roles — built by an AEO operator who needed it to exist. Machine-readable, agent-native, salary-transparent.",
+    "ChainWork is the registry of AI × crypto engineering roles, built by an AEO operator who needed it to exist. Machine-readable, agent-native, salary-transparent.",
   alternates: { canonical: `${SITE_URL}/about` },
 };
 
@@ -28,7 +28,7 @@ export default function AboutPage() {
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">
               ChainWork is the registry of AI × crypto engineering roles. Every
-              job is structured, salary-transparent, and machine-readable —
+              job is structured, salary-transparent, and machine-readable, 
               because the next decade of hiring runs through agents, not
               keyword search.
             </p>
@@ -40,7 +40,7 @@ export default function AboutPage() {
             </h2>
             <p className="mb-4 text-[14px] leading-relaxed text-text-secondary">
               Every other web3 job board is a list of links. The same Greenhouse
-              and Lever feeds, re-skinned. We started there too — but the
+              and Lever feeds, re-skinned. We started there too, but the
               opening isn&apos;t another aggregator. It&apos;s being the source
               an AI agent <em>chooses</em> when someone asks it{" "}
               <span className="text-text-primary">
@@ -68,7 +68,7 @@ export default function AboutPage() {
                 <Link href="/mcp" className="text-accent-blue hover:underline">
                   /mcp
                 </Link>{" "}
-                — your agent searches our database with two tools, no scraping.
+, your agent searches our database with two tools, no scraping.
               </li>
               <li className="rounded-lg border border-subtle bg-elevated p-4">
                 <span className="font-semibold text-text-primary">
@@ -91,7 +91,7 @@ export default function AboutPage() {
                 <span className="font-semibold text-text-primary">
                   AI matching by GitHub or CV.
                 </span>{" "}
-                Drop a GitHub profile or resume — we extract your skill graph
+                Drop a GitHub profile or resume, we extract your skill graph
                 and rank roles by actual fit.
               </li>
               <li className="rounded-lg border border-subtle bg-elevated p-4">
@@ -110,7 +110,7 @@ export default function AboutPage() {
             </h2>
             <p className="mb-3 text-[14px] leading-relaxed text-text-secondary">
               A solo founder who also runs an AEO (Answer Engine Optimization)
-              SaaS. ChainWork is partly the personal dogfood for that work —
+              SaaS. ChainWork is partly the personal dogfood for that work, 
               every architectural choice (MCP, llms.txt, JSON-LD, structured
               everything) is a live experiment in how to be cited by ChatGPT,
               Claude, Perplexity, and Gemini.
@@ -128,7 +128,7 @@ export default function AboutPage() {
             </h2>
             <p className="mb-3 text-[14px] leading-relaxed text-text-secondary">
               We ingest from Greenhouse, Lever, and Ashby across dozens of crypto
-              and AI-adjacent companies, growing daily. Engineering only — Sales / Marketing /
+              and AI-adjacent companies, growing daily. Engineering only. Sales / Marketing /
               Ops / Design / PM are filtered out at ingest. The AI × crypto
               wedge sharpens over time; broader web3 engineering is welcome
               today.
@@ -170,7 +170,7 @@ export default function AboutPage() {
                   href="/pulse"
                   className="text-accent-blue hover:underline"
                 >
-                  Hiring Pulse — live trends
+                  Hiring Pulse, live trends
                 </Link>
               </li>
             </ul>

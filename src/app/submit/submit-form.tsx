@@ -114,7 +114,7 @@ export function SubmitForm() {
           Submitted for review
         </div>
         <p className="max-w-[360px] text-[13px] leading-[1.55] text-text-secondary">
-          Thanks — your role is in the queue. We review submissions for spam
+          Thanks, your role is in the queue. We review submissions for spam
           and accuracy, then publish. It usually goes live within a day, and
           we&apos;ll email you when it does.
         </p>
@@ -134,7 +134,7 @@ export function SubmitForm() {
         </div>
         <p className="mt-1 text-[12.5px] leading-[1.55] text-text-secondary">
           Paste the job link and we&apos;ll fill the form from the public ATS
-          feed — no scraping, no retyping. Review and submit.
+          feed, no scraping, no retyping. Review and submit.
         </p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <Input

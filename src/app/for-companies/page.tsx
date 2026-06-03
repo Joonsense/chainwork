@@ -10,14 +10,14 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "For Companies",
   description:
-    "Reach AI × crypto engineers — the ones using AI agents to find work. JSON-LD, llms.txt, MCP-native, salary-transparent. From $99 per post in crypto.",
+    "Reach AI × crypto engineers, the ones using AI agents to find work. JSON-LD, llms.txt, MCP-native, salary-transparent. From $99 per post in crypto.",
   alternates: { canonical: `${SITE_URL}/for-companies` },
 };
 
 const VALUES: Array<{ title: string; body: string }> = [
   {
     title: "Reached by AI agents",
-    body: "We’re the only job board with a native MCP server. Engineers running Claude Desktop, Cursor, or Windsurf find your role through their agent — not through Google.",
+    body: "We’re the only job board with a native MCP server. Engineers running Claude Desktop, Cursor, or Windsurf find your role through their agent, not through Google.",
   },
   {
     title: "Engineering-only filter",
@@ -29,7 +29,7 @@ const VALUES: Array<{ title: string; body: string }> = [
   },
   {
     title: "AI-matched candidates",
-    body: "Candidates upload GitHub or CV; we extract their actual skill graph. Your post surfaces to people whose code matches your stack — not just keyword hits.",
+    body: "Candidates upload GitHub or CV; we extract their actual skill graph. Your post surfaces to people whose code matches your stack, not just keyword hits.",
   },
   {
     title: "Machine-readable everywhere",
@@ -73,7 +73,7 @@ export default async function ForCompaniesPage() {
                 href="/post"
                 className="inline-flex h-11 items-center justify-center rounded-lg bg-accent-blue px-5 text-[14px] font-medium text-[var(--cw-base)] transition-opacity hover:opacity-90"
               >
-                Post a job — $99
+                Post a job, $99
               </Link>
               <Link
                 href="/pricing"
@@ -124,7 +124,7 @@ export default async function ForCompaniesPage() {
             </h2>
             <div className="rounded-xl border border-subtle bg-elevated p-6">
               <p className="mb-3 text-[14px] leading-relaxed text-text-secondary">
-                You don&apos;t need to post. We auto-ingest your roles daily —
+                You don&apos;t need to post. We auto-ingest your roles daily, 
                 engineering only, JSON-LD added, surfaced in the catalog and
                 MCP for free.
               </p>

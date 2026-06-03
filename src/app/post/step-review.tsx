@@ -15,7 +15,7 @@ const PLACEHOLDER_COMPANY: Company = {
   id: "preview",
   slug: "preview",
   name: "Select a company",
-  logoText: "—",
+  logoText: ", ",
   logoBg: "#1c1c25",
   logoFg: "#f5f5f7",
   stage: null,
@@ -41,7 +41,7 @@ function buildPreview(v: PostForm, companies: Company[]): JobWithCompany {
           id: "preview",
           slug: v.slug || "preview",
           name: v.name || "New company",
-          logoText: (v.logoText || "—").toUpperCase(),
+          logoText: (v.logoText || ", ").toUpperCase(),
           logoBg: v.logoBg,
           logoFg: v.logoFg,
           stage: v.stage || null,
@@ -66,7 +66,7 @@ function buildPreview(v: PostForm, companies: Company[]): JobWithCompany {
     requirements: trimmed(v.requirements),
     niceToHave: trimmed(v.niceToHave),
     oneLiner: null,
-    roleCategory: v.roleCategory || "—",
+    roleCategory: v.roleCategory || ", ",
     seniority: v.seniority,
     employmentType: v.employmentType,
     location,
@@ -219,13 +219,13 @@ export function StepReview({ companies }: { companies: Company[] }) {
         <SectionLabel>Visibility</SectionLabel>
         <ToggleField
           name="isFeatured"
-          label="Feature this role — $199 / 2 weeks"
+          label="Feature this role, $199 / 2 weeks"
           description="Pinned to the top of the home page and the /jobs feed for 14 days. Publishing takes you to secure checkout; the role goes live either way."
         />
       </div>
 
       <div>
-        <SectionLabel>Card preview — latest feed</SectionLabel>
+        <SectionLabel>Card preview, latest feed</SectionLabel>
         <div className="pointer-events-none overflow-hidden rounded-2xl border border-subtle">
           <ListRow job={job} showBlurb />
         </div>

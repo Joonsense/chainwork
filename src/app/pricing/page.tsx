@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Free for ATS-verified companies. Paid posts from $99 — settled in BTC, ETH, USDC, or any of 200+ tokens via NowPayments.",
+    "Free for ATS-verified companies. Paid posts from $99, settled in BTC, ETH, USDC, or any of 200+ tokens via NowPayments.",
   alternates: { canonical: `${SITE_URL}/pricing` },
 };
 
@@ -30,7 +30,7 @@ const TIERS: Tier[] = [
     features: [
       "Auto-import from Greenhouse, Lever, or Ashby",
       "Daily refresh (06:00 UTC)",
-      "Engineering roles only — non-eng filtered out",
+      "Engineering roles only, non-eng filtered out",
       "JSON-LD + agent-readable markdown per role",
       "No featured placement",
     ],
@@ -43,10 +43,10 @@ const TIERS: Tier[] = [
     highlight: true,
     features: [
       "Hand-written 3-step post flow",
-      "Indexed within minutes — full JSON-LD",
+      "Indexed within minutes, full JSON-LD",
       "Surfaced in MCP, REST API, llms.txt",
       "Email alert push to matching subscribers",
-      "Apply via your URL — no candidate gating",
+      "Apply via your URL, no candidate gating",
     ],
   },
   {
@@ -80,7 +80,7 @@ export default function PricingPage() {
             </h1>
             <p className="mx-auto mt-3 max-w-[560px] text-[15px] leading-relaxed text-text-secondary">
               Verified ATS feeds are always free. Paid posts settle on-chain
-              via NowPayments — BTC, ETH, USDC, SOL, and 200+ other tokens.
+              via NowPayments. BTC, ETH, USDC, SOL, and 200+ other tokens.
             </p>
           </header>
 
@@ -156,7 +156,7 @@ export default function PricingPage() {
                   2
                 </span>
                 <span>
-                  We generate a NowPayments invoice with your chosen token —
+                  We generate a NowPayments invoice with your chosen token, 
                   BTC, ETH, USDC, USDT, SOL, MATIC, BNB, and ~200 more.
                 </span>
               </li>
@@ -184,7 +184,7 @@ export default function PricingPage() {
                 <dd className="mt-1 text-text-secondary">
                   Our buyers are crypto companies paying engineers in crypto.
                   Settling in tokens matches the rest of their stack. We may
-                  add fiat later if there&apos;s demand — for now, on-chain is
+                  add fiat later if there&apos;s demand, for now, on-chain is
                   cleaner.
                 </dd>
               </div>
@@ -203,7 +203,7 @@ export default function PricingPage() {
                   Ashby?
                 </dt>
                 <dd className="mt-1 text-text-secondary">
-                  Yes — but you probably don&apos;t need to. Send us your ATS
+                  Yes, but you probably don&apos;t need to. Send us your ATS
                   slug and we auto-ingest you free. Standard / Featured is for
                   companies not on a supported ATS, or for boosting specific
                   roles above the auto-imported feed.

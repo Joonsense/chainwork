@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 const MCP_URL = `${SITE_URL}/api/mcp/mcp`;
 
 export const metadata: Metadata = {
-  title: "MCP server — search crypto jobs from your AI agent",
+  title: "MCP server, search crypto jobs from your AI agent",
   description:
     "Connect Claude Desktop, Cursor, Windsurf, or any MCP client to ChainWork's job database. Two tools: search_jobs, get_job. Streamable HTTP transport, no auth required.",
   alternates: { canonical: `${SITE_URL}/mcp` },
@@ -154,7 +154,7 @@ export default function McpPage() {
                 >
                   /llms.txt
                 </Link>
-                {" — "}plain-text index of every live role, agent-readable.
+                {", "}plain-text index of every live role, agent-readable.
               </li>
               <li>
                 <Link
@@ -163,7 +163,7 @@ export default function McpPage() {
                 >
                   /api/jobs
                 </Link>
-                {" — "}REST JSON feed, CORS-open, schema.org JobPosting on every
+                {", "}REST JSON feed, CORS-open, schema.org JobPosting on every
                 row. Paginated via{" "}
                 <code className="font-mono text-text-primary">
                   ?limit=50&amp;offset=0
@@ -179,7 +179,7 @@ export default function McpPage() {
                 >
                   /pulse
                 </Link>
-                {" — "}live hiring trends across the database.
+                {", "}live hiring trends across the database.
               </li>
             </ul>
           </section>

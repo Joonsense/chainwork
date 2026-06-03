@@ -102,7 +102,7 @@ export function AiMatchPanel() {
     return (
       <PanelShell>
         <p className="text-[12.5px] leading-[1.55] text-text-secondary">
-          Connect GitHub to get matched to roles by your skills — or upload a
+          Connect GitHub to get matched to roles by your skills, or upload a
           CV instead.
         </p>
         <SignInDialog
@@ -150,7 +150,7 @@ export function AiMatchPanel() {
 
       {top.length === 0 ? (
         <p className="py-2 text-[12px] text-text-tertiary">
-          No strong matches yet — check back as new roles land.
+          No strong matches yet, check back as new roles land.
         </p>
       ) : (
         <div className="space-y-1">

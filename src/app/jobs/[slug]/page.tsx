@@ -153,13 +153,13 @@ export default async function JobDetailPage({ params }: Params) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://chainwork-tau.vercel.app";
   const jobUrl = `${siteUrl}/jobs/${slug}`;
   const tweetText = encodeURIComponent(
-    `${job.title} at ${company.name} — ${formatSalary(job.salaryMin, job.salaryMax)} · ${job.location}\n\n${jobUrl}\n\n#crypto #web3 #jobs`,
+    `${job.title} at ${company.name}, ${formatSalary(job.salaryMin, job.salaryMax)} · ${job.location}\n\n${jobUrl}\n\n#crypto #web3 #jobs`,
   );
   const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
   return (
     <div className="min-h-dvh">
-      {/* JSON-LD — read by schema.org validators, Google for Jobs, and agents */}
+      {/* JSON-LD, read by schema.org validators, Google for Jobs, and agents */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(job.jsonLd) }}

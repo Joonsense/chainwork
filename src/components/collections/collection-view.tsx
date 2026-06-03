@@ -104,7 +104,7 @@ export function CollectionView({
             </div>
           )}
 
-          {/* data-driven FAQ — visible Q&A backed by FAQPage JSON-LD (AEO) */}
+          {/* data-driven FAQ, visible Q&A backed by FAQPage JSON-LD (AEO) */}
           {faq && faq.length > 0 && (
             <section className="mt-12">
               <h2 className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-text-tertiary">
@@ -125,7 +125,7 @@ export function CollectionView({
             </section>
           )}
 
-          {/* internal cross-links — the surface's link graph */}
+          {/* internal cross-links, the surface's link graph */}
           {related.length > 0 && (
             <div className="mt-12 grid gap-8 sm:grid-cols-2">
               {related.map((group) => (

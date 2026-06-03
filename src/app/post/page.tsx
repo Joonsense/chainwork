@@ -36,7 +36,7 @@ export default async function PostPage() {
               Post a role
             </h1>
             <p className="mt-1.5 text-[14px] text-text-secondary">
-              Add a role to the board — company, then the role, then a
+              Add a role to the board, company, then the role, then a
               preview before it goes live.
             </p>
           </header>
