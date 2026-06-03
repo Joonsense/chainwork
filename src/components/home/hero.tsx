@@ -1,5 +1,4 @@
 import { Search } from "lucide-react";
-import { CommandTrigger } from "@/components/command-trigger";
 
 const TRY_CHIPS = [
   "AI agents",
@@ -67,38 +66,32 @@ export function Hero({
           alike, searchable over MCP. Indexed daily from real ATS feeds.
         </p>
 
-        {/* search box */}
+        {/* search box — a real inline search that lands on /jobs?q=.
+            Cmd+K still opens the command palette globally (mounted in layout). */}
         <div className="mx-auto mt-7 max-w-[680px]">
-          {/* desktop, opens the command palette */}
-          <CommandTrigger
-            ariaLabel="Search roles, skills, and companies"
-            className="cw-glass cw-bordered hidden w-full items-center gap-3 rounded-2xl p-3.5 text-left md:flex"
-          >
-            <Search size={18} className="shrink-0 text-text-tertiary" />
-            <span className="flex-1 text-[15px] text-text-tertiary">
-              Search roles · skills · companies…
-            </span>
-            <kbd className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-md border border-line bg-glass-hi px-1.5 font-mono text-[11px] text-text-secondary">
-              ⌘K
-            </kbd>
-          </CommandTrigger>
-
-          {/* mobile, falls back to a normal search */}
           <form
             action="/jobs"
-            className="cw-glass flex items-center gap-2 rounded-xl p-2 md:hidden"
+            role="search"
+            className="cw-glass cw-bordered flex items-center gap-2 rounded-2xl p-2 md:gap-3 md:p-3"
           >
-            <Search size={16} className="ml-1.5 shrink-0 text-text-tertiary" />
+            <Search
+              size={18}
+              className="ml-1.5 shrink-0 text-text-tertiary"
+            />
             <input
               name="q"
               type="search"
-              placeholder="senior rust"
+              enterKeyHint="search"
+              placeholder="senior rust · zk · solana…"
               aria-label="Search roles, skills, and companies"
-              className="min-w-0 flex-1 bg-transparent text-[14px] text-text-primary outline-none placeholder:text-text-tertiary"
+              className="min-w-0 flex-1 bg-transparent text-[15px] text-text-primary outline-none placeholder:text-text-tertiary"
             />
+            <kbd className="hidden h-[24px] min-w-[24px] items-center justify-center rounded-md border border-line bg-glass-hi px-1.5 font-mono text-[11px] text-text-secondary md:inline-flex">
+              ⌘K
+            </kbd>
             <button
               type="submit"
-              className="cw-apply h-8 shrink-0 px-3.5 text-[12px]"
+              className="cw-apply h-9 shrink-0 px-4 text-[13px]"
             >
               Search
             </button>

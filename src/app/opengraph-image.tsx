@@ -33,12 +33,34 @@ export default async function OgImage() {
           <div
             style={{
               display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               width: 40,
               height: 40,
               borderRadius: 10,
               backgroundImage: "linear-gradient(135deg,#5b8def,#9d6bff)",
             }}
-          />
+          >
+            <div style={{ display: "flex" }}>
+              <div
+                style={{
+                  width: 15,
+                  height: 11,
+                  border: "3px solid #ffffff",
+                  borderRadius: 5,
+                }}
+              />
+              <div
+                style={{
+                  width: 15,
+                  height: 11,
+                  border: "3px solid #ffffff",
+                  borderRadius: 5,
+                  marginLeft: -6,
+                }}
+              />
+            </div>
+          </div>
           <div
             style={{
               marginLeft: 16,
