@@ -25,6 +25,7 @@ export function normalizeFilters(raw: unknown): JobFilters {
     Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
   return {
     q: typeof f.q === "string" ? f.q : "",
+    company: typeof f.company === "string" ? f.company : "",
     eco: arr(f.eco),
     role: arr(f.role),
     seniority: arr(f.seniority),

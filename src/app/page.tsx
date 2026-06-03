@@ -6,11 +6,12 @@ import { McpCallout } from "@/components/home/mcp-callout";
 import { FilterSidebar } from "@/components/home/filter-sidebar";
 import { SidePanels } from "@/components/home/side-panels";
 import { FeaturedCard } from "@/components/jobs/featured-card";
-import { ListRow } from "@/components/jobs/list-row";
+import { ListRow, CompanyOverflowRow } from "@/components/jobs/list-row";
 import { CompanyLogo } from "@/components/ui/company-logo";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { getFeaturedJobs, getLatestJobs, getHomeStats, getTrendingJobs } from "@/db/queries";
+import { arrangeJobs, mergeNearDuplicates, cardKey } from "@/lib/job-display";
 import { formatSalary, relativeTime } from "@/lib/format";
 
 /* Data-backed page — prerendered + ISR, revalidated hourly (catalogue updates
@@ -20,15 +21,31 @@ export const dynamic = "force-static";
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [featured, latest, stats, trending] = await Promise.all([
+  // Over-fetch latest/trending so the display layer can merge duplicates,
+  // dedupe across sections, and cap per company while still filling the page.
+  const [featured, latestRaw, stats, trendingRaw] = await Promise.all([
     getFeaturedJobs(3),
-    getLatestJobs(12),
+    getLatestJobs(60),
     getHomeStats(),
-    getTrendingJobs(4),
+    getTrendingJobs(8),
   ]);
   const indexedLabel = stats.lastIndexedAt
     ? relativeTime(stats.lastIndexedAt)
     : "just now";
+
+  // Cross-section dedup priority: featured > trending > latest.
+  const featuredKeys = new Set(featured.map(cardKey));
+  const trendingCards = mergeNearDuplicates(trendingRaw)
+    .filter((c) => !featuredKeys.has(c.key))
+    .slice(0, 4);
+  const shownKeys = new Set<string>([
+    ...featuredKeys,
+    ...trendingCards.map((c) => c.key),
+  ]);
+  const { cards: latestCards } = arrangeJobs(latestRaw, {
+    excludeKeys: shownKeys,
+  });
+  const latest = latestCards.slice(0, 12);
 
   return (
     <div className="min-h-dvh pb-[76px] md:pb-0">
@@ -76,7 +93,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── Pulse / Trending banner ── */}
-        {trending.length > 0 && (
+        {trendingCards.length > 0 && (
           <section className="mx-auto max-w-[1240px] px-5 pb-7 md:px-6">
             <div className="mb-3 flex items-end justify-between gap-4">
               <div className="flex items-center gap-2">
@@ -97,7 +114,9 @@ export default async function HomePage() {
               </a>
             </div>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {trending.map((job) => (
+              {trendingCards.map((card) => {
+                const job = card.primary;
+                return (
                 <a
                   key={job.id}
                   href={`/jobs/${job.slug}`}
@@ -125,7 +144,8 @@ export default async function HomePage() {
                     ))}
                   </div>
                 </a>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
@@ -164,12 +184,30 @@ export default async function HomePage() {
               </div>
 
               <div className="cw-card overflow-hidden rounded-2xl">
-                {latest.map((job, i) => (
+                {latest.map((card, i) => (
                   <div
-                    key={job.id}
+                    key={card.primary.id}
                     className={i > 0 ? "border-t border-subtle" : ""}
                   >
-                    <ListRow job={job} showBlurb={i < 2} />
+                    <ListRow
+                      job={card.primary}
+                      showBlurb={i < 2}
+                      locations={card.locations}
+                      variants={
+                        card.variants.length > 1
+                          ? card.variants.map((v) => ({
+                              slug: v.slug,
+                              location: v.location,
+                            }))
+                          : undefined
+                      }
+                      salaryRange={{ min: card.salaryMin, max: card.salaryMax }}
+                    />
+                    {card.overflow && (
+                      <div className="border-t border-subtle">
+                        <CompanyOverflowRow {...card.overflow} />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

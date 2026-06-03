@@ -18,6 +18,7 @@ import {
   type JobWithCompany,
 } from "@/db/queries";
 import { loadJobsSearchParams, type JobFilters } from "@/lib/jobs-search-params";
+import { arrangeJobs } from "@/lib/job-display";
 import { getServerSession } from "@/lib/auth";
 import { getStoredProfile } from "@/lib/profile-index";
 import { rankMatches } from "@/lib/matching";
@@ -63,19 +64,26 @@ export default async function JobsPage({
     : null;
   const fitSort = sp.sort === "fit" && matchProfile !== null;
 
+  // Fetch the full result set (catalogue is small) so the display layer can
+  // merge duplicates + cap per company correctly, then paginate the arranged
+  // cards client-side. The DB / API / MCP queries are untouched.
   const [searchResult, facets] = await Promise.all([
-    searchJobs(sp, { limit: fitSort ? 1000 : 20, offset: 0 }),
+    searchJobs(sp, { limit: fitSort ? 1000 : 500, offset: 0 }),
     getFacetCounts(sp),
   ]);
 
   // "Fit" can't be ordered in SQL — rank the full result set in memory.
-  let result: { jobs: JobWithCompany[]; total: number } = searchResult;
+  let jobsList: JobWithCompany[] = searchResult.jobs;
   if (fitSort && matchProfile) {
-    result = {
-      jobs: rankMatches(searchResult.jobs, matchProfile).map((r) => r.job),
-      total: searchResult.total,
-    };
+    jobsList = rankMatches(searchResult.jobs, matchProfile).map((r) => r.job);
   }
+
+  // Release the cap when viewing a single company, or under "fit" ranking
+  // (where reordering by company would break the personalized order).
+  const { cards } = arrangeJobs(jobsList, {
+    releaseCap: Boolean(sp.company.trim()) || fitSort,
+  });
+  const totalMatches = searchResult.total;
   const filterKey = JSON.stringify(sp);
 
   return (
@@ -91,8 +99,8 @@ export default async function JobsPage({
             <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <div className="mb-1 font-mono text-[10.5px] uppercase tracking-[0.08em] text-text-tertiary">
-                  Latest · all roles · {result.total}{" "}
-                  {result.total === 1 ? "match" : "matches"}
+                  Latest · all roles · {totalMatches}{" "}
+                  {totalMatches === 1 ? "match" : "matches"}
                 </div>
                 <h1 className="text-[22px] font-semibold tracking-[-0.025em] text-text-primary md:text-[26px]">
                   All roles
@@ -117,15 +125,10 @@ export default async function JobsPage({
 
             <ActiveFilters />
 
-            {result.total === 0 ? (
+            {totalMatches === 0 ? (
               <EmptyState />
             ) : (
-              <JobFeed
-                key={filterKey}
-                initialJobs={result.jobs}
-                total={result.total}
-                filters={sp}
-              />
+              <JobFeed key={filterKey} cards={cards} totalMatches={totalMatches} />
             )}
           </div>
 

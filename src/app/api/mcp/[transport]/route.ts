@@ -83,6 +83,7 @@ const handler = createMcpHandler(
       async (args) => {
         const filters: JobFilters = {
           q: args.q ?? "",
+          company: "",
           eco: args.ecosystems ?? [],
           role: args.roles ?? [],
           seniority: args.seniority ?? [],

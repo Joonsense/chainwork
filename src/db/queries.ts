@@ -238,6 +238,19 @@ function ftsCondition(q: string): SQL {
 function buildConditions(f: JobFilters): SQL[] {
   const c: SQL[] = [];
   if (f.q.trim()) c.push(ftsCondition(f.q.trim()));
+  if (f.company?.trim()) {
+    // Subquery (not a join) so this also applies to the COUNT query, which
+    // selects from `jobs` alone.
+    c.push(
+      inArray(
+        jobs.companyId,
+        db
+          .select({ id: companies.id })
+          .from(companies)
+          .where(eq(companies.slug, f.company.trim())),
+      ),
+    );
+  }
   if (f.eco.length) {
     c.push(
       or(

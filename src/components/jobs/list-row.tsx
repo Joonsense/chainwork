@@ -1,4 +1,4 @@
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, ChevronRight } from "lucide-react";
 import { CompanyLogo } from "@/components/ui/company-logo";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import {
@@ -17,15 +17,31 @@ import type { JobWithCompany } from "@/db/queries";
  *
  * A stretched link makes the whole row navigable while the bookmark
  * button stays independently clickable (`relative z-10`).
+ *
+ * Merged-card props (optional, set by the display layer in lib/job-display):
+ *  - `locations`   distinct locations across near-duplicate variants
+ *  - `variants`    each variant's slug+location, rendered as deep links so the
+ *                  individual roles (and their apply URLs) stay reachable
+ *  - `salaryRange` the widest disclosed range across variants
  */
 export function ListRow({
   job,
   showBlurb = false,
+  locations,
+  variants,
+  salaryRange,
 }: {
   job: JobWithCompany;
   showBlurb?: boolean;
+  locations?: string[];
+  variants?: { slug: string; location: string }[];
+  salaryRange?: { min: number; max: number };
 }) {
   const { company } = job;
+  const sMin = salaryRange?.min ?? job.salaryMin;
+  const sMax = salaryRange?.max ?? job.salaryMax;
+  const locs = locations && locations.length ? locations : [job.location];
+  const merged = locs.length > 1;
   return (
     <div className="group relative block px-4 py-4 transition-colors hover:bg-glass sm:px-[18px]">
       <a
@@ -48,8 +64,16 @@ export function ListRow({
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           {/* top meta — comp + location + type + bookmark */}
           <div className="flex flex-wrap items-center gap-1.5">
-            <SalaryPill min={job.salaryMin} max={job.salaryMax} size="sm" />
-            <LocationPill location={job.location} size="sm" />
+            <SalaryPill min={sMin} max={sMax} size="sm" />
+            <LocationPill location={merged ? locs[0] : job.location} size="sm" />
+            {merged && (
+              <span
+                title={locs.join(" · ")}
+                className="rounded-md border border-line bg-glass-hi px-1.5 py-0.5 font-mono text-[10.5px] text-text-tertiary"
+              >
+                +{locs.length - 1} {locs.length - 1 === 1 ? "location" : "locations"}
+              </span>
+            )}
             <span className="text-[11.5px] text-text-tertiary">
               {job.employmentType}
             </span>
@@ -80,6 +104,25 @@ export function ListRow({
               {company.stage} · {company.size}
             </span>
           </div>
+
+          {/* merged variants — individual roles stay reachable (z-10 over the
+              stretched row link); apply URLs preserved per role */}
+          {merged && variants && variants.length > 1 && (
+            <div className="relative z-10 flex flex-wrap items-center gap-1.5">
+              <span className="font-mono text-[10.5px] text-text-muted">
+                Open in:
+              </span>
+              {variants.map((v) => (
+                <a
+                  key={v.slug}
+                  href={`/jobs/${v.slug}`}
+                  className="rounded-md border border-line bg-glass px-1.5 py-0.5 text-[11px] text-text-secondary transition-colors hover:border-strong hover:text-text-primary"
+                >
+                  {v.location || "View"}
+                </a>
+              ))}
+            </div>
+          )}
 
           {/* blurb */}
           {showBlurb && (
@@ -125,5 +168,30 @@ export function ListRow({
         </span>
       </div>
     </div>
+  );
+}
+
+/**
+ * "View all N roles from {company} →" — rendered after a company's last
+ * visible card when the per-company display cap hid the rest. Links to the
+ * single-company view (which releases the cap and shows them all).
+ */
+export function CompanyOverflowRow({
+  companyName,
+  companySlug,
+  hidden,
+}: {
+  companyName: string;
+  companySlug: string;
+  hidden: number;
+}) {
+  return (
+    <a
+      href={`/jobs?company=${encodeURIComponent(companySlug)}`}
+      className="flex items-center justify-center gap-1.5 bg-glass-hi/40 px-4 py-2.5 text-[12px] font-medium text-accent-blue transition-colors hover:bg-glass-hi"
+    >
+      View all {hidden} more {hidden === 1 ? "role" : "roles"} from {companyName}
+      <ChevronRight size={13} strokeWidth={2.4} />
+    </a>
   );
 }

@@ -22,6 +22,9 @@ export const SALARY_MAX = 400;
  */
 export const jobsSearchParams = {
   q: parseAsString.withDefault("").withOptions({ shallow: false }),
+  // Single-company view (by company slug). Powers the "view all from X" link
+  // and releases the per-company display cap. Empty = all companies.
+  company: parseAsString.withDefault("").withOptions({ shallow: false }),
   eco: parseAsArrayOf(parseAsString).withDefault([]).withOptions({ shallow: false }),
   role: parseAsArrayOf(parseAsString).withDefault([]).withOptions({ shallow: false }),
   seniority: parseAsArrayOf(parseAsString)
@@ -44,6 +47,7 @@ export const loadJobsSearchParams = createLoader(jobsSearchParams);
 /** Parsed-filter shape shared between server query and client actions. */
 export type JobFilters = {
   q: string;
+  company: string;
   eco: string[];
   role: string[];
   seniority: string[];

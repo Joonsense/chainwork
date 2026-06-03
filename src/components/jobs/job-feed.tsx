@@ -1,41 +1,50 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { ListRow } from "@/components/jobs/list-row";
-import { loadMoreJobs } from "@/app/jobs/actions";
-import type { JobWithCompany } from "@/db/queries";
-import type { JobFilters } from "@/lib/jobs-search-params";
+import { useState } from "react";
+import { ListRow, CompanyOverflowRow } from "@/components/jobs/list-row";
+import type { DisplayCard } from "@/lib/job-display";
+
+const PAGE = 20;
 
 /**
- * Job results list with a "Load more" pager. Mount this with a key derived
- * from the filters so a filter change remounts it with fresh initial data.
+ * Job results list with a "Load more" pager. The cards are already arranged
+ * (near-duplicates merged, per-company cap + interleave applied) on the
+ * server; here we just page through them client-side, so the cap stays
+ * globally correct instead of fighting server pagination. Mount with a key
+ * derived from the filters so a filter change remounts with fresh cards.
  */
 export function JobFeed({
-  initialJobs,
-  total,
-  filters,
+  cards,
+  totalMatches,
 }: {
-  initialJobs: JobWithCompany[];
-  total: number;
-  filters: JobFilters;
+  cards: DisplayCard[];
+  totalMatches: number;
 }) {
-  const [jobs, setJobs] = useState(initialJobs);
-  const [pending, startTransition] = useTransition();
-  const remaining = total - jobs.length;
-
-  function loadMore() {
-    startTransition(async () => {
-      const more = await loadMoreJobs(filters, jobs.length);
-      setJobs((prev) => [...prev, ...more]);
-    });
-  }
+  const [shown, setShown] = useState(PAGE);
+  const visible = cards.slice(0, shown);
+  const remaining = cards.length - visible.length;
 
   return (
     <>
       <div className="cw-card overflow-hidden rounded-2xl">
-        {jobs.map((job, i) => (
-          <div key={job.id} className={i > 0 ? "border-t border-subtle" : ""}>
-            <ListRow job={job} showBlurb={i < 2} />
+        {visible.map((card, i) => (
+          <div key={card.primary.id} className={i > 0 ? "border-t border-subtle" : ""}>
+            <ListRow
+              job={card.primary}
+              showBlurb={i < 2}
+              locations={card.locations}
+              variants={
+                card.variants.length > 1
+                  ? card.variants.map((v) => ({ slug: v.slug, location: v.location }))
+                  : undefined
+              }
+              salaryRange={{ min: card.salaryMin, max: card.salaryMax }}
+            />
+            {card.overflow && (
+              <div className="border-t border-subtle">
+                <CompanyOverflowRow {...card.overflow} />
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -44,19 +53,17 @@ export function JobFeed({
         {remaining > 0 ? (
           <button
             type="button"
-            onClick={loadMore}
-            disabled={pending}
-            className="flex h-10 items-center rounded-lg border border-line bg-glass px-5 text-[13px] font-medium text-text-bright transition-colors hover:border-strong disabled:opacity-50"
+            onClick={() => setShown((n) => n + PAGE)}
+            className="flex h-10 items-center rounded-lg border border-line bg-glass px-5 text-[13px] font-medium text-text-bright transition-colors hover:border-strong"
           >
-            {pending ? "Loading…" : `Load more · ${remaining} left`}
+            Load more · {remaining} left
           </button>
         ) : (
-          <span className="text-[11px] text-text-tertiary">
-            End of results
-          </span>
+          <span className="text-[11px] text-text-tertiary">End of results</span>
         )}
         <span className="font-mono text-[10.5px] text-text-muted">
-          {jobs.length} of {total} shown
+          {visible.length} of {cards.length} shown
+          {totalMatches !== cards.length ? ` · ${totalMatches} roles` : ""}
         </span>
       </div>
     </>
