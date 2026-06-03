@@ -63,8 +63,21 @@ const handler = createMcpHandler(
             .enum(POSTED_VALUES)
             .optional()
             .describe("Time window for posting date"),
-          limit: z.number().int().min(1).max(20).optional(),
-          offset: z.number().int().min(0).optional(),
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(20)
+            .optional()
+            .describe(
+              "Results per page (default 10, max 20). Page through larger result sets with offset + the returned next_offset.",
+            ),
+          offset: z
+            .number()
+            .int()
+            .min(0)
+            .optional()
+            .describe("Row offset for pagination (default 0)."),
         },
       },
       async (args) => {

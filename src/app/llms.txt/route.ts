@@ -67,7 +67,7 @@ export async function GET() {
     "",
     "## API",
     "",
-    `- GET ${SITE_URL}/api/jobs — paginated job feed as JSON, company embedded, schema.org JSON-LD on every row. Params: ?limit=50&offset=0&eco=&role=&min=`,
+    `- GET ${SITE_URL}/api/jobs — paginated job feed as JSON, company embedded, schema.org JSON-LD on every row. Params: ?limit=50&offset=0&eco=&role=&min= (limit default 50, max 100; offset default 0; total count in the X-Total-Count response header). Add ?meta=1 to wrap the body as { data, total, limit, offset } for inline pagination.`,
     `- GET ${SITE_URL}/api/jobs/{slug} — a single job as JSON, JSON-LD intact.`,
     `- GET ${SITE_URL}/llms/{slug}.md — a single role as markdown.`,
     `- GET ${SITE_URL}/sitemap.xml — every indexable URL.`,
