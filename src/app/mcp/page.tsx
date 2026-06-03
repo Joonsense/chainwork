@@ -164,7 +164,13 @@ export default function McpPage() {
                   /api/jobs
                 </Link>
                 {" — "}REST JSON feed, CORS-open, schema.org JobPosting on every
-                row.
+                row. Paginated via{" "}
+                <code className="font-mono text-text-primary">
+                  ?limit=50&amp;offset=0
+                </code>{" "}
+                (max 100; total in the <code className="font-mono text-text-primary">X-Total-Count</code>{" "}
+                header; add <code className="font-mono text-text-primary">?meta=1</code> for an
+                envelope).
               </li>
               <li>
                 <Link
