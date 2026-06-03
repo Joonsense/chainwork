@@ -4,7 +4,7 @@ import { getSalaryInsight, getSubscriberCount } from "@/db/queries";
 
 /* Right-rail panels. The live AI-match panel (P10) renders separately on
    /jobs; this rail keeps the job-alerts CTA and a real salary insight.
-   Every number here is computed from live data — no vanity metrics. */
+   Every number here is computed from live data, no vanity metrics. */
 
 function fmtK(n: number): string {
   return `$${Math.round(n / 1000)}k`;
@@ -24,7 +24,7 @@ async function JobAlertsPanel() {
         </span>
       </div>
       <p className="mb-3 text-[11.5px] leading-[1.55] text-text-secondary">
-        Get an email the moment a matching crypto engineering role goes live —
+        Get an email the moment a matching crypto engineering role goes live, 
         filtered by role, ecosystem, and salary.
       </p>
       <a

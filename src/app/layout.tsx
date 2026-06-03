@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   /* Absolute base for OG images and other metadata URLs. */
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Chainwork — registry for AI × crypto engineering roles",
+    default: "Chainwork, registry for AI × crypto engineering roles",
     template: "%s · Chainwork",
   },
   description:
@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Chainwork",
     url: SITE_URL,
-    title: "Chainwork — registry for AI × crypto engineering roles",
+    title: "Chainwork, registry for AI × crypto engineering roles",
     description:
       "Salary-transparent, agent-native job registry. AI × crypto engineering roles ingested daily, searchable via MCP and llms.txt.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chainwork — registry for AI × crypto engineering roles",
+    title: "Chainwork, registry for AI × crypto engineering roles",
     description:
       "Salary-transparent, agent-native job registry. AI × crypto engineering roles, searchable via MCP and llms.txt.",
   },
@@ -81,7 +81,7 @@ const siteJsonLd = {
       name: "Chainwork",
       url: SITE_URL,
       description:
-        "The registry for AI × crypto engineering roles — salary-transparent, agent-native, indexed daily.",
+        "The registry for AI × crypto engineering roles, salary-transparent, agent-native, indexed daily.",
       logo: `${SITE_URL}/opengraph-image`,
     },
     {
@@ -114,7 +114,7 @@ export default function RootLayout({
     /* dark-only: the `dark` class is forced, there is no theme toggle. */
     <html lang="en" className={`dark ${inter.variable} ${jetBrainsMono.variable}`}>
       <body className="bg-base text-text-primary font-sans antialiased">
-        {/* Google Analytics 4 (gtag.js) — id from NEXT_PUBLIC_GA_ID; omitted if unset */}
+        {/* Google Analytics 4 (gtag.js), id from NEXT_PUBLIC_GA_ID; omitted if unset */}
         {gaId ? (
           <>
             <Script

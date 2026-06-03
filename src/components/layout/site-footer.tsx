@@ -29,7 +29,7 @@ const GROUPS: Group[] = [
     links: [
       { label: "Why chainwork", href: "/for-companies" },
       { label: "Pricing", href: "/pricing" },
-      { label: "Submit a role — free", href: "/submit" },
+      { label: "Submit a role, free", href: "/submit" },
       { label: "Post a job", href: "/post" },
     ],
   },
@@ -77,7 +77,7 @@ export function SiteFooter() {
               Agent-native
             </div>
             <p className="text-[14px] leading-snug text-text-secondary">
-              Point your AI agent straight at the catalog — no scraping, no
+              Point your AI agent straight at the catalog, no scraping, no
               HTML parsing. Structured, salary-transparent, indexed daily.
             </p>
           </div>

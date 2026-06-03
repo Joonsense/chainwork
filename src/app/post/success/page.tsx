@@ -47,12 +47,12 @@ export default async function PostSuccessPage({
           <p className="mt-2 max-w-[420px] text-[14px] leading-relaxed text-text-secondary">
             {paid
               ? "Payment received. It is pinned to the top of the home page and the /jobs feed for the next 14 days."
-              : "It is on the board now — and already in the agent layer (llms.txt, per-role markdown, and the JSON API)."}
+              : "It is on the board now, and already in the agent layer (llms.txt, per-role markdown, and the JSON API)."}
           </p>
 
           {cancelled && (
             <p className="mt-3 max-w-[420px] rounded-lg border border-accent-amber/25 bg-accent-amber/10 px-3 py-2 text-[12.5px] text-text-secondary">
-              The Featured upgrade was not completed — your role is still live,
+              The Featured upgrade was not completed, your role is still live,
               just not featured.
             </p>
           )}

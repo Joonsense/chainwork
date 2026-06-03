@@ -97,7 +97,7 @@ export function SignInPanel({ callbackURL }: { callbackURL: string }) {
         Sign in to save roles, get matched, and post jobs.
       </p>
 
-      {/* option 1 — GitHub */}
+      {/* option 1. GitHub */}
       <button
         type="button"
         onClick={signInGithub}
@@ -121,7 +121,7 @@ export function SignInPanel({ callbackURL }: { callbackURL: string }) {
         <span className="h-px flex-1 bg-line" />
       </div>
 
-      {/* option 2 — email magic link */}
+      {/* option 2, email magic link */}
       <form onSubmit={sendMagicLink} className="space-y-2">
         <Input
           type="email"

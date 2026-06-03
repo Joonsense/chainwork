@@ -24,7 +24,7 @@ export async function GET() {
 
   const roleLines = allJobs.map((job) => {
     const salary = formatSalary(job.salaryMin, job.salaryMax);
-    return `- /llms/${job.slug}.md — ${job.title} at ${job.company.name} (${salary}, ${job.location})`;
+    return `- /llms/${job.slug}.md, ${job.title} at ${job.company.name} (${salary}, ${job.location})`;
   });
 
   // Browse-by collections — the same surface humans get, for agents that
@@ -34,10 +34,10 @@ export async function GET() {
   const disciplineLines = ROLE_COLLECTIONS.filter((r) => role[r.category] > 0)
     .map(
       (r) =>
-        `- ${SITE_URL}/roles/${r.slug} — ${r.label} jobs (${role[r.category]})`,
+        `- ${SITE_URL}/roles/${r.slug}, ${r.label} jobs (${role[r.category]})`,
     );
   const ecosystemLines = ECO_COLLECTIONS.filter((e) => eco[e.key] > 0).map(
-    (e) => `- ${SITE_URL}/ecosystems/${e.slug} — ${e.name} jobs (${eco[e.key]})`,
+    (e) => `- ${SITE_URL}/ecosystems/${e.slug}, ${e.name} jobs (${eco[e.key]})`,
   );
 
   const body = [
@@ -49,7 +49,7 @@ export async function GET() {
     "",
     "## Roles",
     "",
-    "Every role has a machine-readable markdown file at the path below — fetch it directly, no HTML parsing needed.",
+    "Every role has a machine-readable markdown file at the path below, fetch it directly, no HTML parsing needed.",
     "",
     ...roleLines,
     "",
@@ -67,21 +67,21 @@ export async function GET() {
     "",
     "## API",
     "",
-    `- GET ${SITE_URL}/api/jobs — paginated job feed as JSON, company embedded, schema.org JSON-LD on every row. Params: ?limit=50&offset=0&eco=&role=&min= (limit default 50, max 100; offset default 0; total count in the X-Total-Count response header). Add ?meta=1 to wrap the body as { data, total, limit, offset } for inline pagination.`,
-    `- GET ${SITE_URL}/api/jobs/{slug} — a single job as JSON, JSON-LD intact.`,
-    `- GET ${SITE_URL}/llms/{slug}.md — a single role as markdown.`,
-    `- GET ${SITE_URL}/sitemap.xml — every indexable URL.`,
+    `- GET ${SITE_URL}/api/jobs, paginated job feed as JSON, company embedded, schema.org JSON-LD on every row. Params: ?limit=50&offset=0&eco=&role=&min= (limit default 50, max 100; offset default 0; total count in the X-Total-Count response header). Add ?meta=1 to wrap the body as { data, total, limit, offset } for inline pagination.`,
+    `- GET ${SITE_URL}/api/jobs/{slug}, a single job as JSON, JSON-LD intact.`,
+    `- GET ${SITE_URL}/llms/{slug}.md, a single role as markdown.`,
+    `- GET ${SITE_URL}/sitemap.xml, every indexable URL.`,
     "",
     "## Open data (CC0)",
     "",
     "Free to reuse, no attribution required. Most crypto job boards keep this closed.",
     "",
-    `- GET ${SITE_URL}/api/data/jobs — the full live dataset of every role as one JSON document (CC0-1.0).`,
-    `- GET ${SITE_URL}/api/data/stats — citable market snapshot: salary percentiles (USD-annual), token/equity share, busiest ecosystems and roles (CC0-1.0).`,
+    `- GET ${SITE_URL}/api/data/jobs, the full live dataset of every role as one JSON document (CC0-1.0).`,
+    `- GET ${SITE_URL}/api/data/stats, citable market snapshot: salary percentiles (USD-annual), token/equity share, busiest ecosystems and roles (CC0-1.0).`,
     "",
     "## MCP",
     "",
-    `An MCP (Model Context Protocol) server is available at ${SITE_URL}/api/mcp/mcp — Streamable HTTP transport, no auth. Five tools: \`list_filters\` (valid filter values), \`search_jobs\` (filterable, paginated), \`get_job\` (by slug), \`get_market_stats\` (salary percentiles + market snapshot), and \`submit_job\` (post a role into the moderation queue — agents welcome). Setup instructions at ${SITE_URL}/mcp.`,
+    `An MCP (Model Context Protocol) server is available at ${SITE_URL}/api/mcp/mcp. Streamable HTTP transport, no auth. Five tools: \`list_filters\` (valid filter values), \`search_jobs\` (filterable, paginated), \`get_job\` (by slug), \`get_market_stats\` (salary percentiles + market snapshot), and \`submit_job\` (post a role into the moderation queue, agents welcome). Setup instructions at ${SITE_URL}/mcp.`,
     "",
     "## Conventions",
     "",

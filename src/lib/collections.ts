@@ -160,7 +160,7 @@ const plural = (n: number, one: string, many = `${one}s`) =>
 /** Lead sentence for a role page — directly answers the search intent. */
 export function roleIntro(role: RoleCollection, count: number): string {
   if (count === 0) {
-    return `There are no open ${role.phrase} roles in crypto right now. New ${role.label} roles are ingested daily from real ATS feeds — check back, or set an alert below.`;
+    return `There are no open ${role.phrase} roles in crypto right now. New ${role.label} roles are ingested daily from real ATS feeds, check back, or set an alert below.`;
   }
   return `${count} open ${role.phrase} ${plural(
     count,
@@ -171,7 +171,7 @@ export function roleIntro(role: RoleCollection, count: number): string {
 /** Lead sentence for an ecosystem page. */
 export function ecoIntro(eco: EcoCollection, count: number): string {
   if (count === 0) {
-    return `No open engineering roles in ${eco.blurb} right now. New ${eco.name} roles are ingested daily from real ATS feeds — check back, or set an alert below.`;
+    return `No open engineering roles in ${eco.blurb} right now. New ${eco.name} roles are ingested daily from real ATS feeds, check back, or set an alert below.`;
   }
   return `${count} open engineering ${plural(
     count,
@@ -186,7 +186,7 @@ export function comboIntro(
   count: number,
 ): string {
   if (count === 0) {
-    return `No open ${role.phrase} roles in ${eco.blurb} right now. These roles are ingested daily from real ATS feeds — check back, or explore related roles below.`;
+    return `No open ${role.phrase} roles in ${eco.blurb} right now. These roles are ingested daily from real ATS feeds, check back, or explore related roles below.`;
   }
   return `${count} open ${role.label} ${plural(
     count,

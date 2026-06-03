@@ -151,14 +151,14 @@ export function StepCompany({ companies }: { companies: Company[] }) {
             label="Logo monogram"
             required
             error={errors.logoText?.message}
-            hint="1–3 letters on a colored square — shown on every card."
+            hint="1–3 letters on a colored square, shown on every card."
           >
             <div className="flex items-center gap-3">
               <span
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-line text-[15px] font-semibold"
                 style={{ background: logoBg, color: logoFg }}
               >
-                {logoText || "—"}
+                {logoText || ", "}
               </span>
               <input
                 {...register("logoText")}

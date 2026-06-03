@@ -67,7 +67,7 @@ export function buildCollectionFaq(opts: {
   } else {
     items.push({
       q: `What do ${noun} jobs pay?`,
-      a: `Most ${noun} roles here negotiate pay privately — ${disclosedCount} of ${total} publish a salary range. chainwork surfaces a public range wherever the company discloses one.`,
+      a: `Most ${noun} roles here negotiate pay privately, ${disclosedCount} of ${total} publish a salary range. chainwork surfaces a public range wherever the company discloses one.`,
     });
   }
 

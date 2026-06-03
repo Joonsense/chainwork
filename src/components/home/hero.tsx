@@ -64,12 +64,12 @@ export function Hero({
 
         <p className="mx-auto mt-4 max-w-[620px] text-[14px] leading-[1.55] text-text-secondary md:text-[16px]">
           Salary-transparent and open-source. Built for humans and AI agents
-          alike — searchable over MCP. Indexed daily from real ATS feeds.
+          alike, searchable over MCP. Indexed daily from real ATS feeds.
         </p>
 
         {/* search box */}
         <div className="mx-auto mt-7 max-w-[680px]">
-          {/* desktop — opens the command palette */}
+          {/* desktop, opens the command palette */}
           <CommandTrigger
             ariaLabel="Search roles, skills, and companies"
             className="cw-glass cw-bordered hidden w-full items-center gap-3 rounded-2xl p-3.5 text-left md:flex"
@@ -83,7 +83,7 @@ export function Hero({
             </kbd>
           </CommandTrigger>
 
-          {/* mobile — falls back to a normal search */}
+          {/* mobile, falls back to a normal search */}
           <form
             action="/jobs"
             className="cw-glass flex items-center gap-2 rounded-xl p-2 md:hidden"

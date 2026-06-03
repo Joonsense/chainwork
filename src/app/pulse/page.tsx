@@ -15,11 +15,11 @@ export const revalidate = 900;
 export const metadata: Metadata = {
   title: "Crypto Hiring Pulse",
   description:
-    "Real-time snapshot of who's hiring in crypto and Web3. Ecosystem breakdown, top companies, trending roles — updated daily.",
+    "Real-time snapshot of who's hiring in crypto and Web3. Ecosystem breakdown, top companies, trending roles, updated daily.",
   openGraph: {
     title: "Crypto Hiring Pulse",
     description:
-      "Who's hiring in crypto right now? Live data across crypto and Web3 companies — ecosystem breakdown, top roles, salary signals.",
+      "Who's hiring in crypto right now? Live data across crypto and Web3 companies, ecosystem breakdown, top roles, salary signals.",
     type: "website",
   },
   twitter: { card: "summary_large_image" },
@@ -111,7 +111,7 @@ export default async function PulsePage() {
     ECOSYSTEMS[topEco]?.label ?? topEco.toUpperCase();
 
   const tweetText = encodeURIComponent(
-    `🔥 Crypto Hiring Pulse — ${stats.totalJobs} open roles across ${stats.totalCompanies} Web3 companies\n\n` +
+    `🔥 Crypto Hiring Pulse, ${stats.totalJobs} open roles across ${stats.totalCompanies} Web3 companies\n\n` +
       `• ${stats.jobsThisWeek} new this week\n` +
       `• Top ecosystem: ${topEcoLabel}\n\n` +
       `Full breakdown 👇\n${siteUrl}/pulse\n\n#crypto #web3 #hiring`,
@@ -330,7 +330,7 @@ export default async function PulsePage() {
             Found this useful?
           </div>
           <p className="mb-4 text-[13px] text-text-secondary">
-            Share the Pulse with your network — it helps the whole Web3 community.
+            Share the Pulse with your network, it helps the whole Web3 community.
           </p>
           <a
             href={tweetUrl}

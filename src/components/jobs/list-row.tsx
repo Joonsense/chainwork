@@ -62,7 +62,7 @@ export function ListRow({
 
         {/* body */}
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-          {/* top meta — comp + location + type + bookmark */}
+          {/* top meta, comp + location + type + bookmark */}
           <div className="flex flex-wrap items-center gap-1.5">
             <SalaryPill min={sMin} max={sMax} size="sm" />
             <LocationPill location={merged ? locs[0] : job.location} size="sm" />
@@ -105,7 +105,7 @@ export function ListRow({
             </span>
           </div>
 
-          {/* merged variants — individual roles stay reachable (z-10 over the
+          {/* merged variants, individual roles stay reachable (z-10 over the
               stretched row link); apply URLs preserved per role */}
           {merged && variants && variants.length > 1 && (
             <div className="relative z-10 flex flex-wrap items-center gap-1.5">
@@ -145,7 +145,7 @@ export function ListRow({
           </div>
         </div>
 
-        {/* right column — sm and up */}
+        {/* right column, sm and up */}
         <div className="hidden shrink-0 flex-col items-end justify-between gap-3 sm:flex">
           <span className="whitespace-nowrap font-mono text-[10.5px] text-text-tertiary">
             {relativeTime(job.postedAt)} ago
@@ -157,7 +157,7 @@ export function ListRow({
         </div>
       </div>
 
-      {/* footer — below sm only */}
+      {/* footer, below sm only */}
       <div className="mt-3 flex items-center justify-between border-t border-dashed border-line pt-3 sm:hidden">
         <span className="font-mono text-[10.5px] text-text-tertiary">
           {relativeTime(job.postedAt)} ago
