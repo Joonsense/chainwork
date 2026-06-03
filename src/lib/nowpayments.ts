@@ -21,6 +21,10 @@ export const nowpaymentsEnabled = Boolean(
 export const FEATURED_PRICE_USD = 199;
 export const FEATURED_DAYS = 14;
 
+/** Paid "post a job" — $150 for a 1-week (7-day) featured listing. */
+export const POST_PRICE_USD = 150;
+export const POST_DAYS = 7;
+
 export interface InvoiceInput {
   priceUsd: number;
   orderId: string;

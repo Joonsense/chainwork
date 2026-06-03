@@ -35,6 +35,24 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
+/** Paid-post marker: green "$150 PAID" when settled, amber "PAID PENDING" when not. */
+function PaidPill({ data }: { data: SubmissionForm }) {
+  const meta = (data as { _meta?: { kind?: string; paid?: boolean } })._meta;
+  if (meta?.kind !== "paid") return null;
+  return (
+    <span
+      className={cn(
+        "rounded-md border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em]",
+        meta.paid
+          ? "border-accent-green/40 bg-accent-green/10 text-accent-green"
+          : "border-accent-amber/40 bg-accent-amber/10 text-accent-amber",
+      )}
+    >
+      {meta.paid ? "$150 paid" : "unpaid"}
+    </span>
+  );
+}
+
 function Card({ item }: { item: QueueItem }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -69,6 +87,7 @@ function Card({ item }: { item: QueueItem }) {
               {d.title}
             </h3>
             <StatusPill status={item.status} />
+            <PaidPill data={item.data} />
           </div>
           <div className="mt-0.5 text-[13px] text-text-secondary">
             {d.companyName}

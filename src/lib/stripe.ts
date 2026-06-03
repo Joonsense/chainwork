@@ -16,3 +16,7 @@ export const stripe = key ? new Stripe(key) : null;
 /** Featured slot — price (USD cents) and length. */
 export const FEATURED_PRICE_CENTS = 19_900;
 export const FEATURED_DAYS = 14;
+
+/** Paid "post a job" — $150 for a 1-week (7-day) featured listing. */
+export const POST_PRICE_CENTS = 15_000;
+export const POST_DAYS = 7;

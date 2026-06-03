@@ -7,6 +7,7 @@ import {
   nowpaymentsEnabled,
   verifyIpnSignature,
 } from "@/lib/nowpayments";
+import { markPaidPostPaid } from "@/app/submit/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -60,17 +61,20 @@ export async function POST(req: NextRequest) {
     return Response.json({ received: true, error: "malformed order_id" });
   }
   const kind = orderId.slice(0, sep);
-  const jobId = orderId.slice(sep + 1);
+  const id = orderId.slice(sep + 1);
 
-  if (kind === "featured" && jobId) {
+  if (kind === "featured" && id) {
     await db
       .update(jobs)
       .set({
         isFeatured: true,
         featuredUntil: new Date(Date.now() + FEATURED_DAYS * 86_400_000),
       })
-      .where(eq(jobs.id, jobId));
-    console.log(`NowPayments: Featured slot activated for job ${jobId}`);
+      .where(eq(jobs.id, id));
+    console.log(`NowPayments: Featured slot activated for job ${id}`);
+  } else if (kind === "paidpost" && id) {
+    await markPaidPostPaid(id);
+    console.log(`NowPayments: paid post ${id} marked paid`);
   }
 
   return Response.json({ received: true });

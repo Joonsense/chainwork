@@ -52,6 +52,15 @@ export async function publishSubmission(id: string): Promise<AdminResult> {
       return { ok: false, error: "Submission payload is invalid." };
     const f = parsed.data;
 
+    // Paid posts (from /post) carry a `_meta` marker; publish them as a
+    // featured listing for the paid window. Free /submit posts have no meta.
+    const meta = (sub.data as { _meta?: { kind?: string; weeks?: number } })
+      ._meta;
+    const isPaid = meta?.kind === "paid";
+    const featuredUntil = isPaid
+      ? new Date(Date.now() + (meta?.weeks ?? 1) * 7 * 86_400_000)
+      : null;
+
     // 1. Company — reuse by slug, else create with an auto-derived lockup.
     const companySlug = slugify(f.companyName);
     let companyId: string;
@@ -131,9 +140,11 @@ export async function publishSubmission(id: string): Promise<AdminResult> {
         hasTokenEquity: f.hasTokenEquity,
         ecosystems: f.ecosystems,
         isVerified: companyVerified,
+        isFeatured: isPaid,
+        featuredUntil,
         applyUrl: f.applyUrl || null,
         applyEmail: f.applyEmail || null,
-        source: "community",
+        source: isPaid ? "paid" : "community",
         jsonLd,
         postedAt,
       })
