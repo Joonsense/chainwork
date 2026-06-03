@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
@@ -110,6 +111,19 @@ export default function RootLayout({
     /* dark-only: the `dark` class is forced, there is no theme toggle. */
     <html lang="en" className={`dark ${inter.variable} ${jetBrainsMono.variable}`}>
       <body className="bg-base text-text-primary font-sans antialiased">
+        {/* Google Analytics 4 (gtag.js) — G-X4SSJR37LF */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-X4SSJR37LF"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-X4SSJR37LF');
+          `}
+        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
