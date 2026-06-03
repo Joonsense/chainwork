@@ -4,6 +4,7 @@ import {
   or,
   desc,
   eq,
+  ne,
   count,
   gte,
   lte,
@@ -103,6 +104,26 @@ export async function getLatestJobs(limit = 12): Promise<JobWithCompany[]> {
     .from(jobs)
     .innerJoin(companies, eq(jobs.companyId, companies.id))
     .orderBy(sql`(${jobs.salaryMax} > 0 OR ${jobs.salaryMin} > 0) DESC`, desc(jobs.postedAt))
+    .limit(limit);
+  return rows.map((r) => ({ ...r.jobs, company: r.companies }));
+}
+
+/**
+ * Related roles for a job detail page — same role category, newest first,
+ * excluding the current job. Feeds the "more positions" footer that keeps a
+ * reader moving to the next role instead of bouncing.
+ */
+export async function getRelatedJobs(
+  roleCategory: string,
+  excludeId: string,
+  limit = 6,
+): Promise<JobWithCompany[]> {
+  const rows = await db
+    .select()
+    .from(jobs)
+    .innerJoin(companies, eq(jobs.companyId, companies.id))
+    .where(and(eq(jobs.roleCategory, roleCategory), ne(jobs.id, excludeId)))
+    .orderBy(desc(jobs.postedAt))
     .limit(limit);
   return rows.map((r) => ({ ...r.jobs, company: r.companies }));
 }
