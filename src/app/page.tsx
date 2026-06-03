@@ -7,6 +7,7 @@ import { FilterSidebar } from "@/components/home/filter-sidebar";
 import { SidePanels } from "@/components/home/side-panels";
 import { FeaturedCard } from "@/components/jobs/featured-card";
 import { ListRow } from "@/components/jobs/list-row";
+import { CompanyLogo } from "@/components/ui/company-logo";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { getFeaturedJobs, getLatestJobs, getHomeStats, getTrendingJobs } from "@/db/queries";
@@ -47,17 +48,17 @@ export default async function HomePage() {
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
               <div className="mb-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-text-tertiary">
-                Featured · vetted · this week
+                Highest-paying · salary-transparent
               </div>
               <h2 className="text-[22px] font-semibold tracking-[-0.025em] text-text-primary md:text-[26px]">
                 High-signal roles
               </h2>
             </div>
             <a
-              href="/jobs?featured=1"
+              href="/jobs?sort=salary"
               className="hidden shrink-0 items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12px] text-text-bright transition-colors hover:border-line sm:flex"
             >
-              View all featured
+              View all roles
               <ArrowRight size={11} />
             </a>
           </div>
@@ -102,12 +103,14 @@ export default async function HomePage() {
                   href={`/jobs/${job.slug}`}
                   className="flex items-center gap-3 rounded-xl border border-subtle bg-surface px-4 py-3 transition-colors hover:border-line hover:bg-glass"
                 >
-                  <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold"
-                    style={{ background: job.company.logoBg, color: job.company.logoFg }}
-                  >
-                    {job.company.logoText}
-                  </span>
+                  <CompanyLogo
+                    name={job.company.name}
+                    website={job.company.website}
+                    logoText={job.company.logoText}
+                    logoBg={job.company.logoBg}
+                    logoFg={job.company.logoFg}
+                    className="h-9 w-9 rounded-lg text-[13px]"
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-semibold text-text-primary">
                       {job.title}

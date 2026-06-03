@@ -14,7 +14,14 @@ import {
 } from "drizzle-orm";
 import { ECOSYSTEMS } from "@/lib/ecosystems";
 import { db } from "./index";
-import { jobs, companies, savedJobs, type Job, type Company } from "./schema";
+import {
+  jobs,
+  companies,
+  savedJobs,
+  jobAlerts,
+  type Job,
+  type Company,
+} from "./schema";
 import {
   type JobFilters,
   LOCATION_OPTIONS,
@@ -68,14 +75,19 @@ export const getJobBySlug = cache(
   },
 );
 
-/** Featured roles, newest first — the home "High-signal roles" slots. */
+/**
+ * Home "High-signal roles" slots. Data-driven, no hand-picked seeds: any paid
+ * Featured rows lead, then the highest-paying real roles that have a working
+ * external apply link and a disclosed salary. This keeps the slot honest —
+ * every card is a real, applyable, salary-transparent job.
+ */
 export async function getFeaturedJobs(limit = 3): Promise<JobWithCompany[]> {
   const rows = await db
     .select()
     .from(jobs)
     .innerJoin(companies, eq(jobs.companyId, companies.id))
-    .where(eq(jobs.isFeatured, true))
-    .orderBy(desc(jobs.postedAt))
+    .where(and(sql`${jobs.applyUrl} IS NOT NULL`, gte(jobs.salaryMax, 1)))
+    .orderBy(desc(jobs.isFeatured), desc(jobs.salaryMax), desc(jobs.postedAt))
     .limit(limit);
   return rows.map((r) => ({ ...r.jobs, company: r.companies }));
 }
@@ -165,6 +177,46 @@ export async function getHomeStats(): Promise<{
     companies: companyAgg?.value ?? 0,
     lastIndexedAt: recent?.indexedAt ?? null,
   };
+}
+
+/**
+ * Real salary insight from disclosed-pay roles only — powers the home rail.
+ * Returns null when too few roles disclose pay to be meaningful, so the UI can
+ * hide the panel rather than show an invented number. `sampleSize` is the count
+ * of roles the median is computed from (shown for honesty).
+ */
+export async function getSalaryInsight(): Promise<{
+  medianMax: number;
+  minMin: number;
+  maxMax: number;
+  sampleSize: number;
+} | null> {
+  const [row] = await db
+    .select({
+      medianMax: sql<number>`percentile_cont(0.5) WITHIN GROUP (ORDER BY ${jobs.salaryMax})`,
+      minMin: sql<number>`min(${jobs.salaryMin})`,
+      maxMax: sql<number>`max(${jobs.salaryMax})`,
+      sampleSize: count(),
+    })
+    .from(jobs)
+    .where(gte(jobs.salaryMax, 1));
+
+  if (!row || row.sampleSize < 5) return null;
+  return {
+    medianMax: Math.round(Number(row.medianMax)),
+    minMin: Number(row.minMin),
+    maxMax: Number(row.maxMax),
+    sampleSize: Number(row.sampleSize),
+  };
+}
+
+/** Verified, active job-alert subscribers — the only honest "subscribers" number. */
+export async function getSubscriberCount(): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(jobAlerts)
+    .where(and(eq(jobAlerts.verified, true), eq(jobAlerts.active, true)));
+  return row?.value ?? 0;
 }
 
 /* ── /jobs filtering + search (P4) ──────────────────────────── */
@@ -478,7 +530,7 @@ export type PulseStats = {
   jobsToday: number;
   ecosystemBreakdown: Array<{ eco: string; count: number }>;
   roleBreakdown: Array<{ role: string; count: number }>;
-  topCompanies: Array<{ name: string; slug: string; logoText: string; logoBg: string; logoFg: string; count: number }>;
+  topCompanies: Array<{ name: string; slug: string; website: string | null; logoText: string; logoBg: string; logoFg: string; count: number }>;
 };
 
 export async function getPulseStats(): Promise<PulseStats> {
@@ -522,6 +574,7 @@ export async function getPulseStats(): Promise<PulseStats> {
     .select({
       name: companies.name,
       slug: companies.slug,
+      website: companies.website,
       logoText: companies.logoText,
       logoBg: companies.logoBg,
       logoFg: companies.logoFg,
@@ -529,7 +582,7 @@ export async function getPulseStats(): Promise<PulseStats> {
     })
     .from(jobs)
     .innerJoin(companies, eq(jobs.companyId, companies.id))
-    .groupBy(companies.id, companies.name, companies.slug, companies.logoText, companies.logoBg, companies.logoFg)
+    .groupBy(companies.id, companies.name, companies.slug, companies.website, companies.logoText, companies.logoBg, companies.logoFg)
     .orderBy(desc(count(jobs.id)))
     .limit(10);
 

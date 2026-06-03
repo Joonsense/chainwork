@@ -4,6 +4,7 @@ import { GlassNav } from "@/components/layout/glass-nav";
 import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { BrandLogo } from "@/components/ui/brand-logo";
+import { CompanyLogo } from "@/components/ui/company-logo";
 import { getPulseStats, getTrendingJobs } from "@/db/queries";
 import { ECOSYSTEMS } from "@/lib/ecosystems";
 import { formatSalary, relativeTime } from "@/lib/format";
@@ -256,12 +257,14 @@ export default async function PulsePage() {
                 <span className="font-mono text-[11px] text-text-muted">
                   {String(rank + 1).padStart(2, "0")}
                 </span>
-                <span
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold"
-                  style={{ background: c.logoBg, color: c.logoFg }}
-                >
-                  {c.logoText}
-                </span>
+                <CompanyLogo
+                  name={c.name}
+                  website={c.website}
+                  logoText={c.logoText}
+                  logoBg={c.logoBg}
+                  logoFg={c.logoFg}
+                  className="h-8 w-8 rounded-lg text-[12px]"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13px] font-medium text-text-primary">
                     {c.name}
@@ -294,15 +297,14 @@ export default async function PulsePage() {
                   href={`/jobs/${job.slug}`}
                   className="flex items-center gap-3 rounded-lg border border-subtle p-3 transition-colors hover:border-line hover:bg-glass"
                 >
-                  <span
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold"
-                    style={{
-                      background: job.company.logoBg,
-                      color: job.company.logoFg,
-                    }}
-                  >
-                    {job.company.logoText}
-                  </span>
+                  <CompanyLogo
+                    name={job.company.name}
+                    website={job.company.website}
+                    logoText={job.company.logoText}
+                    logoBg={job.company.logoBg}
+                    logoFg={job.company.logoFg}
+                    className="h-8 w-8 rounded-lg text-[12px]"
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-medium text-text-primary">
                       {job.title}
