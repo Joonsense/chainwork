@@ -34,6 +34,11 @@ export const SENIORITIES = [
 export const EMPLOYMENT_TYPES = ["Full-time", "Contract"] as const;
 export const CURRENCIES = ["USD", "USDC", "USDT", "EUR", "GBP"] as const;
 
+/* Paid post pricing — client-safe (no server SDK). $150 per week, scales
+   linearly; the Stripe/NowPayments cent/usd amounts live in their libs. */
+export const POST_WEEKLY_USD = 150;
+export const POST_WEEK_OPTIONS = [1, 2, 4] as const;
+
 export const MIN_DESCRIPTION = 200;
 
 const INT_RE = /^\d+$/;

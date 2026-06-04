@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Free for ATS-verified companies and community submissions. Post a job for $150 a week, no account needed, pay by card or crypto.",
+    "Free for ATS-verified companies and community submissions. Post a job from $150 a week, no account needed, pay in crypto.",
   alternates: { canonical: `${SITE_URL}/pricing` },
 };
 
@@ -51,12 +51,12 @@ const TIERS: Tier[] = [
   {
     name: "Post a job",
     price: "$150",
-    unit: "per role · 1 week",
+    unit: "per week · 1, 2, or 4",
     cta: { label: "Post a job", href: "/post" },
     highlight: true,
     features: [
-      "No account, pay by card or crypto",
-      "Featured: home + top of /jobs for a week",
+      "No account, pay in crypto (200+ tokens)",
+      "Featured: pinned to the top of home + /jobs",
       "Indexed within minutes, full JSON-LD",
       "Surfaced in MCP, REST API, llms.txt",
       "Reviewed before going live",
@@ -80,8 +80,8 @@ export default function PricingPage() {
             </h1>
             <p className="mx-auto mt-3 max-w-[560px] text-[15px] leading-relaxed text-text-secondary">
               ATS feeds and community submissions are always free. A paid post
-              is $150 a week, no account needed. Pay by card, or in BTC, ETH,
-              USDC, SOL, and 200+ tokens.
+              is $150 a week (pick 1, 2, or 4), no account needed. Pay in BTC,
+              ETH, USDC, SOL, and 200+ tokens.
             </p>
           </header>
 
@@ -180,11 +180,11 @@ export default function PricingPage() {
             <dl className="space-y-5 text-[14px] leading-relaxed">
               <div>
                 <dt className="font-semibold text-text-primary">
-                  Card or crypto?
+                  How do I pay?
                 </dt>
                 <dd className="mt-1 text-text-secondary">
-                  Both. Checkout takes a card via Stripe, or BTC / ETH / USDC /
-                  SOL and 200+ tokens via NowPayments. No account either way.
+                  In crypto, via NowPayments. BTC, ETH, USDC, USDT, SOL, and
+                  200+ tokens. No account needed.
                 </dd>
               </div>
               <div>
@@ -192,8 +192,8 @@ export default function PricingPage() {
                   Is the post auto-renewed?
                 </dt>
                 <dd className="mt-1 text-text-secondary">
-                  No. The featured listing runs 1 week then expires. You can
-                  re-post with a new checkout.
+                  No. The featured listing runs for the weeks you bought, then
+                  expires. You can re-post with a new checkout.
                 </dd>
               </div>
               <div>

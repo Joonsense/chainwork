@@ -308,10 +308,12 @@ export async function searchJobs(
   opts: { limit: number; offset: number },
 ): Promise<{ jobs: JobWithCompany[]; total: number }> {
   const where = and(...buildConditions(f));
+  // Paid/featured roles pin to the top of every sort (the expire-featured cron
+  // clears the flag once the paid window ends).
   const orderBy =
     f.sort === "salary"
-      ? [desc(jobs.salaryMax), desc(jobs.postedAt)]
-      : [desc(jobs.postedAt), desc(jobs.id)];
+      ? [desc(jobs.isFeatured), desc(jobs.salaryMax), desc(jobs.postedAt)]
+      : [desc(jobs.isFeatured), desc(jobs.postedAt), desc(jobs.id)];
 
   const [rows, [tot]] = await Promise.all([
     db

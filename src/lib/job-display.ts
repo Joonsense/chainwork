@@ -124,6 +124,12 @@ export function arrangeJobs(
   }
   const totalCards = cards.length;
 
+  // Paid/featured roles pin to the very top and bypass the per-company cap —
+  // that placement is exactly what they paid for. The rest gets capped.
+  const featured = cards.filter((c) => c.primary.isFeatured);
+  const rest = cards.filter((c) => !c.primary.isFeatured);
+  cards = rest;
+
   const byCompany = new Map<string, JobCard[]>();
   const order: string[] = [];
   for (const c of cards) {
@@ -138,9 +144,14 @@ export function arrangeJobs(
   const applyCap =
     !opts.releaseCap && order.length >= CAP_MIN_DISTINCT_COMPANIES;
 
+  const featuredCards: DisplayCard[] = featured.map((c) => ({ ...c }));
+
   if (!applyCap) {
     // No cap — keep original order (releaseCap) so fit/company views are exact.
-    return { cards: cards.map((c) => ({ ...c })), totalCards };
+    return {
+      cards: [...featuredCards, ...rest.map((c) => ({ ...c }))],
+      totalCards,
+    };
   }
 
   const shown: DisplayCard[] = roundRobin(byCompany, order, cap).map((c) => ({
@@ -167,5 +178,5 @@ export function arrangeJobs(
     }
   }
 
-  return { cards: shown, totalCards };
+  return { cards: [...featuredCards, ...shown], totalCards };
 }
