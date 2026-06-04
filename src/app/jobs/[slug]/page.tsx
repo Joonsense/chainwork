@@ -180,11 +180,15 @@ export default async function JobDetailPage({ params }: Params) {
         <article className="relative mx-auto max-w-[760px] px-5 pb-12 pt-4 md:pt-6">
           {/* breadcrumb */}
           <nav className="flex min-w-0 items-center gap-1.5 font-mono text-[11px] text-text-tertiary">
-            <span>chainwork</span>
+            <Link href="/" className="cw-focus shrink-0 hover:text-text-secondary">
+              chainwork
+            </Link>
             <ChevronRight size={11} className="shrink-0 text-text-muted" />
-            <span>Jobs</span>
+            <Link href="/jobs" className="cw-focus shrink-0 hover:text-text-secondary">
+              Jobs
+            </Link>
             <ChevronRight size={11} className="shrink-0 text-text-muted" />
-            <span className="truncate text-text-secondary">{slug}</span>
+            <span className="truncate text-text-secondary">{job.title}</span>
           </nav>
 
           {/* company header */}

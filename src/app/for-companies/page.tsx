@@ -63,7 +63,7 @@ export default async function ForCompaniesPage() {
               Hire engineers who are using AI to find their next role.
             </h1>
             <p className="mt-4 max-w-[640px] text-[15px] leading-relaxed text-text-secondary">
-              ChainWork is where the AI × crypto engineering talent pool meets
+              chainwork is where the AI × crypto engineering talent pool meets
               the AI agents searching on their behalf. Post in 3 steps, pay in
               crypto, get applicants who&apos;ve already accepted your salary
               range.
@@ -131,10 +131,10 @@ export default async function ForCompaniesPage() {
               <p className="text-[14px] leading-relaxed text-text-secondary">
                 Email{" "}
                 <a
-                  href="mailto:hello@chainwork.xx"
-                  className="text-accent-blue hover:underline"
+                  href="mailto:hello@chainwork.dev"
+                  className="cw-focus text-accent-blue hover:underline"
                 >
-                  hello@chainwork.xx
+                  hello@chainwork.dev
                 </a>{" "}
                 with your company name and ATS slug (e.g.{" "}
                 <code className="font-mono text-[12px] text-text-primary">
@@ -144,7 +144,14 @@ export default async function ForCompaniesPage() {
                 <code className="font-mono text-[12px] text-text-primary">
                   lever:bar
                 </code>
-                ) and we&apos;ll add you to the next cron run.
+                ) and we&apos;ll add you to the next cron run — or{" "}
+                <Link
+                  href="/submit"
+                  className="cw-focus text-accent-blue hover:underline"
+                >
+                  add a single role with the free form
+                </Link>
+                .
               </p>
             </div>
           </section>

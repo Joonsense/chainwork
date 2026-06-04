@@ -16,12 +16,13 @@ export function SaveButton({
   size = "md",
 }: {
   slug: string;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
 }) {
   const { authed, ready, isSaved, toggle } = useSavedJobs();
   const saved = isSaved(slug);
-  const dim = size === "sm" ? "h-7 w-7" : "h-8 w-8";
-  const icon = size === "sm" ? 14 : 15;
+  const dim =
+    size === "sm" ? "h-7 w-7" : size === "lg" ? "h-11 w-11" : "h-8 w-8";
+  const icon = size === "sm" ? 14 : size === "lg" ? 16 : 15;
 
   const button = (onClick?: () => void) => (
     <button

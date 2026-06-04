@@ -37,7 +37,9 @@
   --cw-accent-cyan: oklch(0.82 0.13 200);
   --cw-accent-green: oklch(0.78 0.16 155);
   --cw-accent-amber: oklch(0.78 0.16 75);
+  --cw-accent-orange: oklch(0.74 0.18 52);
   --cw-accent-pink: oklch(0.72 0.22 350);
+  --cw-accent-red: oklch(0.68 0.21 22);
 
   /* ── Brand gradient ─────────────────────────────────────── */
   --cw-gradient-brand: linear-gradient(

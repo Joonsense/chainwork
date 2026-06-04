@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Search, Bookmark, Menu } from "lucide-react";
+import { Search, Bookmark } from "lucide-react";
 import { BrandLogo } from "@/components/ui/brand-logo";
 import { CommandTrigger } from "@/components/command-trigger";
 import { NavAuth } from "@/components/auth/nav-auth";
+import { MobileMenu } from "@/components/layout/mobile-menu";
 import { getServerSession } from "@/lib/auth";
 
 /* Center nav links. `lgOnly` ones are hidden on the 768–1024 range so the
@@ -37,7 +38,7 @@ export async function GlassNav() {
                   key={l.label}
                   href={l.href}
                   prefetch={false}
-                  className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 transition-colors ${
+                  className={`cw-focus flex items-center gap-1 rounded-md px-2.5 py-1.5 transition-colors ${
                     l.lgOnly ? "hidden lg:block" : ""
                   } ${
                     l.active
@@ -52,9 +53,9 @@ export async function GlassNav() {
                 </Link>
               ))}
               <Link
-                href="/api"
+                href="/mcp"
                 prefetch={false}
-                className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
+                className="cw-focus flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
               >
                 API
                 <span className="rounded-[4px] border border-accent-blue/40 bg-accent-blue/15 px-1 font-mono text-[9px] text-accent-blue">
@@ -92,21 +93,15 @@ export async function GlassNav() {
             <BrandLogo size={14} />
           </Link>
           <div className="flex items-center gap-1">
-            <button
-              type="button"
+            <Link
+              href="/me/saved"
               aria-label="Saved jobs"
-              className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:text-text-primary"
+              className="cw-focus flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:text-text-primary"
             >
               <Bookmark size={14} />
-            </button>
+            </Link>
             <NavAuth user={navUser} variant="mobile" />
-            <button
-              type="button"
-              aria-label="Open menu"
-              className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:text-text-primary"
-            >
-              <Menu size={16} />
-            </button>
+            <MobileMenu user={navUser} />
           </div>
         </div>
       </div>

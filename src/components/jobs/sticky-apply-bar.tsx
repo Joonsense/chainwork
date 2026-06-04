@@ -1,4 +1,5 @@
-import { Bookmark, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { SaveButton } from "./save-button";
 
 /**
  * Sticky bottom apply bar — last element in flow, pinned to the viewport
@@ -12,13 +13,7 @@ export function StickyApplyBar({ slug }: { slug: string }) {
         className="mx-auto flex max-w-[760px] items-center gap-2"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <button
-          type="button"
-          aria-label="Save job"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-line bg-glass text-text-secondary transition-colors hover:border-strong hover:text-text-primary"
-        >
-          <Bookmark size={16} />
-        </button>
+        <SaveButton slug={slug} size="lg" />
         <a
           href={`/jobs/${slug}/apply`}
           target="_blank"

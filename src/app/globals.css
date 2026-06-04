@@ -305,6 +305,25 @@
   .cw-apply:hover::before {
     opacity: 1;
   }
+  .cw-apply:focus-visible {
+    outline: 2px solid var(--cw-accent-cyan);
+    outline-offset: 2px;
+  }
+  .cw-apply:focus-visible::before {
+    opacity: 1;
+  }
+
+  /* Shared keyboard focus ring for hand-rolled interactive elements
+     (nav links, icon buttons, secondary buttons) that aren't shadcn
+     primitives. Mouse users never see it; keyboard users always do. */
+  .cw-focus {
+    outline: none;
+  }
+  .cw-focus:focus-visible {
+    outline: 2px solid var(--cw-accent-cyan);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
 
   /* Live pulse dot. */
   .cw-dot {
@@ -331,6 +350,12 @@
   .cw-bordered::before,
   .cw-dot::after {
     animation: none;
+  }
+  .cw-apply {
+    transition: none;
+  }
+  .cw-apply:hover {
+    transform: none;
   }
 }
 

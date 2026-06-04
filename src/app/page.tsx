@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight, ChevronDown, Sparkles, TrendingUp } from "lucide-react";
 import { GlassNav } from "@/components/layout/glass-nav";
 import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
@@ -8,7 +9,6 @@ import { SidePanels } from "@/components/home/side-panels";
 import { FeaturedCard } from "@/components/jobs/featured-card";
 import { ListRow, CompanyOverflowRow } from "@/components/jobs/list-row";
 import { CompanyLogo } from "@/components/ui/company-logo";
-import { BrandLogo } from "@/components/ui/brand-logo";
 import { EcoBadge } from "@/components/ui/eco-badge";
 import { getFeaturedJobs, getLatestJobs, getHomeStats, getTrendingJobs } from "@/db/queries";
 import { arrangeJobs, mergeNearDuplicates, cardKey } from "@/lib/job-display";
@@ -61,36 +61,38 @@ export default async function HomePage() {
         <McpCallout />
 
         {/* ── Featured ── */}
-        <section className="mx-auto max-w-[1240px] px-5 pb-7 pt-1 md:px-6">
-          <div className="mb-4 flex items-end justify-between gap-4">
-            <div>
-              <div className="mb-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-text-tertiary">
-                Highest-paying · salary-transparent
+        {featured.length > 0 && (
+          <section className="mx-auto max-w-[1240px] px-5 pb-7 pt-1 md:px-6">
+            <div className="mb-4 flex items-end justify-between gap-4">
+              <div>
+                <div className="mb-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-text-tertiary">
+                  Highest-paying · salary-transparent
+                </div>
+                <h2 className="text-[22px] font-semibold tracking-[-0.025em] text-text-primary md:text-[26px]">
+                  High-signal roles
+                </h2>
               </div>
-              <h2 className="text-[22px] font-semibold tracking-[-0.025em] text-text-primary md:text-[26px]">
-                High-signal roles
-              </h2>
-            </div>
-            <a
-              href="/jobs?sort=salary"
-              className="hidden shrink-0 items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12px] text-text-bright transition-colors hover:border-line sm:flex"
-            >
-              View all roles
-              <ArrowRight size={11} />
-            </a>
-          </div>
-
-          <div className="cw-no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5 pb-1 md:mx-0 md:grid md:grid-cols-3 md:gap-3.5 md:overflow-visible md:px-0 md:pb-0">
-            {featured.map((job, i) => (
-              <div
-                key={job.id}
-                className="min-w-[82%] sm:min-w-[55%] md:min-w-0"
+              <Link
+                href="/jobs?sort=salary"
+                className="cw-focus hidden shrink-0 items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12px] text-text-bright transition-colors hover:border-line sm:flex"
               >
-                <FeaturedCard job={job} accent={i === 0} />
-              </div>
-            ))}
-          </div>
-        </section>
+                View all roles
+                <ArrowRight size={11} />
+              </Link>
+            </div>
+
+            <div className="cw-no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5 pb-1 md:mx-0 md:grid md:grid-cols-3 md:gap-3.5 md:overflow-visible md:px-0 md:pb-0">
+              {featured.map((job, i) => (
+                <div
+                  key={job.id}
+                  className="min-w-[82%] sm:min-w-[55%] md:min-w-0"
+                >
+                  <FeaturedCard job={job} accent={i === 0} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── Pulse / Trending banner ── */}
         {trendingCards.length > 0 && (
@@ -166,20 +168,20 @@ export default async function HomePage() {
                   </h2>
                 </div>
                 <div className="hidden items-center gap-2 sm:flex">
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12px] text-text-bright transition-colors hover:border-line"
+                  <Link
+                    href="/jobs?sort=fit"
+                    className="cw-focus flex items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12px] text-text-bright transition-colors hover:border-line"
                   >
                     <Sparkles size={11} className="text-accent-purple" />
                     Sort by fit
-                  </button>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12px] text-text-bright transition-colors hover:border-line"
+                  </Link>
+                  <Link
+                    href="/jobs"
+                    className="cw-focus flex items-center gap-1.5 rounded-lg border border-subtle bg-glass px-3 py-1.5 text-[12px] text-text-bright transition-colors hover:border-line"
                   >
                     Newest
                     <ChevronDown size={12} />
-                  </button>
+                  </Link>
                 </div>
               </div>
 

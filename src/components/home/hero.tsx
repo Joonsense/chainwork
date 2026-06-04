@@ -27,19 +27,21 @@ export function Hero({
       <div className="cw-ambient" />
       <div className="relative mx-auto max-w-[1240px] text-center">
         {/* live counter */}
-        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-glass px-2.5 py-1 text-[11.5px] text-text-secondary">
-          <span className="cw-dot" />
-          <span>
-            <span className="text-text-primary">
-              {jobCount.toLocaleString()} live roles
-            </span>{" "}
-            at{" "}
-            <span className="text-text-primary">
-              {companyCount.toLocaleString()} companies
+        <div className="mb-5 inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-full border border-line bg-glass px-2.5 py-1 text-[11.5px] text-text-secondary">
+          <span className="inline-flex items-center gap-2">
+            <span className="cw-dot" />
+            <span>
+              <span className="text-text-primary">
+                {jobCount.toLocaleString()} live roles
+              </span>{" "}
+              at{" "}
+              <span className="text-text-primary">
+                {companyCount.toLocaleString()} companies
+              </span>
             </span>
           </span>
-          <span className="text-text-muted">·</span>
-          <span className="font-mono text-[10.5px]">
+          <span className="hidden text-text-muted sm:inline">·</span>
+          <span className="font-mono text-[10.5px] text-text-tertiary">
             indexed {indexedLabel} ago
           </span>
         </div>
@@ -72,7 +74,7 @@ export function Hero({
           <form
             action="/jobs"
             role="search"
-            className="cw-glass cw-bordered flex items-center gap-2 rounded-2xl p-2 md:gap-3 md:p-3"
+            className="cw-glass cw-bordered flex items-center gap-2 rounded-2xl p-2 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent-cyan md:gap-3 md:p-3"
           >
             <Search
               size={18}

@@ -50,7 +50,9 @@ const config: Config = {
           cyan: "var(--cw-accent-cyan)",
           green: "var(--cw-accent-green)",
           amber: "var(--cw-accent-amber)",
+          orange: "var(--cw-accent-orange)",
           pink: "var(--cw-accent-pink)",
+          red: "var(--cw-accent-red)",
         },
       },
 

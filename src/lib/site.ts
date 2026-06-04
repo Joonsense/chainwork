@@ -12,7 +12,7 @@ function resolveSiteUrl(): string {
   const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   if (vercel) return `https://${vercel}`;
 
-  return "https://chainwork.xx";
+  return "https://chainwork.dev";
 }
 
 export const SITE_URL = resolveSiteUrl();
