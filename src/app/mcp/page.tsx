@@ -10,7 +10,7 @@ const MCP_URL = `${SITE_URL}/api/mcp/mcp`;
 export const metadata: Metadata = {
   title: "MCP server, search crypto jobs from your AI agent",
   description:
-    "Connect Claude Desktop, Cursor, Windsurf, or any MCP client to ChainWork's job database. Two tools: search_jobs, get_job. Streamable HTTP transport, no auth required.",
+    "Connect Claude Desktop, Cursor, Windsurf, or any MCP client to chainwork's job database. Two tools: search_jobs, get_job. Streamable HTTP transport, no auth required.",
   alternates: { canonical: `${SITE_URL}/mcp` },
 };
 
@@ -51,7 +51,7 @@ export default function McpPage() {
               Model Context Protocol
             </span>
             <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.025em] text-text-primary md:text-[32px]">
-              ChainWork MCP server
+              chainwork MCP server
             </h1>
             <p className="mt-1.5 text-[14px] text-text-secondary">
               Point your AI agent at our job database. Search crypto, web3,

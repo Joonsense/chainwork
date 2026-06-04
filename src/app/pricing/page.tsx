@@ -203,7 +203,7 @@ export default function PricingPage() {
                 </dt>
                 <dd className="mt-1 text-text-secondary">
                   Yes, but you probably don&apos;t need to. Send us your ATS
-                  slug and we auto-ingest you free. Standard / Featured is for
+                  slug and we auto-ingest you free. A paid post is for
                   companies not on a supported ATS, or for boosting specific
                   roles above the auto-imported feed.
                 </dd>
