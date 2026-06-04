@@ -61,12 +61,12 @@ async function SalaryInsightPanel() {
         <span className="font-mono text-[24px] font-semibold tracking-tight text-text-primary">
           {fmtK(insight.medianMax)}
         </span>
-        <span className="text-[11px] text-text-muted">median top of band</span>
+        <span className="text-[11px] text-text-tertiary">median top of band</span>
       </div>
-      <div className="mt-0.5 text-[10px] text-text-muted">
+      <div className="mt-0.5 text-[10px] text-text-tertiary">
         across listed roles · USD
       </div>
-      <div className="mt-3 flex justify-between font-mono text-[9.5px] text-text-muted">
+      <div className="mt-3 flex justify-between font-mono text-[9.5px] text-text-tertiary">
         <span>{fmtK(insight.minMin)}</span>
         <span>{fmtK(insight.maxMax)}</span>
       </div>

@@ -143,8 +143,8 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-subtle pt-6 text-[11px] text-text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-mono">© {new Date().getFullYear()} Chainwork Labs</p>
+        <div className="mt-12 flex flex-col gap-2 border-t border-subtle pt-6 text-[11px] text-text-tertiary sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-mono">© {new Date().getFullYear()} chainwork Labs</p>
           <p className="font-mono">
             built for the agents searching · transparent for the engineers
             reading

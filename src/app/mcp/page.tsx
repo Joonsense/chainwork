@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GlassNav } from "@/components/layout/glass-nav";
+import { CopyBlock } from "@/components/ui/copy-block";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -125,9 +126,7 @@ export default function McpPage() {
               </code>{" "}
               to bridge stdio ↔ HTTP):
             </p>
-            <pre className="overflow-x-auto rounded-lg border border-subtle bg-elevated p-4 font-mono text-[12px] leading-relaxed text-text-primary">
-              {claudeDesktopConfig}
-            </pre>
+            <CopyBlock code={claudeDesktopConfig} label="Claude Desktop config" />
           </section>
 
           <section className="mb-10">
@@ -137,9 +136,7 @@ export default function McpPage() {
             <p className="mb-3 text-[13px] text-text-secondary">
               Clients with native Streamable HTTP support can connect directly:
             </p>
-            <pre className="overflow-x-auto rounded-lg border border-subtle bg-elevated p-4 font-mono text-[12px] leading-relaxed text-text-primary">
-              {streamableHttpConfig}
-            </pre>
+            <CopyBlock code={streamableHttpConfig} label="Streamable HTTP config" />
           </section>
 
           <section className="mb-10">
