@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { db, jobSubmissions } from "@/db";
-import { submissionSchema } from "@/lib/submission-schema";
+import { submissionSchema, normalizeUrl } from "@/lib/submission-schema";
 import { importJobFromUrl, type ImportResult } from "@/lib/ats/import-url";
 import { APP_URL } from "@/lib/site";
 import { stripe, stripeEnabled, POST_PRICE_CENTS } from "@/lib/stripe";
@@ -58,7 +58,11 @@ export async function createSubmission(args: {
     await db.insert(jobSubmissions).values({
       status: "pending",
       submitterEmail: f.submitterEmail.trim().toLowerCase(),
-      data: f,
+      data: {
+        ...f,
+        companyWebsite: normalizeUrl(f.companyWebsite),
+        applyUrl: normalizeUrl(f.applyUrl),
+      },
       note: f.note.trim() || null,
     });
     return { ok: true };
@@ -104,7 +108,12 @@ export async function createPaidPost(args: {
       .values({
         status: "pending",
         submitterEmail: f.submitterEmail.trim().toLowerCase(),
-        data: { ...f, _meta: meta },
+        data: {
+          ...f,
+          companyWebsite: normalizeUrl(f.companyWebsite),
+          applyUrl: normalizeUrl(f.applyUrl),
+          _meta: meta,
+        },
         note: f.note.trim() || null,
       })
       .returning({ id: jobSubmissions.id });
