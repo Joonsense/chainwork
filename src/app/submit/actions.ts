@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { db, jobSubmissions } from "@/db";
 import { submissionSchema, normalizeUrl } from "@/lib/submission-schema";
 import { importJobFromUrl, type ImportResult } from "@/lib/ats/import-url";
+import { POST_WEEK_OPTIONS } from "@/lib/post-schema";
 import { APP_URL } from "@/lib/site";
 import { stripe, stripeEnabled, POST_PRICE_CENTS } from "@/lib/stripe";
 import {
@@ -86,6 +87,7 @@ export async function createSubmission(args: {
  */
 export async function createPaidPost(args: {
   data: unknown;
+  weeks?: number;
 }): Promise<PaidPostResult> {
   const parsed = submissionSchema.safeParse(args.data);
   if (!parsed.success) {
@@ -94,9 +96,18 @@ export async function createPaidPost(args: {
   const f = parsed.data;
   const paymentEnabled = nowpaymentsEnabled || stripeEnabled;
 
+  // Whole-week durations only; price scales linearly at $150/week.
+  const weeks = (POST_WEEK_OPTIONS as readonly number[]).includes(
+    args.weeks ?? 1,
+  )
+    ? (args.weeks as number)
+    : 1;
+  const priceUsd = POST_PRICE_USD * weeks;
+  const priceCents = POST_PRICE_CENTS * weeks;
+
   const meta: PaidPostMeta = {
     kind: "paid",
-    weeks: 1,
+    weeks,
     // Dev fallback: no rail wired -> treat as paid so the queue is testable.
     paid: !paymentEnabled,
     ...(!paymentEnabled ? { paidAt: new Date().toISOString() } : {}),
@@ -123,11 +134,12 @@ export async function createPaidPost(args: {
     const orderId = `paidpost:${row.id}`;
     const successUrl = `${APP_URL}/post/success?status=paid`;
     const cancelUrl = `${APP_URL}/post/success?status=cancelled`;
-    const description = `Chainwork job post — ${f.title} at ${f.companyName}`;
+    const weekLabel = `${weeks} week${weeks > 1 ? "s" : ""}`;
+    const description = `Chainwork featured job post (${weekLabel}): ${f.title} at ${f.companyName}`;
 
     if (nowpaymentsEnabled) {
       const invoice = await createNowPaymentsInvoice({
-        priceUsd: POST_PRICE_USD,
+        priceUsd,
         orderId,
         description,
         successUrl,
@@ -145,15 +157,15 @@ export async function createPaidPost(args: {
           quantity: 1,
           price_data: {
             currency: "usd",
-            unit_amount: POST_PRICE_CENTS,
+            unit_amount: priceCents,
             product_data: {
-              name: "Chainwork job post — 1 week, featured",
+              name: `Chainwork featured job post (${weekLabel})`,
               description,
             },
           },
         },
       ],
-      metadata: { submissionId: row.id, kind: "paidpost" },
+      metadata: { submissionId: row.id, kind: "paidpost", weeks: String(weeks) },
       success_url: successUrl,
       cancel_url: cancelUrl,
     });

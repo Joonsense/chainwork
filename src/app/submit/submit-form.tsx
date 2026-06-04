@@ -18,7 +18,13 @@ import {
   LOCATION_OPTIONS,
   ECOSYSTEM_OPTIONS,
 } from "@/lib/jobs-search-params";
-import { SENIORITIES, EMPLOYMENT_TYPES, CURRENCIES } from "@/lib/post-schema";
+import {
+  SENIORITIES,
+  EMPLOYMENT_TYPES,
+  CURRENCIES,
+  POST_WEEK_OPTIONS,
+  POST_WEEKLY_USD,
+} from "@/lib/post-schema";
 import { ECOSYSTEMS } from "@/lib/ecosystems";
 import { createSubmission, createPaidPost, importFromUrl } from "./actions";
 
@@ -48,6 +54,7 @@ const withCommas = (s: string) => {
 export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
   const paid = tier === "paid";
   const [done, setDone] = useState(false);
+  const [weeks, setWeeks] = useState(1);
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
 
@@ -87,7 +94,7 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
 
   async function onSubmit(values: SubmissionForm) {
     if (paid) {
-      const res = await createPaidPost({ data: values });
+      const res = await createPaidPost({ data: values, weeks });
       if (!res.ok) {
         toast.error(res.error);
         return;
@@ -408,6 +415,33 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
         </div>
       </div>
 
+      {paid && (
+        <div>
+          <FieldLabel>Featured duration</FieldLabel>
+          <div className="flex flex-wrap gap-2">
+            {POST_WEEK_OPTIONS.map((w) => {
+              const on = weeks === w;
+              return (
+                <button
+                  key={w}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setWeeks(w)}
+                  className={cn(
+                    "rounded-lg border px-3 py-2 text-[13px] font-medium transition-colors",
+                    on
+                      ? "border-accent-blue/50 bg-accent-blue/15 text-text-primary"
+                      : "border-line bg-glass-hi text-text-secondary hover:border-strong",
+                  )}
+                >
+                  {w} week{w > 1 ? "s" : ""} · ${POST_WEEKLY_USD * w}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <button
         type="submit"
         disabled={isSubmitting}
@@ -418,11 +452,13 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
         ) : (
           <Send size={15} />
         )}
-        {paid ? "Continue to payment · $150 / week" : "Submit role for review"}
+        {paid
+          ? `Continue to payment · $${POST_WEEKLY_USD * weeks} (${weeks} week${weeks > 1 ? "s" : ""})`
+          : "Submit role for review"}
       </button>
       <p className="text-center text-[12px] text-text-tertiary">
         {paid
-          ? "Secure checkout, card or crypto. Featured for 1 week. Reviewed before going live."
+          ? "Secure crypto checkout (BTC, ETH, USDC, 200+ tokens). Featured to the top of the board for the chosen window. Reviewed before going live."
           : "Free. Reviewed for spam & accuracy before going live."}
       </p>
       </form>

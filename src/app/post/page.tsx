@@ -8,12 +8,12 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Post a job · $150 / week",
   description:
-    "Post a crypto, web3, or AI × crypto engineering role for $150 a week. No account needed, pay by card or crypto. Featured placement, indexed for search and AI engines, readable by humans and AI agents.",
+    "Post a crypto, web3, or AI × crypto engineering role from $150 a week. No account needed, pay in crypto (BTC, ETH, USDC, and 200+ tokens). Featured placement, indexed for search and AI engines, readable by humans and AI agents.",
   alternates: { canonical: `${SITE_URL}/post` },
   openGraph: {
     title: "Post a job · $150 / week | Chainwork",
     description:
-      "Post a crypto engineering role. No account, card or crypto, featured for a week.",
+      "Post a crypto engineering role. No account, pay in crypto, featured to the top.",
     url: `${SITE_URL}/post`,
   },
 };
@@ -40,10 +40,10 @@ export default function PostPage() {
             </h1>
             <p className="mt-2 max-w-[560px] text-[14px] leading-[1.6] text-text-secondary">
               Reach AI × crypto engineers, including the ones searching over MCP
-              and AI agents. $150 for a 1-week featured listing. No account
-              needed, pay by card or crypto. We review for spam and accuracy,
-              then it goes live. Want it free instead? Auto-ingest your ATS or
-              use the{" "}
+              and AI agents. $150 a week (pick 1, 2, or 4 weeks), featured to
+              the top of the board. No account needed, pay in crypto. We review
+              for spam and accuracy, then it goes live. Want it free instead?
+              Auto-ingest your ATS or use the{" "}
               <a href="/submit" className="text-accent-blue hover:underline">
                 free community form
               </a>
