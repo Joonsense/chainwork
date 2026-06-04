@@ -120,11 +120,11 @@ export default function PricingPage() {
 
                 <Link
                   href={tier.cta.href}
-                  className={`inline-flex h-10 items-center justify-center rounded-lg px-4 text-[13px] font-medium transition-colors ${
+                  className={
                     tier.highlight
-                      ? "bg-accent-blue text-[var(--cw-base)] hover:opacity-90"
-                      : "border border-subtle bg-transparent text-text-primary hover:bg-elevated"
-                  }`}
+                      ? "cw-apply h-10 px-4 text-[13px]"
+                      : "inline-flex h-10 items-center justify-center rounded-lg border border-subtle bg-transparent px-4 text-[13px] font-medium text-text-primary transition-colors hover:bg-elevated"
+                  }
                 >
                   {tier.cta.label}
                 </Link>

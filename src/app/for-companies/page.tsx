@@ -69,10 +69,7 @@ export default async function ForCompaniesPage() {
               range.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/post"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-accent-blue px-5 text-[14px] font-medium text-[var(--cw-base)] transition-opacity hover:opacity-90"
-              >
+              <Link href="/post" className="cw-apply h-11 px-5 text-[14px]">
                 Post a job, $150 / week
               </Link>
               <Link
@@ -165,10 +162,7 @@ export default async function ForCompaniesPage() {
               indexed in MCP, llms.txt, REST API, and the catalog within
               minutes.
             </p>
-            <Link
-              href="/post"
-              className="mt-5 inline-flex h-11 items-center justify-center rounded-lg bg-accent-blue px-6 text-[14px] font-medium text-[var(--cw-base)] transition-opacity hover:opacity-90"
-            >
+            <Link href="/post" className="cw-apply mt-5 h-11 px-6 text-[14px]">
               Post a job
             </Link>
           </section>
