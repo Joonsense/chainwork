@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, Controller, type Resolver } from "react-hook-form";
+import { useForm, Controller, type FieldErrors, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Check, Loader2, Send, Sparkles, Wand2 } from "lucide-react";
@@ -42,7 +42,7 @@ function Err({ msg }: { msg?: string }) {
 }
 
 const selectCls =
-  "h-11 w-full rounded-lg border border-input bg-transparent px-2.5 text-[14px] text-text-primary outline-none transition-colors focus-visible:border-ring dark:bg-input/30";
+  "h-11 w-full rounded-lg border border-input bg-transparent px-2.5 text-[14px] text-text-primary outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
 
 /** Salary fields store raw digits (schema wants `\d+`) but display with commas. */
 const onlyDigits = (s: string) => s.replace(/\D/g, "");
@@ -113,6 +113,23 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
       return;
     }
     setDone(true);
+  }
+
+  // On a failed submit, bring the first invalid field into view and focus it —
+  // on a long form the error can otherwise be off-screen (esp. on mobile).
+  function onInvalid(errs: FieldErrors<SubmissionForm>) {
+    const names = Object.keys(errs);
+    const form = document.getElementById("submit-form");
+    const fields = Array.from(
+      form?.querySelectorAll<HTMLElement>("[name]") ?? [],
+    );
+    const target = fields.find((el) =>
+      names.includes(el.getAttribute("name") ?? ""),
+    );
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      target.focus({ preventScroll: true });
+    }
   }
 
   async function handleImport() {
@@ -198,7 +215,8 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
       </div>
 
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        id="submit-form"
+        onSubmit={handleSubmit(onSubmit, onInvalid)}
         className="space-y-6 rounded-2xl border border-subtle bg-surface p-5 md:p-7"
       >
         {/* ── you ── */}
