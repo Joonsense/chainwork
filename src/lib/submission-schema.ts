@@ -17,9 +17,18 @@ import { ECOSYSTEM_OPTIONS, LOCATION_OPTIONS } from "@/lib/jobs-search-params";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const INT_RE = /^\d+$/;
+
+/** Prepend https:// when the user omits the scheme (e.g. "acme.xyz"). */
+export function normalizeUrl(v: string): string {
+  const s = v.trim();
+  if (!s) return "";
+  return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+}
+
+/** Accepts bare domains too — we normalize the scheme before validating. */
 const isUrl = (v: string): boolean => {
   try {
-    new URL(v);
+    new URL(normalizeUrl(v));
     return true;
   } catch {
     return false;

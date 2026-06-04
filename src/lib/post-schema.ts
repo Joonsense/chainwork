@@ -32,7 +32,7 @@ export const SENIORITIES = [
   "Principal",
 ] as const;
 export const EMPLOYMENT_TYPES = ["Full-time", "Contract"] as const;
-export const CURRENCIES = ["USD", "EUR", "GBP"] as const;
+export const CURRENCIES = ["USD", "USDC", "USDT", "EUR", "GBP"] as const;
 
 export const MIN_DESCRIPTION = 200;
 

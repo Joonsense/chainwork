@@ -38,6 +38,13 @@ function Err({ msg }: { msg?: string }) {
 const selectCls =
   "h-11 w-full rounded-lg border border-input bg-transparent px-2.5 text-[14px] text-text-primary outline-none transition-colors focus-visible:border-ring dark:bg-input/30";
 
+/** Salary fields store raw digits (schema wants `\d+`) but display with commas. */
+const onlyDigits = (s: string) => s.replace(/\D/g, "");
+const withCommas = (s: string) => {
+  const d = onlyDigits(s);
+  return d ? Number(d).toLocaleString("en-US") : "";
+};
+
 export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
   const paid = tier === "paid";
   const [done, setDone] = useState(false);
@@ -217,7 +224,7 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
         <div>
           <FieldLabel>Company website</FieldLabel>
           <Input
-            placeholder="https://acme.xyz"
+            placeholder="acme.xyz"
             className="h-11"
             {...register("companyWebsite")}
           />
@@ -327,8 +334,32 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
       <div>
         <FieldLabel>Compensation (optional, full annual amount)</FieldLabel>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-[1fr_1fr_auto]">
-          <Input placeholder="Min, e.g. 140000" className="h-11" {...register("salaryMin")} />
-          <Input placeholder="Max, e.g. 200000" className="h-11" {...register("salaryMax")} />
+          <Controller
+            control={control}
+            name="salaryMin"
+            render={({ field }) => (
+              <Input
+                inputMode="numeric"
+                placeholder="Min, e.g. 140,000"
+                className="h-11"
+                value={withCommas(field.value)}
+                onChange={(e) => field.onChange(onlyDigits(e.target.value))}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="salaryMax"
+            render={({ field }) => (
+              <Input
+                inputMode="numeric"
+                placeholder="Max, e.g. 200,000"
+                className="h-11"
+                value={withCommas(field.value)}
+                onChange={(e) => field.onChange(onlyDigits(e.target.value))}
+              />
+            )}
+          />
           <select className={cn(selectCls, "sm:w-24")} {...register("salaryCurrency")}>
             {CURRENCIES.map((c) => (
               <option key={c} value={c}>
@@ -360,7 +391,7 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
         <div>
           <FieldLabel>Apply URL</FieldLabel>
           <Input
-            placeholder="https://acme.xyz/careers/…"
+            placeholder="acme.xyz/careers/…"
             className="h-11"
             {...register("applyUrl")}
           />
