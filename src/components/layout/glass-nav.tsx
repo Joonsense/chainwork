@@ -10,7 +10,7 @@ import { getServerSession } from "@/lib/auth";
 const NAV_LINKS: { label: string; href: string; active?: boolean; lgOnly?: boolean; badge?: string }[] = [
   { label: "Jobs", href: "/", active: true },
   { label: "Pulse", href: "/pulse", badge: "🔥" },
-  { label: "Salaries", href: "/salaries", lgOnly: true },
+  { label: "Hire", href: "/for-companies" },
   { label: "Job alerts", href: "/alerts", lgOnly: true },
 ];
 

@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 import { CommandPalette } from "@/components/command-palette";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { SavedJobsProvider } from "@/components/jobs/saved-jobs-provider";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -24,8 +25,9 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   /* Absolute base for OG images and other metadata URLs. */
   metadataBase: new URL(SITE_URL),
-  title: "Chainwork",
-  description: "Web3 jobs, structured for humans and agents.",
+  title: "Chainwork — registry for AI × crypto engineering roles",
+  description:
+    "Salary-transparent, agent-native job registry. 120+ AI × crypto companies, ingested daily, searchable via MCP and llms.txt.",
 };
 
 export default function RootLayout({
@@ -40,6 +42,7 @@ export default function RootLayout({
         <SavedJobsProvider>
           <NuqsAdapter>{children}</NuqsAdapter>
         </SavedJobsProvider>
+        <SiteFooter />
         <CommandPalette />
         <Toaster theme="dark" position="top-center" richColors />
       </body>

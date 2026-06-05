@@ -11,6 +11,11 @@ import { slugify } from "@/lib/utils";
 import { getServerSession } from "@/lib/auth";
 import { APP_URL } from "@/lib/site";
 import { stripe, stripeEnabled, FEATURED_PRICE_CENTS } from "@/lib/stripe";
+import {
+  createInvoice as createNowPaymentsInvoice,
+  nowpaymentsEnabled,
+  FEATURED_PRICE_USD,
+} from "@/lib/nowpayments";
 import { sendRealtimeAlertsForJob } from "@/lib/alerts";
 import type { JobWithCompany } from "@/db/queries";
 
@@ -36,12 +41,31 @@ async function uniqueJobSlug(base: string): Promise<string> {
   }
 }
 
-/** Stripe Checkout for a Featured slot — $199, charged before the slot is granted. */
+/**
+ * Hosted checkout for a Featured slot — $199, charged before the slot
+ * is granted. Prefers NowPayments (crypto) when wired; falls back to
+ * Stripe (cards). Caller redirects the buyer to the returned URL.
+ */
 async function createFeaturedCheckout(job: {
   id: string;
   slug: string;
   title: string;
 }): Promise<string> {
+  const successUrl = `${APP_URL}/post/success?slug=${job.slug}&featured=paid`;
+  const cancelUrl = `${APP_URL}/post/success?slug=${job.slug}&featured=cancelled`;
+
+  if (nowpaymentsEnabled) {
+    const invoice = await createNowPaymentsInvoice({
+      priceUsd: FEATURED_PRICE_USD,
+      orderId: `featured:${job.id}`,
+      description: `Featured role slot — ${job.title}`,
+      successUrl,
+      cancelUrl,
+      ipnCallbackUrl: `${APP_URL}/api/payments/nowpayments-webhook`,
+    });
+    return invoice.invoiceUrl;
+  }
+
   const checkout = await stripe!.checkout.sessions.create({
     mode: "payment",
     line_items: [
@@ -58,8 +82,8 @@ async function createFeaturedCheckout(job: {
       },
     ],
     metadata: { jobId: job.id, kind: "featured" },
-    success_url: `${APP_URL}/post/success?slug=${job.slug}&featured=paid`,
-    cancel_url: `${APP_URL}/post/success?slug=${job.slug}&featured=cancelled`,
+    success_url: successUrl,
+    cancel_url: cancelUrl,
   });
   if (!checkout.url) throw new Error("Stripe did not return a checkout URL");
   return checkout.url;
@@ -160,9 +184,11 @@ export async function submitJob(args: {
     const title = f.title.trim();
     const descriptionMd = f.descriptionMd.trim();
 
-    // Featured: pay-then-grant when Stripe is wired; granted now otherwise.
+    // Featured: pay-then-grant when a payment rail is wired; granted
+    // now otherwise (dev fallback). NowPayments takes priority over Stripe.
     const wantsFeatured = f.isFeatured;
-    const grantNow = wantsFeatured && !stripeEnabled;
+    const paymentEnabled = nowpaymentsEnabled || stripeEnabled;
+    const grantNow = wantsFeatured && !paymentEnabled;
 
     const jsonLd = buildJobPostingJsonLd({
       title,
@@ -225,8 +251,8 @@ export async function submitJob(args: {
     revalidatePath("/");
     revalidatePath("/jobs");
 
-    // Paid Featured path → hand off to Stripe Checkout.
-    if (wantsFeatured && stripeEnabled) {
+    // Paid Featured path → hand off to the active checkout (NowPayments or Stripe).
+    if (wantsFeatured && paymentEnabled) {
       const checkoutUrl = await createFeaturedCheckout({
         id: inserted.id,
         slug,

@@ -71,6 +71,7 @@ export const ROLE_OPTIONS: { value: string; label: string; category: string }[] 
   { value: "zk-cryptography", label: "ZK / Cryptography", category: "ZK / Cryptography" },
   { value: "ai-x-crypto", label: "AI x Crypto", category: "AI x Crypto" },
   { value: "frontend", label: "Frontend", category: "Frontend" },
+  { value: "backend", label: "Backend", category: "Backend" },
   { value: "infra-devops", label: "Infra / DevOps", category: "Infra / DevOps" },
   { value: "security-audit", label: "Security & Audit", category: "Security & Audit" },
   { value: "devrel", label: "DevRel", category: "DevRel" },
