@@ -150,10 +150,15 @@ export function ListRow({
           <span className="whitespace-nowrap font-mono text-[10.5px] text-text-tertiary">
             {relativeTime(job.postedAt)} ago
           </span>
-          <span className="cw-apply h-9 px-4 text-[13px]">
+          <a
+            href={`/jobs/${job.slug}/apply`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cw-apply relative z-10 h-9 px-4 text-[13px]"
+          >
             Apply
             <ArrowRight size={12} strokeWidth={2.4} />
-          </span>
+          </a>
         </div>
       </div>
 
@@ -162,10 +167,15 @@ export function ListRow({
         <span className="font-mono text-[10.5px] text-text-tertiary">
           {relativeTime(job.postedAt)} ago
         </span>
-        <span className="cw-apply h-8 px-3.5 text-[12px]">
+        <a
+          href={`/jobs/${job.slug}/apply`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cw-apply relative z-10 h-8 px-3.5 text-[12px]"
+        >
           Apply
           <ArrowRight size={11} strokeWidth={2.4} />
-        </span>
+        </a>
       </div>
     </div>
   );

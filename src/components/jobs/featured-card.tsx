@@ -95,10 +95,15 @@ export function FeaturedCard({
         <span className="truncate font-mono text-[11px] text-text-tertiary">
           {relativeTime(job.postedAt)} ago · {job.employmentType}
         </span>
-        <span className="cw-apply h-[30px] shrink-0 px-3 text-[12px]">
+        <a
+          href={`/jobs/${job.slug}/apply`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cw-apply relative z-10 h-[30px] shrink-0 px-3 text-[12px]"
+        >
           Apply
           <ArrowRight size={11} strokeWidth={2.4} />
-        </span>
+        </a>
       </div>
     </div>
   );
