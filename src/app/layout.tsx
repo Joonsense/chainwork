@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { Inter, JetBrains_Mono } from "next/font/google";
@@ -67,6 +67,11 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
   verification: { yandex: "e5e1320ce94d4d98" },
+};
+
+/* Mobile browser chrome tint — matches the dark base. */
+export const viewport: Viewport = {
+  themeColor: "#08080b",
 };
 
 /**
