@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
@@ -142,6 +143,7 @@ export default function RootLayout({
         <SiteFooter />
         <CommandPalette />
         <Toaster theme="dark" position="top-center" richColors />
+        <Analytics />
       </body>
     </html>
   );
