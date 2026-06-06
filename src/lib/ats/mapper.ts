@@ -137,6 +137,71 @@ const ROLE_PATTERNS: Array<{
       /\bprotocol|\bconsensus|\bp2p\b|\bnode\b|\bchain\b|\bdistributed.?system|\bdecentraliz|\bvalidator|\bstaking|\bcross.?chain|\bcore.?(developer|engineer)|\b(solana|ethereum|bitcoin|near|cosmos|polkadot|aptos|sui)\b.{0,30}(engineer|developer)/i,
     ],
   },
+  /* ── Non-engineering categories ──────────────────────────
+   * chainwork now lists design, marketing, community, BD, product, and
+   * other crypto-company roles alongside engineering. These sit before the
+   * Backend catch-all so non-eng titles get a sensible category instead of
+   * silently falling through to "Backend". */
+  {
+    category: "Design",
+    patterns: [
+      /\b(designer|design\s?(lead|manager|intern|coordinator|director)?|brand\s?design|product\s?design|graphic|ui\s?design|ux\s?(design|research)|illustrator|motion\s?design)/i,
+    ],
+  },
+  {
+    category: "Marketing & Growth",
+    patterns: [
+      /\b(marketing|marketer|growth|brand\b|content\s?(writer|creator|marketing|strategist)|social\s?media|copywrit|demand\s?generation|seo\b|videographer|video\s?editor|photographer)/i,
+    ],
+  },
+  {
+    category: "Community",
+    patterns: [
+      /\b(community\s?(manager|coordinator|lead|builder|specialist)|ambassador|moderator)/i,
+    ],
+  },
+  {
+    category: "Business Development",
+    patterns: [
+      /\b(sales|account\s?(manager|executive|director)|business\s?develop|partnerships?|partner\s?success|bdr|sdr|strategic\s?alliances|alliances\s?manager|relationship\s?manager)/i,
+    ],
+  },
+  {
+    category: "Product",
+    patterns: [
+      /\b(product\s?manager|product\s?owner|principal\s?product|head\s?of\s?product|director\s?of\s?product|chief\s?product|cpo\b)/i,
+    ],
+  },
+  {
+    category: "Operations",
+    patterns: [
+      /\b(operations\s?(manager|coordinator|associate|analyst|specialist|director|lead)|chief\s?of\s?staff|coo\b|biz\s?ops|professional\s?services|general\s?manager|strategy\s?&?\s?operations|office\s?(services|manager|coordinator|administrator|admin)|executive\s?assistant|receptionist|workplace)/i,
+    ],
+  },
+  {
+    category: "Finance",
+    patterns: [
+      /\b(accountant|accounting|controller|financial?\s?(analyst|operations|ops|planning)|treasury|tax\b|bookkeep|fp\s?&?\s?a|strategic\s?finance|wealth\s?advisor|financial\s?advisor|trust\s?officer)/i,
+    ],
+  },
+  {
+    category: "People & Talent",
+    patterns: [
+      /\b(hr\b|people\s?(ops|operations|partner)|talent\s?(acquisition|partner|sourcer)|recruit(er|ing)|sourcer|head\s?of\s?people)/i,
+    ],
+  },
+  {
+    category: "Legal & Compliance",
+    patterns: [
+      /\b(legal|paralegal|counsel|attorney|lawyer|compliance|regulatory|fraud|aml\b|kyc\b|sanctions|risk\s?(analyst|manager|strategist|analytics|operations|specialist|lead))/i,
+    ],
+  },
+  {
+    category: "Customer Support",
+    patterns: [
+      /\b(customer\s?(success|support|service|experience)|cx\b|client\s?(success|support|service)|support\s?(specialist|agent|engineer|representative))/i,
+    ],
+  },
   {
     category: "Backend",
     patterns: [/.*/], // generic engineering catch-all
@@ -323,7 +388,8 @@ export function mapGreenhouseJob(
   companyId: string,
 ): Omit<NewJob, "id" | "createdAt" | "indexedAt"> | null {
   const department = job.departments?.[0]?.name ?? "";
-  if (isNonEngineeringRole(job.title, department)) return null;
+  // All role functions are accepted (eng + design/marketing/community/BD/etc.);
+  // inferRoleCategory assigns the right bucket.
 
   const descText = stripHtml(job.content ?? "");
   const descMd = htmlToMd(job.content ?? "");
@@ -402,7 +468,8 @@ export function mapWorkableJob(
   companyId: string,
 ): Omit<NewJob, "id" | "createdAt" | "indexedAt"> | null {
   const department = job.department ?? "";
-  if (isNonEngineeringRole(job.title, department)) return null;
+  // All role functions are accepted (eng + design/marketing/community/BD/etc.);
+  // inferRoleCategory assigns the right bucket.
 
   const descText = stripHtml(job.description ?? "");
   const descMd = htmlToMd(job.description ?? "");
@@ -487,7 +554,8 @@ export function mapLeverJob(
   companyId: string,
 ): Omit<NewJob, "id" | "createdAt" | "indexedAt"> | null {
   const department = job.categories?.department ?? "";
-  if (isNonEngineeringRole(job.text, department)) return null;
+  // All role functions are accepted (eng + design/marketing/community/BD/etc.);
+  // inferRoleCategory assigns the right bucket.
 
   const level = job.categories?.level ?? "";
   const commitment = job.categories?.commitment ?? "Full-time";
@@ -577,7 +645,8 @@ export function mapAshbyJob(
   companyId: string,
 ): Omit<NewJob, "id" | "createdAt" | "indexedAt"> | null {
   const department = job.department ?? job.team ?? "";
-  if (isNonEngineeringRole(job.title, department)) return null;
+  // All role functions are accepted (eng + design/marketing/community/BD/etc.);
+  // inferRoleCategory assigns the right bucket.
 
   const descText = stripHtml(job.descriptionHtml ?? "");
   const descMd = htmlToMd(job.descriptionHtml ?? "");

@@ -80,6 +80,16 @@ export const ROLE_OPTIONS: { value: string; label: string; category: string }[] 
   { value: "security-audit", label: "Security & Audit", category: "Security & Audit" },
   { value: "devrel", label: "DevRel", category: "DevRel" },
   { value: "research", label: "Research", category: "Research" },
+  { value: "design", label: "Design", category: "Design" },
+  { value: "marketing-growth", label: "Marketing & Growth", category: "Marketing & Growth" },
+  { value: "community", label: "Community", category: "Community" },
+  { value: "business-development", label: "Business Development", category: "Business Development" },
+  { value: "product", label: "Product", category: "Product" },
+  { value: "operations", label: "Operations", category: "Operations" },
+  { value: "finance", label: "Finance", category: "Finance" },
+  { value: "people-talent", label: "People & Talent", category: "People & Talent" },
+  { value: "legal-compliance", label: "Legal & Compliance", category: "Legal & Compliance" },
+  { value: "customer-support", label: "Customer Support", category: "Customer Support" },
 ];
 
 export const SENIORITY_LEVELS = ["Junior", "Mid", "Senior", "Staff", "Principal"];
