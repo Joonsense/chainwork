@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm, Controller, type FieldErrors, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -57,6 +57,11 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
   const [weeks, setWeeks] = useState(1);
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
+  // A blank tab we pop open synchronously on the pay click (so the browser
+  // treats it as user-initiated and doesn't block it), then point at the
+  // hosted checkout once the invoice is created. Keeps the filled form in
+  // this tab so nothing is lost if the buyer comes back.
+  const checkoutWinRef = useRef<Window | null>(null);
 
   const {
     register,
@@ -92,18 +97,32 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
     },
   });
 
+  // Close the tab we popped open on click — for any path that won't hand off
+  // to a hosted checkout (validation failed, create failed, or dev fallback).
+  function closeCheckoutWindow() {
+    checkoutWinRef.current?.close();
+    checkoutWinRef.current = null;
+  }
+
   async function onSubmit(values: SubmissionForm) {
     if (paid) {
       const res = await createPaidPost({ data: values, weeks });
       if (!res.ok) {
+        closeCheckoutWindow();
         toast.error(res.error);
         return;
       }
-      // Hand off to hosted checkout; dev fallback (no rail) returns no URL.
+      // Hand off to hosted checkout in the tab we pre-opened, so the filled
+      // form stays put in this tab. Dev fallback (no rail) returns no URL.
       if (res.checkoutUrl) {
-        window.location.href = res.checkoutUrl;
+        const win = checkoutWinRef.current;
+        if (win && !win.closed) win.location.href = res.checkoutUrl;
+        else window.open(res.checkoutUrl, "_blank", "noopener,noreferrer");
+        checkoutWinRef.current = null;
+        toast.success("Secure checkout opened in a new tab.");
         return;
       }
+      closeCheckoutWindow();
       setDone(true);
       return;
     }
@@ -118,6 +137,7 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
   // On a failed submit, bring the first invalid field into view and focus it —
   // on a long form the error can otherwise be off-screen (esp. on mobile).
   function onInvalid(errs: FieldErrors<SubmissionForm>) {
+    closeCheckoutWindow();
     const names = Object.keys(errs);
     const form = document.getElementById("submit-form");
     const fields = Array.from(
@@ -216,7 +236,7 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
 
       <form
         id="submit-form"
-        onSubmit={handleSubmit(onSubmit, onInvalid)}
+        onSubmit={(e) => void handleSubmit(onSubmit, onInvalid)(e)}
         className="space-y-6 rounded-2xl border border-subtle bg-surface p-5 md:p-7"
       >
         {/* ── you ── */}
@@ -460,25 +480,41 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="cw-apply h-12 w-full text-[14px] disabled:opacity-60"
-      >
-        {isSubmitting ? (
-          <Loader2 size={16} className="animate-spin" />
-        ) : (
-          <Send size={15} />
-        )}
-        {paid
-          ? `Continue to payment · $${POST_WEEKLY_USD * weeks} (${weeks} week${weeks > 1 ? "s" : ""})`
-          : "Submit role for review"}
-      </button>
-      <p className="text-center text-[12px] text-text-tertiary">
-        {paid
-          ? "Secure crypto checkout (BTC, ETH, USDC, 200+ tokens). Featured to the top of the board for the chosen window. Reviewed before going live."
-          : "Free. Reviewed for spam & accuracy before going live."}
-      </p>
+      {/* Sticky action bar — the pay CTA stays in view at any scroll depth. */}
+      <div className="sticky bottom-0 z-10 -mx-5 -mb-5 mt-2 rounded-b-2xl border-t border-subtle bg-surface/85 px-5 py-3.5 backdrop-blur supports-[backdrop-filter]:bg-surface/70 md:-mx-7 md:-mb-7 md:px-7">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          onClick={() => {
+            // Pop the tab now, inside the click, so it isn't blocked; we point
+            // it at the checkout once the invoice comes back (no noopener here —
+            // that would null the handle we need to navigate).
+            if (!paid) return;
+            const win = window.open("", "_blank");
+            if (win) {
+              win.document.write(
+                '<!doctype html><meta charset="utf-8"><title>Secure checkout</title><body style="margin:0;display:grid;place-items:center;height:100vh;font:15px/1.5 system-ui,sans-serif;background:#0b0b0f;color:#e9e9ec">Preparing secure crypto checkout…</body>',
+              );
+            }
+            checkoutWinRef.current = win;
+          }}
+          className="cw-apply h-12 w-full text-[14px] disabled:opacity-60"
+        >
+          {isSubmitting ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Send size={15} />
+          )}
+          {paid
+            ? `Continue to payment · $${POST_WEEKLY_USD * weeks} (${weeks} week${weeks > 1 ? "s" : ""})`
+            : "Submit role for review"}
+        </button>
+        <p className="mt-2 text-center text-[12px] text-text-tertiary">
+          {paid
+            ? "Secure crypto checkout (BTC, ETH, USDC, 200+ tokens), opens in a new tab. Featured to the top of the board for the chosen window. Reviewed before going live."
+            : "Free. Reviewed for spam & accuracy before going live."}
+        </p>
+      </div>
       </form>
     </>
   );
