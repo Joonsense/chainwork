@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import {
   submissionSchema,
+  leanSubmissionSchema,
   type SubmissionForm,
   SUBMISSION_MIN_DESCRIPTION,
 } from "@/lib/submission-schema";
@@ -73,8 +74,9 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
   } = useForm<SubmissionForm>({
     // Cast bridges a types-only drift between the installed zod (4.4) and
     // the zod-core version @hookform/resolvers vendors — runtime is fine.
+    // Paid posts use the lean gate (essentials only); the free form is strict.
     resolver: (zodResolver as (s: unknown) => Resolver<SubmissionForm>)(
-      submissionSchema,
+      paid ? leanSubmissionSchema : submissionSchema,
     ),
     defaultValues: {
       submitterEmail: "",
@@ -239,6 +241,15 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
         onSubmit={(e) => void handleSubmit(onSubmit, onInvalid)(e)}
         className="space-y-6 rounded-2xl border border-subtle bg-surface p-5 md:p-7"
       >
+        {paid && (
+          <div className="rounded-xl border border-accent-green/25 bg-accent-green/[0.06] p-3.5 text-[12.5px] leading-[1.55] text-text-secondary">
+            <span className="font-semibold text-text-primary">Just the essentials.</span>{" "}
+            Only email, company, title and an apply link are required. Paste your
+            ATS link in Autofill above (or in Apply URL) and we&apos;ll complete the
+            rest from your public posting after payment. Everything else is optional.
+          </div>
+        )}
+
         {/* ── you ── */}
       <div>
         <FieldLabel>Your email</FieldLabel>
@@ -290,7 +301,7 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div>
-          <FieldLabel>Discipline</FieldLabel>
+          <FieldLabel>Discipline{paid && " (optional)"}</FieldLabel>
           <select className={selectCls} {...register("roleCategory")}>
             <option value="">Select…</option>
             {ROLE_OPTIONS.map((r) => (
@@ -325,7 +336,7 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
 
       {/* ── ecosystems ── */}
       <div>
-        <FieldLabel>Ecosystems</FieldLabel>
+        <FieldLabel>Ecosystems{paid && " (optional)"}</FieldLabel>
         <Controller
           control={control}
           name="ecosystems"
@@ -364,7 +375,7 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
 
       {/* ── location ── */}
       <div>
-        <FieldLabel>Location</FieldLabel>
+        <FieldLabel>Location{paid && " (optional)"}</FieldLabel>
         <select className={selectCls} {...register("location")}>
           {LOCATION_OPTIONS.map((l) => (
             <option key={l.value} value={l.value}>
@@ -422,10 +433,14 @@ export function SubmitForm({ tier = "free" }: { tier?: "free" | "paid" }) {
 
       {/* ── description ── */}
       <div>
-        <FieldLabel>Role description</FieldLabel>
+        <FieldLabel>Role description{paid && " (optional)"}</FieldLabel>
         <Textarea
           rows={8}
-          placeholder={`What the role does, the team, the stack… (min ${SUBMISSION_MIN_DESCRIPTION} characters). Markdown supported.`}
+          placeholder={
+            paid
+              ? "Optional — leave blank and we'll pull it from your ATS apply link. Or write it here (Markdown supported)."
+              : `What the role does, the team, the stack… (min ${SUBMISSION_MIN_DESCRIPTION} characters). Markdown supported.`
+          }
           {...register("descriptionMd")}
         />
         <Err msg={errors.descriptionMd?.message} />

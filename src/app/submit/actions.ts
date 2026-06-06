@@ -2,7 +2,13 @@
 
 import { eq } from "drizzle-orm";
 import { db, jobSubmissions } from "@/db";
-import { submissionSchema, normalizeUrl } from "@/lib/submission-schema";
+import {
+  submissionSchema,
+  leanSubmissionSchema,
+  normalizeUrl,
+  SUBMISSION_MIN_DESCRIPTION,
+  type SubmissionForm,
+} from "@/lib/submission-schema";
 import { importJobFromUrl, type ImportResult } from "@/lib/ats/import-url";
 import { POST_WEEK_OPTIONS } from "@/lib/post-schema";
 import { APP_URL } from "@/lib/site";
@@ -74,6 +80,36 @@ export async function createSubmission(args: {
 }
 
 /**
+ * Fill blanks on a lean paid post from its ATS apply link. Only runs when the
+ * description is thin and the apply URL is a Greenhouse/Lever/Ashby link; only
+ * fills fields the poster left empty (never overwrites what they typed).
+ * Returns the input untouched on any miss — enrichment is best-effort.
+ */
+async function enrichFromApply(f: SubmissionForm): Promise<SubmissionForm> {
+  const thin = f.descriptionMd.trim().length < SUBMISSION_MIN_DESCRIPTION;
+  if (!f.applyUrl || !thin) return f;
+
+  let imported;
+  try {
+    imported = await importJobFromUrl(normalizeUrl(f.applyUrl));
+  } catch {
+    return f;
+  }
+  if (!imported.ok) return f;
+  const x = imported.fields;
+
+  return {
+    ...f,
+    descriptionMd: f.descriptionMd.trim() ? f.descriptionMd : x.descriptionMd ?? f.descriptionMd,
+    roleCategory: f.roleCategory || (x.roleCategory ?? f.roleCategory),
+    ecosystems: f.ecosystems.length ? f.ecosystems : x.ecosystems ?? f.ecosystems,
+    location: f.location || (x.location ?? f.location),
+    salaryMin: f.salaryMin || (x.salaryMin ?? f.salaryMin),
+    salaryMax: f.salaryMax || (x.salaryMax ?? f.salaryMax),
+  };
+}
+
+/**
  * Paid "post a job" ($150 / 1 week). No login — payment is the gate.
  *
  * Stores the same submission payload as the free flow, tagged with a paid
@@ -89,11 +125,16 @@ export async function createPaidPost(args: {
   data: unknown;
   weeks?: number;
 }): Promise<PaidPostResult> {
-  const parsed = submissionSchema.safeParse(args.data);
+  // Lean gate: only email/company/title/apply are required; payment is the
+  // real gate. We complete the rest below.
+  const parsed = leanSubmissionSchema.safeParse(args.data);
   if (!parsed.success) {
     return { ok: false, error: "Some fields are invalid. Review and retry." };
   }
-  const f = parsed.data;
+  // "Pay, and we fill it in": when the poster left the listing thin and gave
+  // an ATS apply link, pull the full posting from the public feed and fill
+  // only the fields they left blank. Best-effort — never blocks checkout.
+  const f = await enrichFromApply(parsed.data);
   const paymentEnabled = nowpaymentsEnabled || stripeEnabled;
 
   // Whole-week durations only; price scales linearly at $150/week.
