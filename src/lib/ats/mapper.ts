@@ -13,6 +13,7 @@
 import type { GreenhouseJob } from "./greenhouse";
 import type { LeverJob } from "./lever";
 import type { AshbyJob } from "./ashby";
+import type { WorkableJob } from "./workable";
 import type { CompanyEntry } from "./companies";
 import type { NewJob, NewCompany } from "@/db/schema";
 import { buildJobPostingJsonLd } from "@/lib/job-json-ld";
@@ -389,6 +390,91 @@ export function mapGreenhouseJob(
     postedAt,
     source: "greenhouse",
     externalId: String(job.id),
+    viewCount: 0,
+  };
+}
+
+/* ── Workable mapper ────────────────────────────────────── */
+
+export function mapWorkableJob(
+  job: WorkableJob,
+  company: CompanyEntry,
+  companyId: string,
+): Omit<NewJob, "id" | "createdAt" | "indexedAt"> | null {
+  const department = job.department ?? "";
+  if (isNonEngineeringRole(job.title, department)) return null;
+
+  const descText = stripHtml(job.description ?? "");
+  const descMd = htmlToMd(job.description ?? "");
+  const fullText = `${job.title} ${department} ${descText}`;
+
+  const roleCategory = inferRoleCategory(job.title, department);
+  const seniority = inferSeniority(job.title);
+  const ecosystems = detectEcosystems(fullText, company.ecosystems);
+  const skills = extractSkills(fullText);
+  const salary = parseSalary(descText);
+
+  /* Build a human location string from the structured fields. */
+  const primary = job.locations?.[0];
+  const city = primary?.city ?? job.city ?? "";
+  const country = primary?.country ?? job.country ?? "";
+  const composed = [city, country].filter(Boolean).join(", ");
+  const isRemote = job.telecommuting || /remote/i.test(composed);
+  const remoteScope = isRemote ? "Worldwide" : undefined;
+  const location = isRemote ? "Remote" : composed || "Remote";
+
+  const employmentType = job.employment_type || "Full-time";
+
+  const jobSlug = `${company.slug}-${slugify(job.title)}-${shortId()}`;
+
+  const postedAt = new Date(job.published_on ?? job.created_at ?? Date.now());
+
+  const jsonLd = buildJobPostingJsonLd({
+    title: job.title,
+    description: descText.slice(0, 1500),
+    slug: jobSlug,
+    postedAt,
+    employmentType,
+    remoteScope: remoteScope ?? null,
+    location,
+    salaryMin: salary?.min ?? 0,
+    salaryMax: salary?.max ?? 0,
+    salaryCurrency: "USD",
+    company: { name: company.name, website: company.website },
+  });
+
+  return {
+    slug: jobSlug,
+    companyId,
+    title: job.title,
+    descriptionMd: descMd || descText || "See the full job posting for details.",
+    responsibilities: [],
+    requirements: [],
+    niceToHave: [],
+    oneLiner: descText.slice(0, 120).split(".")[0] ?? job.title,
+    roleCategory,
+    seniority,
+    employmentType,
+    location,
+    remoteScope: remoteScope ?? null,
+    salaryMin: salary?.min ?? 0,
+    salaryMax: salary?.max ?? 0,
+    salaryCurrency: "USD",
+    hasTokenEquity: false,
+    ecosystems,
+    skills,
+    isFeatured: false,
+    featuredUntil: null,
+    isSponsored: false,
+    isVerified: false,
+    applyUrl: job.application_url || job.url,
+    applyEmail: null,
+    applyCount: 0,
+    postedBy: null,
+    jsonLd,
+    postedAt,
+    source: "workable",
+    externalId: job.shortcode,
     viewCount: 0,
   };
 }

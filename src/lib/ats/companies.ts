@@ -14,7 +14,7 @@
  * switch ATS platforms; mark `active: false` to pause without deleting.
  */
 
-export type ATSType = "greenhouse" | "lever" | "ashby";
+export type ATSType = "greenhouse" | "lever" | "ashby" | "workable";
 
 export interface CompanyEntry {
   name: string;
@@ -1732,11 +1732,34 @@ const DISCOVERED_2026_06: CompanyEntry[] = [
   },
 ];
 
+/* ── Workable companies ────────────────────────────────────
+ * Workable public widget API:
+ *   GET https://apply.workable.com/api/v1/widget/accounts/{atsSlug}?details=true
+ * Most large crypto firms live on Greenhouse/Lever/Ashby; Workable skews to
+ * smaller / EU-based teams. Slugs verified to return an account; 404s and
+ * 0-job accounts are silently skipped at ingest time. */
+
+const WORKABLE: CompanyEntry[] = [
+  {
+    name: "1inch",
+    slug: "1inch",
+    website: "https://1inch.io",
+    atsType: "workable",
+    atsSlug: "1inch",
+    ecosystems: ["evm"],
+    focus: "DEX aggregator and DeFi infrastructure",
+    logoText: "1I",
+    logoBg: "#1B314F",
+    logoFg: "#FFFFFF",
+  },
+];
+
 export const COMPANY_REGISTRY: CompanyEntry[] = [
   ...GREENHOUSE,
   ...LEVER,
   ...ASHBY,
   ...DISCOVERED_2026_06,
+  ...WORKABLE,
 ];
 
 /** Resolve registry entry by ATS type + slug (used during dedup). */

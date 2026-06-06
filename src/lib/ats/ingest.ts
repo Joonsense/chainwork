@@ -17,7 +17,14 @@ import { COMPANY_REGISTRY } from "./companies";
 import { fetchGreenhouseJobs } from "./greenhouse";
 import { fetchLeverJobs } from "./lever";
 import { fetchAshbyJobs } from "./ashby";
-import { mapGreenhouseJob, mapLeverJob, mapAshbyJob, mapCompany } from "./mapper";
+import { fetchWorkableJobs } from "./workable";
+import {
+  mapGreenhouseJob,
+  mapLeverJob,
+  mapAshbyJob,
+  mapWorkableJob,
+  mapCompany,
+} from "./mapper";
 
 export interface IngestResult {
   companiesProcessed: number;
@@ -52,6 +59,9 @@ export async function runATSIngest(): Promise<IngestResult> {
         rawJobs = res as RawJob[] | null;
       } else if (company.atsType === "ashby") {
         const res = await fetchAshbyJobs(company.atsSlug);
+        rawJobs = res as RawJob[] | null;
+      } else if (company.atsType === "workable") {
+        const res = await fetchWorkableJobs(company.atsSlug);
         rawJobs = res as RawJob[] | null;
       }
 
@@ -95,7 +105,11 @@ export async function runATSIngest(): Promise<IngestResult> {
       /* 3. Process each job ── */
       for (const raw of rawJobs) {
         try {
-          const externalId = String(raw.id);
+          // Workable keys jobs by `shortcode` (no numeric `id`).
+          const externalId =
+            company.atsType === "workable"
+              ? String(raw.shortcode)
+              : String(raw.id);
 
           // Check dedup
           const [existing] = await db
@@ -128,11 +142,17 @@ export async function runATSIngest(): Promise<IngestResult> {
                     company,
                     companyId,
                   )
-                : mapLeverJob(
-                    raw as unknown as Parameters<typeof mapLeverJob>[0],
-                    company,
-                    companyId,
-                  );
+                : company.atsType === "workable"
+                  ? mapWorkableJob(
+                      raw as unknown as Parameters<typeof mapWorkableJob>[0],
+                      company,
+                      companyId,
+                    )
+                  : mapLeverJob(
+                      raw as unknown as Parameters<typeof mapLeverJob>[0],
+                      company,
+                      companyId,
+                    );
 
           if (!jobData) {
             jobsRejected++;
