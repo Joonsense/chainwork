@@ -1730,6 +1730,43 @@ const DISCOVERED_2026_06: CompanyEntry[] = [
     logoBg: "#16A34A",
     logoFg: "#FFFFFF",
   },
+  // Infra / market makers — confirmed 2026-06-09
+  {
+    name: "Turnkey",
+    slug: "turnkey",
+    website: "https://turnkey.com",
+    atsType: "ashby",
+    atsSlug: "turnkey",
+    ecosystems: ["evm", "solana"],
+    focus: "Crypto key management and wallet signing infrastructure for developers",
+    logoText: "TK",
+    logoBg: "#09090B",
+    logoFg: "#F8FAFC",
+  },
+  {
+    name: "Conduit",
+    slug: "conduit",
+    website: "https://conduit.xyz",
+    atsType: "ashby",
+    atsSlug: "conduit",
+    ecosystems: ["evm"],
+    focus: "Rollup-as-a-service platform for deploying production OP Stack and Arbitrum chains",
+    logoText: "CD",
+    logoBg: "#7C3AED",
+    logoFg: "#FFFFFF",
+  },
+  {
+    name: "Wintermute",
+    slug: "wintermute",
+    website: "https://wintermute.com",
+    atsType: "lever",
+    atsSlug: "wintermute-trading",
+    ecosystems: ["evm", "solana"],
+    focus: "Algorithmic market maker operating across CeFi and DeFi venues globally",
+    logoText: "WM",
+    logoBg: "#0F172A",
+    logoFg: "#38BDF8",
+  },
 ];
 
 /* ── Workable companies ────────────────────────────────────

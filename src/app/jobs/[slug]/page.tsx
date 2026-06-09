@@ -149,7 +149,13 @@ export default async function JobDetailPage({ params }: Params) {
     { name: "Jobs", path: "/jobs" },
     { name: job.title, path: `/jobs/${slug}` },
   ]);
-  const jsonLdPretty = JSON.stringify(job.jsonLd, null, 2);
+  // Refresh validThrough to serve time so Google never sees a stale expiry
+  // (stored value is baked at ingest time; jobs older than 30d would appear expired)
+  const liveJsonLd = {
+    ...job.jsonLd,
+    validThrough: new Date(Date.now() + 30 * 86_400_000).toISOString(),
+  };
+  const jsonLdPretty = JSON.stringify(liveJsonLd, null, 2);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://chainwork-tau.vercel.app";
   const jobUrl = `${siteUrl}/jobs/${slug}`;
   const tweetText = encodeURIComponent(
@@ -162,7 +168,7 @@ export default async function JobDetailPage({ params }: Params) {
       {/* JSON-LD, read by schema.org validators, Google for Jobs, and agents */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(job.jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(liveJsonLd) }}
       />
       <script
         type="application/ld+json"

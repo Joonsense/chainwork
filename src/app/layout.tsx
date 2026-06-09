@@ -28,22 +28,26 @@ export const metadata: Metadata = {
   /* Absolute base for OG images and other metadata URLs. */
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Chainwork, registry for AI × crypto engineering roles",
+    default: "Chainwork — job registry for AI × crypto",
     template: "%s · Chainwork",
   },
   description:
-    "Salary-transparent, agent-native job registry. AI × crypto engineering roles ingested daily from real ATS feeds, searchable via MCP and llms.txt.",
+    "700+ verified jobs at the leading AI × crypto companies — engineers, designers, marketers, BD, product, and more. Ingested daily from official ATS feeds. Searchable via MCP and llms.txt.",
   applicationName: "Chainwork",
   keywords: [
     "crypto jobs",
     "web3 jobs",
-    "AI crypto engineering",
-    "blockchain engineer jobs",
-    "smart contract jobs",
+    "blockchain jobs",
+    "AI crypto jobs",
+    "smart contract engineer jobs",
     "zero-knowledge jobs",
     "Solana jobs",
     "Ethereum jobs",
     "remote crypto jobs",
+    "crypto designer jobs",
+    "web3 marketing jobs",
+    "crypto product manager jobs",
+    "DeFi jobs",
     "MCP job search",
   ],
   alternates: { canonical: "/" },
@@ -51,15 +55,15 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Chainwork",
     url: SITE_URL,
-    title: "Chainwork, registry for AI × crypto engineering roles",
+    title: "Chainwork — job registry for AI × crypto",
     description:
-      "Salary-transparent, agent-native job registry. AI × crypto engineering roles ingested daily, searchable via MCP and llms.txt.",
+      "700+ verified jobs at leading AI × crypto companies. Engineers, designers, marketers, BD, and more. Ingested daily from official ATS feeds.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chainwork, registry for AI × crypto engineering roles",
+    title: "Chainwork — job registry for AI × crypto",
     description:
-      "Salary-transparent, agent-native job registry. AI × crypto engineering roles, searchable via MCP and llms.txt.",
+      "700+ verified jobs at leading AI × crypto companies. Engineers, designers, marketers, BD, and more. Updated daily.",
   },
   robots: {
     index: true,
@@ -88,7 +92,7 @@ const siteJsonLd = {
       name: "Chainwork",
       url: SITE_URL,
       description:
-        "The registry for AI × crypto engineering roles, salary-transparent, agent-native, indexed daily.",
+        "The job registry for AI × crypto — engineers, designers, marketers, BD, product, and more. Salary-transparent, agent-native, indexed daily.",
       logo: `${SITE_URL}/opengraph-image`,
     },
     {
